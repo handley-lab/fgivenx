@@ -1,112 +1,118 @@
-from scipy.interpolate import interp1d
+#!/usr/bin/python
+
 import numpy as np
-import matplotlib.pyplot as plt
 
-import statsmodels.nonparametric.kde as KDETOOLS
+nx   = 50
+xmin = -np.pi
+xmax =  np.pi
 
-
-# Definition of pi
-pi = 4*np.arctan(1)
-
-# Class definitions
-# -----------------
-class Sample(object):
-    w = 1
-
-class LinearSample(Sample):
-    def __init__(self, xdat, ydat):
-        self.f = interp1d(xdat,ydat)
-
-# Compute a random sample
-def randomSample():
-    n = 11
-    x = np.linspace(-pi,pi,n)
-    for i in range(1,n-1):
-        x[i]+=np.random.randn()*0.2
-    y = np.random.choice([-1,1])*np.cos(-x) + np.random.randn(n)*0.2
-    return LinearSample(x,y)
-
-# Compute n samples from the above
-def randomSamples(N=100):
-    samples =[]
-    for k in range(0,N,1):
-        samples.append(randomSample())
-    return np.array(samples)
-
-
-
-# Compute a slice of the function at a valid x
-def slice(samples,x):
-    return np.array([sample.f(x) for sample in samples])
-
-# Compute a kde estimator
-#def kde(data,b=0.1):
-#    return KernelDensity(bandwidth=b).fit(np.transpose([data]))
-
-def compute_kernel(data):
-    return KDETOOLS.KDEUnivariate(data).fit()
-
-def pdf(x,kernel):
-    return kernel.evaluate(x)
-
-
-
+ny   = 50
+ymin = -2.0
+ymax =  2.0
 
 
 # Generate the samples
 # --------------------
 print "Generating samples"
-nsamp=20000
-samples = randomSamples(nsamp)
-data = slice(samples,0)
+from sample import randomSamples
+nsamp   = 20000
+samples = randomSamples(xmin,xmax,nsamp)
 
 
-
-#from scipy.stats import gaussian_kde
-from sklearn.neighbors import KernelDensity
-from sklearn.decomposition import PCA
-from sklearn.grid_search import GridSearchCV
-
+# Define the slices we're working on
+# ----------------------------------
+x = np.linspace(xmin,xmax,nx)
+y = np.linspace(ymin,ymax,ny)
 
 
-
-#print "computing kdes"
-#grid = GridSearchCV(
-#        KernelDensity(), 
-#        {'bandwidth': np.logspace(-1, 1, 20)},
-#        cv=20
-#        )
-#grid.fit(kde_data)
-
-#b = grid.best_estimator_.bandwidth + 0.0
-#print("best bandwidth: {0}".format(b))
-
-xvals = np.linspace(pi/2,pi,20)
-
+# Compute the data sets in each slice
+# -----------------------------------
 print "computing slices"
-slices = np.array([sample.f(xvals) for sample in samples]).T
-xnew = np.linspace(-1.5,1.5,1000)
+slices  = np.array([sample.f(x) for sample in samples]).T
 
-for s in slices :
-    print "computing kernel"
-    kernel = KDETOOLS.KDEUnivariate(s)
-    print "fitting kernel"
-    kernel.fit()
-    #ynew = kernel.evaluate(xnew)
-    print "plotting"
-    plt.plot(kernel.support,kernel.density)
-    print "---------------------------"
+
+# Compute the kernels
+# -------------------
+from kde import compute_kernel,pdf
+print "computing kernels"
+kernels = [ compute_kernel(s) for s in slices ]
+
+
+
+print "computing probabilities"
+probs = np.array([ pdf(y,kernel) for kernel in kernels])
+
+
+from scipy.optimize import brentq
+def find_root_in_interval(array,i,j,kernel,p):
+    if(i<0) : return y[0]
+    elif(j>=array.size) : return y[array.size-1]
+    else :
+        return brentq(lambda x: pdf(x,kernel)-p, y[i],y[j])
+
+print "computing masses"
+def compute_pmf(y,kernel):
+
+    ny = y.size
+    prob = pdf(y,kernel)  # compute raw probabilities
+
+    pmf = np.zeros(ny)
+
+    # now we aim to construct a set of intervals where the probability distribution is greater than p
+    k=0
+    for p in prob:
+        # find a lower bound
+        i_l = 0
+        while i_l<ny :
+
+            while i_l<ny and prob[i_l]<p : i_l+=1
+            l = find_root_in_interval(y,i_l-1,i_l,kernel,p)
+            i_r = i_l
+
+            # now find the next upper bound
+            while i_r<ny and prob[i_r]>=p : i_r+=1
+            r = find_root_in_interval(y,i_r-1,i_r,kernel,p)
+            i_l=i_r
+
+            pmf[k]+=kernel.integrate_box_1d(l,r)
+
+        k+=1
+        
+
+    return pmf
+
+
+
+
+masses = np.array([ compute_pmf(y,kernel) for kernel in kernels ])
+
+
+
+
+
+import sys
+sys.exit(0)
+
+
+
+
+# Plot
+# ----
+print "plotting"
+import matplotlib.pyplot as plt
+
+fig, axs = plt.subplots(1,1)
+
+axs.contourf(x,y,masses.T)
+
+plt.show()
+
+axs.contourf(x,y,probs.T)
 
 plt.show()
 
 
 import sys
 sys.exit(0)
-
-#ws = []
-#for i in range(1,nsamp):
-#    ws.append(1.0/nsamp)
-#
-#plt.hist(data,weights=ws,normed=True)
 
 
