@@ -1,21 +1,27 @@
 #!/usr/bin/python
 
 import numpy as np
+import matplotlib.pyplot as plt
 
-nx   = 50
-xmin = -np.pi
-xmax =  np.pi
+nx   = 200       # resolution in x direction
+xmin = -np.pi    # minimum of x range
+xmax =  np.pi    # maximum of x range 
+x_limits = [xmin,xmax]
 
-ny   = 50
-ymin = -2.0
-ymax =  2.0
+ny   = 200       # resolution in y direction 
+ymin = -1.5      # minimum of y range        
+ymax =  1.5      # maximum of y range        
+y_limits = [ymin,ymax]
+
+nresamp = 50     # resolution of kernel estimation 
+                 # (shouldn't need to change this)
 
 
 # Generate the samples
 # --------------------
 print "Generating samples"
 from sample import randomSamples
-nsamp   = 20000
+nsamp   = 2000
 samples = randomSamples(xmin,xmax,nsamp)
 
 
@@ -33,67 +39,34 @@ slices  = np.array([sample.f(x) for sample in samples]).T
 
 # Compute the kernels
 # -------------------
-from kde import compute_kernel,pdf
-print "computing kernels"
-kernels = [ compute_kernel(s) for s in slices ]
+from kde import fast_kernel
+#print "computing kernels"
+#kernels = [ compute_kernel(s) for s in slices ]
 
-
-
-print "computing probabilities"
-probs = np.array([ pdf(y,kernel) for kernel in kernels])
-
-
-from scipy.optimize import brentq
-def find_root_in_interval(array,i,j,kernel,p):
-    if(i<0) : return y[0]
-    elif(j>=array.size) : return y[array.size-1]
-    else :
-        return brentq(lambda x: pdf(x,kernel)-p, y[i],y[j])
+print "computing fast kernels"
+fast_kernels = [fast_kernel(s,np.linspace(ymin,ymax,nresamp)) for s in slices]
 
 print "computing masses"
 def compute_pmf(y,kernel):
+    ny   = y.size
+    pmf  = np.zeros(ny)
 
-    ny = y.size
-    prob = pdf(y,kernel)  # compute raw probabilities
+    prob = np.exp(kernel(y))
 
-    pmf = np.zeros(ny)
+    ii = np.argsort(prob)
+    cdf=0
+    for i in ii:
+        cdf+=prob[i]/ny
+        pmf[i] = cdf
 
-    # now we aim to construct a set of intervals where the probability distribution is greater than p
-    k=0
-    for p in prob:
-        # find a lower bound
-        i_l = 0
-        while i_l<ny :
-
-            while i_l<ny and prob[i_l]<p : i_l+=1
-            l = find_root_in_interval(y,i_l-1,i_l,kernel,p)
-            i_r = i_l
-
-            # now find the next upper bound
-            while i_r<ny and prob[i_r]>=p : i_r+=1
-            r = find_root_in_interval(y,i_r-1,i_r,kernel,p)
-            i_l=i_r
-
-            pmf[k]+=kernel.integrate_box_1d(l,r)
-
-        k+=1
-        
-
-    return pmf
+    return pmf/cdf
 
 
+masses = np.array([ compute_pmf(y,kernel) for kernel in fast_kernels ])
 
+from scipy.special import erfinv
 
-masses = np.array([ compute_pmf(y,kernel) for kernel in kernels ])
-
-
-
-
-
-import sys
-sys.exit(0)
-
-
+masses = np.sqrt(2)*erfinv(1-masses.T)
 
 
 # Plot
@@ -101,11 +74,53 @@ sys.exit(0)
 print "plotting"
 import matplotlib.pyplot as plt
 
+
+mask_level = 3.5
+
+z = np.ma.array(masses, mask = masses>=mask_level )
+
+color = plt.cm.Reds_r
+
 fig, axs = plt.subplots(1,1)
 
-axs.contourf(x,y,masses.T)
+cax = axs.contourf(x,y,z,30,cmap=color,vmin=0,vmax=3,rasterized=True)
+axs.contour(x,y,z,30,cmap=color,vmin=0,vmax=3,rasterized=True)
+cs = axs.contour(x,y,z, colors='k',levels = [1,2,3],vmin=0,vmax=3)
+
+cbar = fig.colorbar(cax, ticks = [0,1,2,3])
+cbar.ax.set_yticklabels(['$0\sigma$','$1\sigma$','$2\sigma$','$3\sigma$'])
+
+# define the y axis
+axs.set_ylabel('$\log(10^{10}\\mathcal{P}_\\mathcal{R})$')
+axs.set_ylim(y_limits)
+
+# define the lower x axis
+axs.set_xlabel('$k/\\mathrm{Mpc}$')
+#axs.set_xscale('log') # set log scale 
+axs.set_xlim(x_limits)
+
+
+def k2l(k):
+    return 14000*k
+
+
+# define the upper x axis
+axs2 = axs.twiny()
+axs2.set_xlabel('$\\ell$')
+#axs2.set_xscale('log')
+from matplotlib.ticker import ScalarFormatter
+x_1,x_2 = axs.get_xlim()
+axs2.xaxis.set_major_formatter(ScalarFormatter())
+axs2.set_xlim((k2l(x_1),k2l(x_2)))
+axs2.set_ylim(y_limits)
+
+
+plt.savefig("temp.pdf",bbox_inches='tight',pad_inches=0.02,dpi=100)
 
 plt.show()
+
+import sys
+sys.exit(0)
 
 axs.contourf(x,y,probs.T)
 

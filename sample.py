@@ -16,8 +16,8 @@ def randomSample(xmin,xmax):
     x = linspace(xmin,xmax,n)
     for i in range(1,n-1):
         x[i]+=normal()*0.2
-    y = choose([-1,1])*cos(-x) + normal(n)*0.2
-    #y = cos(-x) + normal(n)*0.2
+    #y = cos(x+choose([0,1])) + normal(n)*0.2
+    y = cos(x) + normal(n)*0.2
     return LinearSample(x,y)
 
 # Compute n samples from the above
