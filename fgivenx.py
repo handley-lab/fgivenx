@@ -2,7 +2,10 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from contours import compute_contour_plot
 
+# Resolution settings
+# -------------------
 nx   = 200       # resolution in x direction
 xmin = -np.pi    # minimum of x range
 xmax =  np.pi    # maximum of x range 
@@ -13,79 +16,50 @@ ymin = -1.5      # minimum of y range
 ymax =  1.5      # maximum of y range        
 y_limits = [ymin,ymax]
 
-nresamp = 50     # resolution of kernel estimation 
-                 # (shouldn't need to change this)
 
 
 # Generate the samples
 # --------------------
 print "Generating samples"
 from sample import randomSamples
-nsamp   = 2000
+nsamp   = 100 
 samples = randomSamples(xmin,xmax,nsamp)
 
+#import sys
+#sys.exit(0)
 
-# Define the slices we're working on
+
+# Compute the information for the contour plot
 # ----------------------------------
 x = np.linspace(xmin,xmax,nx)
 y = np.linspace(ymin,ymax,ny)
+z = compute_contour_plot(samples,x,y)
 
-
-# Compute the data sets in each slice
-# -----------------------------------
-print "computing slices"
-slices  = np.array([sample.f(x) for sample in samples]).T
-
-
-# Compute the kernels
-# -------------------
-from kde import fast_kernel
-#print "computing kernels"
-#kernels = [ compute_kernel(s) for s in slices ]
-
-print "computing fast kernels"
-fast_kernels = [fast_kernel(s,np.linspace(ymin,ymax,nresamp)) for s in slices]
-
-print "computing masses"
-def compute_pmf(y,kernel):
-    ny   = y.size
-    pmf  = np.zeros(ny)
-
-    prob = np.exp(kernel(y))
-
-    ii = np.argsort(prob)
-    cdf=0
-    for i in ii:
-        cdf+=prob[i]/ny
-        pmf[i] = cdf
-
-    return pmf/cdf
-
-
-masses = np.array([ compute_pmf(y,kernel) for kernel in fast_kernels ])
-
-from scipy.special import erfinv
-
-masses = np.sqrt(2)*erfinv(1-masses.T)
 
 
 # Plot
 # ----
 print "plotting"
-import matplotlib.pyplot as plt
 
 
-mask_level = 3.5
+mask_level     = 3.5
+fineness       = 0.5#3.0/10.0
+contour_levels = np.arange(0,4,fineness)
 
-z = np.ma.array(masses, mask = masses>=mask_level )
+
+z = np.ma.array(z, mask = z>=mask_level )
 
 color = plt.cm.Reds_r
 
 fig, axs = plt.subplots(1,1)
 
-cax = axs.contourf(x,y,z,30,cmap=color,vmin=0,vmax=3,rasterized=True)
-axs.contour(x,y,z,30,cmap=color,vmin=0,vmax=3,rasterized=True)
-cs = axs.contour(x,y,z, colors='k',levels = [1,2,3],vmin=0,vmax=3)
+if fineness < 0.5 : axs.contour(x,y,z,cmap=color,levels = contour_levels,vmin=0,vmax=3)
+cax = axs.contourf(x,y,z,cmap=color,levels = contour_levels,vmin=0,vmax=3)
+
+cs = axs.contour(x,y,z, colors='k', levels = [1,2,3],vmin=0,vmax=3)
+
+#for c in cax.collections:
+#    c.set_rasterized(True)
 
 cbar = fig.colorbar(cax, ticks = [0,1,2,3])
 cbar.ax.set_yticklabels(['$0\sigma$','$1\sigma$','$2\sigma$','$3\sigma$'])
@@ -115,19 +89,6 @@ axs2.set_xlim((k2l(x_1),k2l(x_2)))
 axs2.set_ylim(y_limits)
 
 
-plt.savefig("temp.pdf",bbox_inches='tight',pad_inches=0.02,dpi=100)
+plt.savefig("temp.pdf",bbox_inches='tight',pad_inches=0.02,dpi=400)
 
 plt.show()
-
-import sys
-sys.exit(0)
-
-axs.contourf(x,y,probs.T)
-
-plt.show()
-
-
-import sys
-sys.exit(0)
-
-

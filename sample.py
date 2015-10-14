@@ -9,6 +9,9 @@ class Sample(object):
 class LinearSample(Sample):
     def __init__(self, xdat, ydat):
         self.f = interp1d(xdat,ydat)
+    def __call__(self,x):
+        return self.f(x)
+
 
 # Compute a random sample
 def randomSample(xmin,xmax):
