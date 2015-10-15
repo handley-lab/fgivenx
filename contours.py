@@ -6,8 +6,9 @@ def compute_contour_plot(samples,x,y):
     slices  = compute_slices(samples,x)
     kernels = compute_kernels(slices)  
     masses  = compute_masses(kernels,y)
-    sigmas  = compute_sigmas(masses)   
-    return sigmas
+    return masses
+    #sigmas  = compute_sigmas(masses)   
+    #return sigmas
 
 
 
