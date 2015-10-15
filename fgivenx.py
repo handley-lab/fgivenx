@@ -2,44 +2,18 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from contours import compute_contour_plot
 
-# Resolution settings
-# -------------------
-nx   = 200       # resolution in x direction
-xmin = -np.pi    # minimum of x range
-xmax =  np.pi    # maximum of x range 
-x_limits = [xmin,xmax]
+x = np.load('data/x.npy')
+y = np.load('data/y.npy')
+z = np.load('data/z.npy')
 
-ny   = 200       # resolution in y direction 
-ymin = -1.5      # minimum of y range        
-ymax =  1.5      # maximum of y range        
-y_limits = [ymin,ymax]
-
-
-
-# Generate the samples
-# --------------------
-print "Generating samples"
-from sample import randomSamples
-nsamp   = 100 
-samples = randomSamples(xmin,xmax,nsamp)
-
-#import sys
-#sys.exit(0)
-
-
-# Compute the information for the contour plot
-# ----------------------------------
-x = np.linspace(xmin,xmax,nx)
-y = np.linspace(ymin,ymax,ny)
-z = compute_contour_plot(samples,x,y)
-
+x_limits = [min(x),max(x)]
+y_limits = [min(y),max(y)]
 
 
 # Plot
 # ----
-print "plotting"
+print "Plotting"
 
 
 mask_level     = 3.5
