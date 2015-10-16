@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import planckStyle
+import fgivenx.planckStyle
 import numpy as np
 from matplotlib        import pyplot as plt
 from matplotlib.ticker import ScalarFormatter
@@ -120,7 +120,7 @@ colorbar.add_lines(CS[1])
 fig.subplots_adjust(left=0.05,right=0.85)
 plt.show()
 
-output_root = "single"
+output_root = "plots/single"
 
 plt.savefig(output_root + ".pdf",bbox_inches='tight',pad_inches=0.02,dpi=400)
 

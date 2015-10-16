@@ -2,8 +2,8 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from contours import compute_contour_plot
-from read_data import read_and_trim,read_and_trim_combined
+from fgivenx.contours import compute_contour_plot
+from fgivenx.read_data import read_and_trim,read_and_trim_combined
 
 # Resolution settings
 # -------------------
