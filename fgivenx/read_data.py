@@ -16,9 +16,9 @@ def save_contours(root,x,y,z):
 #    x,y,z = read_contours(<rootname>)
 def read_contours(root):
     return [
-            np.load('contours/'+root+'_x'),
-            np.load('contours/'+root+'_y'),
-            np.load('contours/'+root+'_z')
+            np.load('contours/'+root+'_x.npy'),
+            np.load('contours/'+root+'_y.npy'),
+            np.load('contours/'+root+'_z.npy')
             ]
 
 
