@@ -7,8 +7,9 @@ class Sample(object):
     w = 1
 
 class LinearSample(Sample):
-    def __init__(self, xdat, ydat):
+    def __init__(self, xdat, ydat, w=1):
         self.f = interp1d(xdat,ydat,bounds_error=False,fill_value=0)
+        self.w = w
     def __call__(self,x):
         return self.f(x)
 
