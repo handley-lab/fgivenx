@@ -2,5 +2,5 @@
 *.swp
 plots/*.pdf
 plots/*.png
-data/*.npy
+contours/*.npy
 chains/*.txt

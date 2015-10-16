@@ -1,12 +1,11 @@
 #!/usr/bin/python
 
-import numpy as np
-import matplotlib.pyplot as plt
+from numpy import linspace
 from fgivenx.contours import compute_contour_plot
-from fgivenx.read_data import read_and_trim,read_and_trim_combined
+from fgivenx.read_data import read_and_trim,save_contours
 
-# Resolution settings
-# -------------------
+# Settings
+# --------
 nx   = 100       # resolution in x direction
 xmin = -4        # minimum of x range
 xmax = -0.3      # maximum of x range 
@@ -15,41 +14,32 @@ ny   = 100       # resolution in y direction
 ymin = 2         # minimum of y range        
 ymax = 4         # maximum of y range        
 
-nsamp   = 100000000
+nsamp   = -1     # number of samples to keep ( <= 0 means keep all)
 
-x = np.linspace(xmin,xmax,nx)
-y = np.linspace(ymin,ymax,ny)
+chains_file = 'chains/my_data.txt' # where the chains are kept
+root        = 'my_data'            # the root name for the other files
 
 
-filenames = np.array(['0TT','1TT','2TT','3TT','4TT','5TT','6TT','7TT','8TT'])
-filenames = np.array([ 'chains/'+f+'_stripped.txt' for f in filenames])
-evidences = np.array([-0.56741974E+004, -0.56745759E+004, -0.56749792E+004, -0.56759389E+004, -0.56763374E+004, -0.56770026E+004, -0.56768555E+004, -0.56776854E+004, -0.56776890E+004,])
-evidences = np.exp(evidences-max(evidences))
+# Computing contours
+# ------------------
 
-samples = read_and_trim_combined(filenames,evidences,nsamp)
+# Read chains file and convert into a set of interpolation functions
+#   - We assume that the chains file has the format:
+#      <weight>    <N x coordinates>   <N y coordinates>
+#     in a space - separated file (just as in getdist)
+#
+#   - Note that you may need to use python or awk to process a raw chains file
+#
+#   - It is fine for each line to have different values of N, but there 
+#     shouldn't be any additional irrelevant parameters
+#   
+
+samples = read_and_trim(chains_file)
+
+# Compute a grid for making a contour plot
+x = linspace(xmin,xmax,nx)
+y = linspace(ymin,ymax,ny)
 z = compute_contour_plot(samples,x,y)
 
-np.save('data/'+'combined'+'_x',x)
-np.save('data/'+'combined'+'_y',y)
-np.save('data/'+'combined'+'_z',z)
-
-
-
-
-
-
-for i in ['0TT','1TT','2TT','3TT','4TT','5TT','6TT','7TT','8TT'] :
-#for i in ['8TT'] :
-    # Read the samples
-    # --------------------
-    print "Reading samples from", i+'_stripped.txt'
-    samples = read_and_trim('chains/'+i+'_stripped.txt',nsamp)
-
-    # Compute the information for the contour plot
-    # ----------------------------------
-    z = compute_contour_plot(samples,x,y)
-
-    # Print to file
-    np.save('data/'+i+'_x',x)
-    np.save('data/'+i+'_y',y)
-    np.save('data/'+i+'_z',z)
+# Save the contours to file for later use
+save_contours(root,x,y,z)
