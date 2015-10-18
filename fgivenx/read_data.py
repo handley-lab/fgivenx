@@ -24,12 +24,12 @@ def read_contours(root):
 
 
 
-def read_and_trim(filename,nsamp=0):
+def read_and_trim(filename,nsamp=0,pbar=False):
 
     # Read in all the samples
     # -----------------------
     num_lines = sum(1 for line in open(filename))
-    progress_bar = ProgressBar(num_lines,message="reading samples  ")
+    if pbar: progress_bar = ProgressBar(num_lines,message="reading samples  ")
     samples = []; f = open(filename,'r')
 
     for line in f:
@@ -39,7 +39,7 @@ def read_and_trim(filename,nsamp=0):
         n    = xy.size/2                            # get the number of (x,y) coordines on this line
         x,y  = xy[:n],xy[n:]                        # extract the x and y coordinates from xy
         samples.append(LinearSample(x,y,w))         # create the sample and add to the array
-        progress_bar()
+        if pbar: progress_bar()
 
     samples = trim_samples(np.array(samples),nsamp)
     

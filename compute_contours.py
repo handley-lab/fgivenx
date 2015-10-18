@@ -50,11 +50,11 @@ print "------------------"
 # --------
 nx   = 100       # resolution in x direction (this is normally sufficient)
 xmin = 0.0       # minimum of x range
-xmax = 1.0       # maximum of x range 
+xmax = 2.0       # maximum of x range 
 
 ny   = 100       # resolution in y direction (this is normally sufficient) 
-ymin = 0.0       # minimum of y range        
-ymax = 1.0       # maximum of y range        
+ymin = -2.0       # minimum of y range        
+ymax = 0.0       # maximum of y range        
 
 nsamp   = -1     # number of samples to keep ( <= 0 means keep all)
                  # Plots are quick to compute if nsamp~1000, and typically entirely stable
@@ -64,6 +64,7 @@ nsamp   = -1     # number of samples to keep ( <= 0 means keep all)
 chains_file = 'chains/my_data.txt' # where the chains are kept
 root        = 'my_data'            # the root name for the other files
 
+progress_bar = False
 
 # Computing contours
 # ------------------
@@ -79,12 +80,12 @@ root        = 'my_data'            # the root name for the other files
 #     shouldn't be any additional irrelevant parameters
 #   
 
-samples = read_and_trim(chains_file,nsamp)
+samples = read_and_trim(chains_file,nsamp,progress_bar)
 
 # Compute a grid for making a contour plot
 x = linspace(xmin,xmax,nx)
 y = linspace(ymin,ymax,ny)
-z = compute_contour_plot(samples,x,y)
+z = compute_contour_plot(samples,x,y,progress_bar)
 
 # Save the contours to file for later use
 save_contours(root,x,y,z)
