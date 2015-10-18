@@ -1,13 +1,15 @@
 #!/usr/bin/python
 from fgivenx.read_data import read_contours
 
-import os
 import numpy as np
-
-from matplotlib import pyplot as plt
 
 from scipy.ndimage import gaussian_filter
 from scipy.special import erfinv
+
+from matplotlib import pyplot as plt
+import os
+
+
 
 print "Plotting contours"
 print "-----------------"
