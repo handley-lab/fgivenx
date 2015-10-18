@@ -7,12 +7,12 @@ from fgivenx.read_data import read_and_trim,save_contours
 # Settings
 # --------
 nx   = 100       # resolution in x direction
-xmin = -4        # minimum of x range
-xmax = -0.3      # maximum of x range 
+xmin = 0.0       # minimum of x range
+xmax = 1.0       # maximum of x range 
 
 ny   = 100       # resolution in y direction 
-ymin = 2         # minimum of y range        
-ymax = 4         # maximum of y range        
+ymin = 0.0       # minimum of y range        
+ymax = 1.0       # maximum of y range        
 
 nsamp   = -1     # number of samples to keep ( <= 0 means keep all)
 

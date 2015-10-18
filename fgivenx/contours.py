@@ -1,14 +1,13 @@
 import numpy as np
-from progress import update_progress
+from progress import ProgressBar
 
 # Compute the contour plot
 def compute_contour_plot(samples,x,y):
     slices  = compute_slices(samples,x)
-    kernels = compute_kernels(slices)  
+    weights = compute_weights(samples)
+    kernels = compute_kernels(slices,weights)  
     masses  = compute_masses(kernels,y)
     return masses
-    #sigmas  = compute_sigmas(masses)   
-    #return sigmas
 
 
 
@@ -24,33 +23,43 @@ def compute_contour_plot(samples,x,y):
 #     A 2D array containing samples from P
 #
 def compute_slices(fsamples,xs):
+    progress_bar = ProgressBar(fsamples.size,message="computing slices ")
+    slices = []
 
-    nxs = xs.size                      # get the size of x array
-    nsamp = fsamples.size              # get the number of samples
-    slices = np.empty([nsamp,nxs])     # initialise empty array to return
+    for f in fsamples:
+        slices.append(f(xs))
+        progress_bar()
+                     
+    return np.array(slices).T                   # return transpose
 
-    for i in range(nsamp):                                   
-        update_progress((i+1.0)/nsamp, "computing slices")   # progress bar
-        slices[i] = fsamples[i](xs)                          # compute slice
+def compute_weights(fsamples):
 
-    return slices.T                   # return transpose
-
+    weights = np.array([f.w for f in fsamples])
+    weights /= max(weights)
+                     
+    return weights
 
 
 # compute_kernels
 # ---------------
-from scipy.stats import gaussian_kde
+from weighted_kde import gaussian_kde
 #
-#   Converts samples from P( y(x) | x ) to kernel density estimates using scipy.stats.gaussian_kde
+#   Converts samples from P( y(x) | x ) to kernel density estimates using weighted_kde.gaussian_kde
 #
 #   Inputs:
 #     slices  : 2D array of samples from P( y(x) | x ) for several x's (as produced by compute_slices)
 #   Output:
 #     A 1D array of kernel density estimates of the distribution P( y(x) | x ) for each of the x's
 #
-def compute_kernels(slices):
-    print "computing kernels"
-    return np.array([ gaussian_kde(s) for s in slices ])
+def compute_kernels(slices,weights):
+    progress_bar = ProgressBar(slices.size,message="computing kernels")
+    kernels = []
+
+    for s in slices:
+        kernels.append(gaussian_kde(s,weights=weights))
+        progress_bar()
+                     
+    return np.array(kernels)
 
 
 # compute_pmf
@@ -127,14 +136,14 @@ def compute_pmf(ys,kernel):
 #
 def compute_masses(kernels,y):
 
-    nx = kernels.size           # get number of x coords
-    ny = y.size                 # get number of y coords
-    masses = np.empty([nx,ny])  # initialise masses at zero
+    progress_bar = ProgressBar(kernels.size,message="computing masses ")
+    masses = []
 
-    for i in range(nx):
-        update_progress((i+1.0)/nx, "computing masses") # progress bar
-        masses[i] = compute_pmf(y,kernels[i])           # compute M(x,y) for each value
-    return masses.T             # return the transpose
+    for k in kernels:
+        masses.append( compute_pmf(y,k) )         # compute M(x,y) for each value
+        progress_bar()
+
+    return np.array(masses).T             # return the transpose
 
 # compute_sigmas
 from scipy.special import erfinv
