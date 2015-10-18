@@ -1,11 +1,11 @@
 import numpy as np
 from sample import LinearSample,trim_samples
-import csv
-import sys
+from progress import ProgressBar
 
 
 # Save the contours in a binary format
 def save_contours(root,x,y,z):
+    print "saving contours to files contours/" + root + "_{x,y,z}.npy"
     np.save('contours/'+root+'_x',x)
     np.save('contours/'+root+'_y',y)
     np.save('contours/'+root+'_z',z)
@@ -15,6 +15,7 @@ def save_contours(root,x,y,z):
 # This should be called as:
 #    x,y,z = read_contours(<rootname>)
 def read_contours(root):
+    print "reading contours from files contours/" + root + "_{x,y,z}.npy"
     return [
             np.load('contours/'+root+'_x.npy'),
             np.load('contours/'+root+'_y.npy'),
@@ -27,7 +28,8 @@ def read_and_trim(filename,nsamp=0):
 
     # Read in all the samples
     # -----------------------
-    print "Reading samples from file"
+    num_lines = sum(1 for line in open(filename))
+    progress_bar = ProgressBar(num_lines,message="reading samples  ")
     samples = []; f = open(filename,'r')
 
     for line in f:
@@ -37,7 +39,8 @@ def read_and_trim(filename,nsamp=0):
         n    = xy.size/2                            # get the number of (x,y) coordines on this line
         x,y  = xy[:n],xy[n:]                        # extract the x and y coordinates from xy
         samples.append(LinearSample(x,y,w))         # create the sample and add to the array
+        progress_bar()
 
-    samples = trim_samples(np.array(samples))
+    samples = trim_samples(np.array(samples),nsamp)
     
     return samples

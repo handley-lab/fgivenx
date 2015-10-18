@@ -9,6 +9,8 @@ from matplotlib import pyplot as plt
 from scipy.ndimage import gaussian_filter
 from scipy.special import erfinv
 
+print "Plotting contours"
+print "-----------------"
 
 # Parameters
 # ----------
@@ -26,6 +28,7 @@ contour_levels = np.arange(0,4,fineness)
 
 # Read the data
 # -------------
+print "Reading contours from file"
 x,y,z = read_contours(root)
 
 
@@ -49,6 +52,7 @@ z = np.sqrt(2)*erfinv(1-z)
 fig,ax = plt.subplots(1,1)
 
 # Plot the filled contours onto the axis ax
+print "Plotting filled contours"
 for i in range(2):
     CS1 = ax.contourf(
             x,y,z,
@@ -56,6 +60,7 @@ for i in range(2):
             levels = contour_levels,vmin=0,vmax=max_sigma)
 
 # Plot some sigma-based contour lines
+print "Plotting contours"
 CS2 = ax.contour(
         x,y,z, 
         colors='k', 
@@ -92,10 +97,11 @@ colorbar.add_lines(CS2)
 output_root = "plots/" + root
 
 # Save as pdf
+print "Saving as pdf"
 plt.savefig(output_root + ".pdf",bbox_inches='tight',pad_inches=0.02,dpi=400)
 
 # Convert to png
+print "Saving as png"
 shell_command = "convert -density 400 " + output_root + ".pdf" + " -quality 100 " + output_root + ".png"
-print shell_command
 os.system(shell_command)
 

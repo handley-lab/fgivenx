@@ -144,12 +144,3 @@ def compute_masses(kernels,y):
         progress_bar()
 
     return np.array(masses).T             # return the transpose
-
-# compute_sigmas
-from scipy.special import erfinv
-#
-# Convert probability mass into sigma significance
-def compute_sigmas(masses):
-    return np.sqrt(2)*erfinv(1-masses)
-
-

@@ -13,7 +13,9 @@ class LinearSample(Sample):
     def __call__(self,x):
         return self.f(x)
 
-def trim_samples(samples):
+from numpy.random import choice
+
+def trim_samples(samples,nsamp):
 
     weights = np.array([s.w for s in samples])
     weights /= max(weights)
@@ -22,7 +24,13 @@ def trim_samples(samples):
 
     print "effective number of samples: " , neff, "/", n
 
-    weights*=np.sum(weights)
+    # Now trim off the ones that are too small
+    ntarget = sum([ w if w<1.0/n else 1 for w in weights]) + 0.0
+
+    if nsamp>0 and nsamp<ntarget:
+        weights *= nsamp/neff
+    else:
+        weights *= n
 
     progress_bar = ProgressBar(samples.size,message="trimming samples ")
     trimmed_samples = []
@@ -30,13 +38,12 @@ def trim_samples(samples):
         if rand() < w:
             s.w = max(1.0,w)
             trimmed_samples.append(s)
+
         progress_bar()
 
+    trimmed_samples = np.array(trimmed_samples)
+    print "Samples trimmed from " , n, " to ", trimmed_samples.size
 
-    weights = np.array([s.w for s in trimmed_samples])
-    weights /= max(weights)
+    return trimmed_samples
 
 
-    print "Samples trimmed from " , n, " to ", weights.size
-
-    return np.array(trimmed_samples)
