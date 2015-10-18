@@ -2,11 +2,11 @@ import numpy as np
 from progress import ProgressBar
 
 # Compute the contour plot
-def compute_contour_plot(samples,x,y):
-    slices  = compute_slices(samples,x)
+def compute_contour_plot(samples,x,y,progress_bar=False):
+    slices  = compute_slices(samples,x,progress_bar)
     weights = compute_weights(samples)
-    kernels = compute_kernels(slices,weights)  
-    masses  = compute_masses(kernels,y)
+    kernels = compute_kernels(slices,weights,progress_bar)  
+    masses  = compute_masses(kernels,y,progress_bar)
     return masses
 
 
@@ -22,13 +22,14 @@ def compute_contour_plot(samples,x,y):
 #   Output:
 #     A 2D array containing samples from P
 #
-def compute_slices(fsamples,xs):
-    progress_bar = ProgressBar(fsamples.size,message="computing slices ")
+def compute_slices(fsamples,xs,pbar=False):
+    if pbar: progress_bar = ProgressBar(fsamples.size,message="computing slices ")
+    else: print "computing slices"
     slices = []
 
     for f in fsamples:
         slices.append(f(xs))
-        progress_bar()
+        if pbar: progress_bar()
                      
     return np.array(slices).T                   # return transpose
 
@@ -51,13 +52,14 @@ from weighted_kde import gaussian_kde
 #   Output:
 #     A 1D array of kernel density estimates of the distribution P( y(x) | x ) for each of the x's
 #
-def compute_kernels(slices,weights):
-    progress_bar = ProgressBar(slices.size,message="computing kernels")
+def compute_kernels(slices,weights,pbar=False):
+    if pbar: progress_bar = ProgressBar(slices.size,message="computing kernels")
+    else: print "computing kernels"
     kernels = []
 
     for s in slices:
         kernels.append(gaussian_kde(s,weights=weights))
-        progress_bar()
+        if pbar: progress_bar()
                      
     return np.array(kernels)
 
@@ -134,13 +136,14 @@ def compute_pmf(ys,kernel):
 #   Output:
 #     A 2D array indicating M(x,y) where for each x, M(y) is the probability mass function of P( y(x) | x )
 #
-def compute_masses(kernels,y):
+def compute_masses(kernels,y,pbar=False):
 
-    progress_bar = ProgressBar(kernels.size,message="computing masses ")
+    if pbar: progress_bar = ProgressBar(kernels.size,message="computing masses ")
+    else: print "computing masses"
     masses = []
 
     for k in kernels:
         masses.append( compute_pmf(y,k) )         # compute M(x,y) for each value
-        progress_bar()
+        if pbar: progress_bar()
 
     return np.array(masses).T             # return the transpose
