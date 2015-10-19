@@ -9,14 +9,17 @@ from matplotlib import pyplot as plt
 from scipy.ndimage import gaussian_filter
 from scipy.special import erfinv
 
+import cubehelix
+
+
 
 # Parameters
 # ----------
 root  = 'my_data'      # root name for files
-color = plt.cm.Reds_r  # color scheme
+color = cubehelix.cmap(reverse=False, start=0.0, rot=0.5, minLight=0.1)
 
-xlabel = '$x$'
-ylabel = '$y$'
+xlabel = '$z$'
+ylabel = '$w(z)$'
 
 max_sigma     = 3.5
 
