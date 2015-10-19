@@ -48,6 +48,7 @@ print "------------------"
 
 # Settings
 # --------
+<<<<<<< HEAD
 nx   = 100       # resolution in x direction
 xmin = 0.0
 xmax = 3.0       # maximum of x range 
@@ -55,6 +56,15 @@ xmax = 3.0       # maximum of x range
 ny   = 100       # resolution in y direction 
 ymin = -2.0      # minimum of y range        
 ymax = -0.0      # maximum of y range        
+=======
+nx   = 100       # resolution in x direction (this is normally sufficient)
+xmin = 0.0       # minimum of x range
+xmax = 1.0       # maximum of x range 
+
+ny   = 100       # resolution in y direction (this is normally sufficient) 
+ymin = 0.0        # minimum of y range        
+ymax = 1.0       # maximum of y range        
+>>>>>>> 494227d230c2b9f85201f58751ee8ab1561cf344
 
 nsamp   = -1     # number of samples to keep ( <= 0 means keep all)
                  # Plots are quick to compute if nsamp~1000, and typically entirely stable

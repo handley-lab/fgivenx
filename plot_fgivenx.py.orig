@@ -6,9 +6,11 @@ import numpy as np
 from scipy.ndimage import gaussian_filter
 from scipy.special import erfinv
 
+<<<<<<< HEAD
 import cubehelix
 
 
+=======
 from matplotlib import pyplot as plt
 import os
 
@@ -16,6 +18,7 @@ import os
 
 print "Plotting contours"
 print "-----------------"
+>>>>>>> 494227d230c2b9f85201f58751ee8ab1561cf344
 
 # Parameters
 # ----------

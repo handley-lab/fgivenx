@@ -1,36 +1,50 @@
 from scipy.interpolate import interp1d
-from numpy import array,linspace,cos
-from numpy.random import randn as normal
-from numpy.random import choice as choose
+import numpy as np
+from numpy.random import rand
+from progress import ProgressBar
 
 class Sample(object):
     w = 1
 
 class LinearSample(Sample):
-    def __init__(self, xdat, ydat):
+    def __init__(self, xdat, ydat, w=1):
         self.f = interp1d(xdat,ydat,bounds_error=False,fill_value=0)
+        self.w = w
     def __call__(self,x):
         return self.f(x)
 
+from numpy.random import choice
 
-# Compute a random sample
-def randomSample(xmin,xmax):
-    n = 11
-    x = linspace(xmin,xmax,n)
-    for i in range(1,n-1):
-        x[i]+=normal()*0.2
-    #y = cos(x+choose([0,1])) + normal(n)*0.2
-    y = cos(x) + normal(n)*0.2
-    return LinearSample(x,y)
+def trim_samples(samples,nsamp,pbar=False):
 
-# Compute n samples from the above
-def randomSamples(xmin,xmax,N=100):
-    samples =[]
-    for k in range(0,N,1):
-        samples.append(randomSample(xmin,xmax))
-    return array(samples)
+    weights = np.array([s.w for s in samples])
+    weights /= max(weights)
+    neff = np.sum(weights)
+    n    = weights.size 
 
-# Compute a slice of the function at a valid x
-def slice(samples,x):
-    return array([sample.f(x) for sample in samples])
+    print "effective number of samples: " , neff, "/", n
+
+    # Now trim off the ones that are too small
+    ntarget = sum([ w if w<1.0/n else 1 for w in weights]) + 0.0
+
+    if nsamp>0 and nsamp<ntarget:
+        weights *= nsamp/neff
+    else:
+        weights *= n
+
+    if pbar: progress_bar = ProgressBar(samples.size,message="trimming samples ")
+    else: print "trimming samples"
+    trimmed_samples = []
+    for w,s in zip(weights,samples):
+        if rand() < w:
+            s.w = max(1.0,w)
+            trimmed_samples.append(s)
+
+        if pbar: progress_bar()
+
+    trimmed_samples = np.array(trimmed_samples)
+    print "Samples trimmed from " , n, " to ", trimmed_samples.size
+
+    return trimmed_samples
+
 
