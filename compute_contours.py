@@ -50,7 +50,7 @@ print "------------------"
 # --------
 nx   = 100       # resolution in x direction
 xmin = 0.0
-xmax = 3.0       # maximum of x range 
+xmax = 2.0       # maximum of x range 
 
 ny   = 100       # resolution in y direction 
 ymin = -2.0      # minimum of y range        
