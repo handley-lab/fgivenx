@@ -1,28 +1,28 @@
 import numpy as np
 from progress import ProgressBar
 
-# Compute the contour plot
-def compute_contour_plot(samples,x,y,progress_bar=False):
-    slices  = compute_slices(samples,x,progress_bar)
-    weights = compute_weights(samples)
+def compute_contour_plot(fsamples,x,y,progress_bar=False):
+    """From a set of function samples, compute the mass function on an x-y grid."""
+    slices  = compute_slices(fsamples,x,progress_bar)
+    weights = compute_weights(fsamples)
     kernels = compute_kernels(slices,weights,progress_bar)  
     masses  = compute_masses(kernels,y,progress_bar)
     return masses
 
 
 
-# compute_slices
-# --------------
-#   Converts a set of interpolation functions to a set of samples 
-#   from P( y(x) | x ) for several x's
-#
-#   Inputs:
-#     fsamples  : an array of interpolation functions (see sample.py)
-#     xs        : an array of x coordinates
-#   Output:
-#     A 2D array containing samples from P
-#
 def compute_slices(fsamples,xs,pbar=False):
+    """
+    Convert a set of interpolation functions to a set of samples 
+    from P( y(x) | x ) for several x's.
+
+    Inputs:
+      fsamples  : an array of interpolation functions (see sample.py)
+      xs        : an array of x coordinates
+    Output:
+     A 2D array containing samples from P
+     """
+
     if pbar: progress_bar = ProgressBar(fsamples.size,message="computing slices ")
     else: print "computing slices"
     slices = []
