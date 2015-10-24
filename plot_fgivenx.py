@@ -69,8 +69,8 @@ print "Plotting contours"
 CS2 = ax.contour(
         x,y,z, 
         colors='k', 
-        linewidths=0.5,
-        levels = [1,2,3],vmin=0,vmax=max_sigma)
+        linewidths=1.0,
+        levels = [1,2],vmin=0,vmax=max_sigma)
 
 
 # Set limits on axes
@@ -88,6 +88,29 @@ colorbar = plt.colorbar(CS1,ticks = [0,1,2,3])
 colorbar.ax.set_yticklabels(['$0\sigma$','$1\sigma$','$2\sigma$','$3\sigma$'])
 colorbar.ax.tick_params(labelsize=12)
 colorbar.add_lines(CS2)
+
+
+#For the toy Model Data - want to add white functions to show performance:
+# Need an xarray for the plots:
+###xarray = np.linspace(0.0, 1.0,1000)
+# yarray for the sin function: 
+#(only need the below line and can then plot)
+###yarray = [ np.sin(x*2*np.pi) for x in xarray ]
+# yarray for the linear zig-zag:
+#(create manually and finish by making yarray an np.array)
+###yarray = []
+###for x in xarray:
+###    if x<=0.25:
+###        yarray += [ 4.*x ]
+###    elif x>0.25 and x<=0.75:
+###        yarray += [ -4.*x +2. ]
+###    else:
+###        yarray += [ 4.*x -4. ]
+###yarray = np.array(yarray)
+
+#add the white plot
+###ax.plot( xarray, yarray, color='white')
+
 
 #fig.subplots_adjust(left=0.05,right=0.85)
 
