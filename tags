@@ -1,0 +1,172 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+BAO	fgivenx/planckStyle.py	/^BAO = 'BAO'$/;"	v
+CS1	plot_fgivenx.py	/^    CS1 = ax.contourf($/;"	v
+CS2	plot_fgivenx.py	/^CS2 = ax.contour($/;"	v
+H0_gpe	fgivenx/planckStyle.py	/^H0_gpe = [70.6, 3.3]$/;"	v
+HST	fgivenx/planckStyle.py	/^HST = r'$H_0$'$/;"	v
+LCDM	fgivenx/planckStyle.py	/^LCDM = r'$\\Lambda$CDM'$/;"	v
+LinearSample	fgivenx/read_data.py	/^from sample import LinearSample,trim_samples$/;"	i
+LinearSample	fgivenx/sample.py	/^class LinearSample(Sample):$/;"	c
+NoLowL	fgivenx/planckStyle.py	/^NoLowL = r'\\textit{Planck}$-$lowL'$/;"	v
+NoLowLE	fgivenx/planckStyle.py	/^NoLowLE = datalabel[defdata_allNoLowE]$/;"	v
+NoLowLhighL	fgivenx/planckStyle.py	/^NoLowLhighL = r'\\textit{Planck}$-$lowL+highL'$/;"	v
+NoLowLhighLtau	fgivenx/planckStyle.py	/^NoLowLhighLtau = r'\\textit{Planck}$-$lowL+highL+$\\tau$prior'$/;"	v
+ProgressBar	fgivenx/contours.py	/^from progress import ProgressBar$/;"	i
+ProgressBar	fgivenx/progress.py	/^class ProgressBar(object):$/;"	c
+ProgressBar	fgivenx/read_data.py	/^from progress import ProgressBar$/;"	i
+ProgressBar	fgivenx/sample.py	/^from progress import ProgressBar$/;"	i
+Sample	fgivenx/sample.py	/^class Sample(object):$/;"	c
+WP	fgivenx/planckStyle.py	/^WP = r'\\textit{Planck}+WP'$/;"	v
+WPhighL	fgivenx/planckStyle.py	/^WPhighL = r'\\textit{Planck}+WP+highL'$/;"	v
+WPhighLlensing	fgivenx/planckStyle.py	/^WPhighLlensing = r'\\textit{Planck}+lensing+WP+highL'$/;"	v
+__call__	fgivenx/progress.py	/^    def __call__(self):$/;"	m	class:ProgressBar	file:
+__call__	fgivenx/sample.py	/^    def __call__(self,x):$/;"	m	class:LinearSample	file:
+__call__	fgivenx/weighted_kde.py	/^    __call__ = evaluate$/;"	v	class:gaussian_kde
+__init__	fgivenx/planckStyle.py	/^    def __init__(self):$/;"	m	class:planckStyleTableFormatter
+__init__	fgivenx/progress.py	/^    def __init__(self,n,message=" "):$/;"	m	class:ProgressBar
+__init__	fgivenx/sample.py	/^    def __init__(self, xdat, ydat, w=1):$/;"	m	class:LinearSample
+__init__	fgivenx/weighted_kde.py	/^    def __init__(self, dataset, bw_method=None, weights=None):$/;"	m	class:gaussian_kde
+_compute_covariance	fgivenx/weighted_kde.py	/^    def _compute_covariance(self):$/;"	m	class:gaussian_kde
+absolute_import	fgivenx/planckStyle.py	/^from __future__ import absolute_import$/;"	i
+batchjob	fgivenx/planckStyle.py	/^from paramgrid import batchjob$/;"	i
+belowTitleLine	fgivenx/planckStyle.py	/^    def belowTitleLine(self, colsPerParam, numResults):$/;"	m	class:planckStyleTableFormatter
+cdist	fgivenx/weighted_kde.py	/^from scipy.spatial.distance import cdist$/;"	i
+chains_file	compute_contours.py	/^chains_file = 'chains\/my_data.txt' # where the chains are kept$/;"	v
+choice	fgivenx/sample.py	/^from numpy.random import choice$/;"	i
+cmap	plot_fgivenx.py	/^            cmap=color,$/;"	v
+color	plot_fgivenx.py	/^color = cubehelix.cmap(reverse=False, start=0.0, rot=0.5, minLight=0.1)$/;"	v
+colorbar	plot_fgivenx.py	/^colorbar = plt.colorbar(CS1,ticks = [0,1,2,3])$/;"	v
+colors	plot_fgivenx.py	/^        colors='k', $/;"	v
+compute_contour_plot	compute_contours.py	/^from fgivenx.contours import compute_contour_plot$/;"	i
+compute_contour_plot	fgivenx/contours.py	/^def compute_contour_plot(samples,x,y,progress_bar=False):$/;"	f
+compute_kernels	fgivenx/contours.py	/^def compute_kernels(slices,weights,pbar=False):$/;"	f
+compute_masses	fgivenx/contours.py	/^def compute_masses(kernels,y,pbar=False):$/;"	f
+compute_pmf	fgivenx/contours.py	/^def compute_pmf(ys,kernel):$/;"	f
+compute_slices	fgivenx/contours.py	/^def compute_slices(fsamples,xs,pbar=False):$/;"	f
+compute_weights	fgivenx/contours.py	/^def compute_weights(fsamples):$/;"	f
+contour_levels	plot_fgivenx.py	/^contour_levels = np.arange(0,4,fineness)$/;"	v
+copy	fgivenx/planckStyle.py	/^import copy$/;"	i
+covariance_factor	fgivenx/weighted_kde.py	/^    covariance_factor = scotts_factor$/;"	v	class:gaussian_kde
+cubehelix	plot_fgivenx.py	/^import cubehelix$/;"	i
+datalabel	fgivenx/planckStyle.py	/^datalabel = dict()$/;"	v
+defdata	fgivenx/planckStyle.py	/^defdata = defdata_TT$/;"	v
+defdata_EE	fgivenx/planckStyle.py	/^defdata_EE = defdata_root + '_EE_lowEB'$/;"	v
+defdata_EE_TEB	fgivenx/planckStyle.py	/^defdata_EE_TEB = defdata_root + '_EE_lowTEB'$/;"	v
+defdata_TE	fgivenx/planckStyle.py	/^defdata_TE = defdata_root + '_TE_lowEB'$/;"	v
+defdata_TE_TEB	fgivenx/planckStyle.py	/^defdata_TE_TEB = defdata_root + '_TE_lowTEB'$/;"	v
+defdata_TT	fgivenx/planckStyle.py	/^defdata_TT = defdata_root + '_TT_lowTEB'$/;"	v
+defdata_TTTEEE	fgivenx/planckStyle.py	/^defdata_TTTEEE = defdata_all$/;"	v
+defdata_TTonly	fgivenx/planckStyle.py	/^defdata_TTonly = defdata_root + '_TT_lowl'$/;"	v
+defdata_all	fgivenx/planckStyle.py	/^defdata_all = defdata_root + '_TTTEEE_lowTEB'$/;"	v
+defdata_allNoLowE	fgivenx/planckStyle.py	/^defdata_allNoLowE = defdata_root + '_TTTEEE_lowl'$/;"	v
+defdata_all_lensing	fgivenx/planckStyle.py	/^defdata_all_lensing = defdata_all + '_lensing'$/;"	v
+defdata_lensing	fgivenx/planckStyle.py	/^defdata_lensing = defdata_TT + '_lensing'$/;"	v
+defdata_root	fgivenx/planckStyle.py	/^    defdata_root = 'plikHM'$/;"	v
+deflabel	fgivenx/planckStyle.py	/^deflabel = datalabel[defdata_TT]$/;"	v
+defplanck	fgivenx/planckStyle.py	/^defplanck = datalabel[defdata]$/;"	v
+doExport	fgivenx/planckStyle.py	/^    def doExport(self, fname=None, adir=None, watermark=None, tag=None):$/;"	m	class:planckPlotter
+endTable	fgivenx/planckStyle.py	/^    def endTable(self):$/;"	m	class:planckStyleTableFormatter
+erfinv	plot_fgivenx.py	/^from scipy.special import erfinv$/;"	i
+evaluate	fgivenx/weighted_kde.py	/^    def evaluate(self, points):$/;"	m	class:gaussian_kde
+export	fgivenx/planckStyle.py	/^    def export(self, fname=None, tag=None):$/;"	m	class:planckPlotter
+exportExtra	fgivenx/planckStyle.py	/^    def exportExtra(self, fname=None):$/;"	m	class:planckPlotter
+fineness	plot_fgivenx.py	/^fineness = 0.1$/;"	v
+formatTitle	fgivenx/planckStyle.py	/^    def formatTitle(self, title):$/;"	m	class:planckStyleTableFormatter
+gaussian_filter	plot_fgivenx.py	/^from scipy.ndimage import gaussian_filter$/;"	i
+gaussian_kde	fgivenx/contours.py	/^from weighted_kde import gaussian_kde$/;"	i
+gaussian_kde	fgivenx/weighted_kde.py	/^class gaussian_kde(object):$/;"	c
+getBatch	fgivenx/planckStyle.py	/^    def getBatch(self):$/;"	m	class:planckPlotter
+getJobItem	fgivenx/planckStyle.py	/^    def getJobItem(self, paramtag, datatag):$/;"	m	class:planckPlotter
+getPlotter	fgivenx/planckStyle.py	/^def getPlotter(plot_data=None, chain_dir=None, **kwargs):$/;"	f
+getPlotterWidth	fgivenx/planckStyle.py	/^def getPlotterWidth(size=1, **kwargs):  # size in mm$/;"	f
+getRoot	fgivenx/planckStyle.py	/^    def getRoot(self, paramtag, datatag, returnJobItem=False):$/;"	m	class:planckPlotter
+getSinglePlotter	fgivenx/planckStyle.py	/^def getSinglePlotter(ratio=3 \/ 4., plot_data=None, chain_dir=None, width_inch=3.464, **kwargs):$/;"	f
+getSubplotPlotter	fgivenx/planckStyle.py	/^def getSubplotPlotter(plot_data=None, chain_dir=None, subplot_size=2, **kwargs):$/;"	f
+getdist	fgivenx/planckStyle.py	/^import getdist$/;"	i
+i	fgivenx/progress.py	/^    i=0.0$/;"	v	class:ProgressBar
+interp1d	fgivenx/sample.py	/^from scipy.interpolate import interp1d$/;"	i
+lensing	fgivenx/planckStyle.py	/^lensing = datalabel[defdata_lensing]$/;"	v
+lensingall	fgivenx/planckStyle.py	/^lensingall = datalabel[defdata_all_lensing]$/;"	v
+lensonly	fgivenx/planckStyle.py	/^lensonly = 'lensing'$/;"	v
+linewidths	plot_fgivenx.py	/^        linewidths=1.0,$/;"	v
+linspace	compute_contours.py	/^from numpy import linspace$/;"	i
+max_sigma	plot_fgivenx.py	/^max_sigma     = 3.5$/;"	v
+message	fgivenx/progress.py	/^    message=" "$/;"	v	class:ProgressBar
+n	fgivenx/progress.py	/^    n=0$/;"	v	class:ProgressBar
+non_final	fgivenx/planckStyle.py	/^    non_final = False$/;"	v
+np	fgivenx/contours.py	/^import numpy as np$/;"	i
+np	fgivenx/read_data.py	/^import numpy as np$/;"	i
+np	fgivenx/sample.py	/^import numpy as np$/;"	i
+np	fgivenx/weighted_kde.py	/^import numpy as np$/;"	i
+np	plot_fgivenx.py	/^import numpy as np$/;"	i
+nsamp	compute_contours.py	/^nsamp   = -1     # number of samples to keep ( <= 0 means keep all)$/;"	v
+nx	compute_contours.py	/^nx   = 100       # resolution in x direction$/;"	v
+ny	compute_contours.py	/^ny   = 100       # resolution in y direction $/;"	v
+os	fgivenx/planckStyle.py	/^import os$/;"	i
+os	fgivenx/progress.py	/^import os$/;"	i
+os	plot_fgivenx.py	/^import os$/;"	i
+output_base_dir	fgivenx/planckStyle.py	/^output_base_dir = getdist.output_base_dir or batchjob.getCodeRootPath()$/;"	v
+output_root	plot_fgivenx.py	/^output_root = "plots\/" + root$/;"	v
+params	fgivenx/planckStyle.py	/^params = {'backend': 'pdf',$/;"	v
+percent	fgivenx/progress.py	/^    percent = -1$/;"	v	class:ProgressBar
+planck	fgivenx/planckStyle.py	/^planck = r'\\textit{Planck}'$/;"	v
+planckPlotter	fgivenx/planckStyle.py	/^class planckPlotter(plots.GetDistPlotter):$/;"	c
+planckStyleTableFormatter	fgivenx/planckStyle.py	/^class planckStyleTableFormatter(types.NoLineTableFormatter):$/;"	c
+planckTT	fgivenx/planckStyle.py	/^planckTT = datalabel[defdata_TTonly]$/;"	v
+planckTTlowTEB	fgivenx/planckStyle.py	/^planckTTlowTEB = datalabel[defdata_TT]$/;"	v
+planck_lensing	fgivenx/planckStyle.py	/^def planck_lensing(omm, sigma):$/;"	f
+planckall	fgivenx/planckStyle.py	/^planckall = datalabel[defdata_all]$/;"	v
+plotBounds	fgivenx/planckStyle.py	/^def plotBounds(omm, data, c='gray'):$/;"	f
+plots	fgivenx/planckStyle.py	/^from getdist import types, plots$/;"	i
+plt	fgivenx/planckStyle.py	/^from matplotlib import pyplot as plt$/;"	i
+plt	plot_fgivenx.py	/^from matplotlib import pyplot as plt$/;"	i
+progress_bar	compute_contours.py	/^progress_bar = False$/;"	v
+rand	fgivenx/sample.py	/^from numpy.random import rand$/;"	i
+rc	fgivenx/planckStyle.py	/^from matplotlib import rcParams, rc$/;"	i
+rcParams	fgivenx/planckStyle.py	/^from matplotlib import rcParams, rc$/;"	i
+read_and_trim	compute_contours.py	/^from fgivenx.read_data import read_and_trim,save_contours$/;"	i
+read_and_trim	fgivenx/read_data.py	/^def read_and_trim(filename,nsamp=0,pbar=False):$/;"	f
+read_contours	fgivenx/read_data.py	/^def read_contours(root):$/;"	f
+read_contours	plot_fgivenx.py	/^from fgivenx.read_data import read_contours$/;"	i
+root	compute_contours.py	/^root        = 'my_data'            # the root name for the other files$/;"	v
+root	plot_fgivenx.py	/^root  = 'my_data'      # root name for files$/;"	v
+rootdir	fgivenx/planckStyle.py	/^rootdir = getdist.default_grid_root or os.path.join(batchjob.getCodeRootPath(), 'main')$/;"	v
+s	fgivenx/planckStyle.py	/^s = copy.copy(plots.defaultSettings)$/;"	v
+samples	compute_contours.py	/^samples = read_and_trim(chains_file,nsamp,progress_bar)$/;"	v
+save_contours	compute_contours.py	/^from fgivenx.read_data import read_and_trim,save_contours$/;"	i
+save_contours	fgivenx/read_data.py	/^def save_contours(root,x,y,z):$/;"	f
+scotts_factor	fgivenx/weighted_kde.py	/^    def scotts_factor(self):$/;"	m	class:gaussian_kde
+setRc	fgivenx/planckStyle.py	/^def setRc():$/;"	f
+set_bandwidth	fgivenx/weighted_kde.py	/^    def set_bandwidth(self, bw_method=None):$/;"	m	class:gaussian_kde
+sfmath	fgivenx/planckStyle.py	/^sfmath = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'sfmath'$/;"	v
+shell_command	plot_fgivenx.py	/^shell_command = "convert -density 400 " + output_root + ".pdf" + " -quality 100 " + output_root + ".png"$/;"	v
+shortlabel	fgivenx/planckStyle.py	/^shortlabel = {}$/;"	v
+silverman_factor	fgivenx/weighted_kde.py	/^    def silverman_factor(self):$/;"	m	class:gaussian_kde
+startTable	fgivenx/planckStyle.py	/^    def startTable(self, ncol, colsPerResult, numResults):$/;"	m	class:planckStyleTableFormatter
+sys	fgivenx/progress.py	/^import sys$/;"	i
+textAsColumn	fgivenx/planckStyle.py	/^    def textAsColumn(self, txt, latex=False, separator=False, bold=False):$/;"	m	class:planckStyleTableFormatter
+titleSubColumn	fgivenx/planckStyle.py	/^    def titleSubColumn(self, colsPerResult, title):$/;"	m	class:planckStyleTableFormatter
+trim_samples	fgivenx/read_data.py	/^from sample import LinearSample,trim_samples$/;"	i
+trim_samples	fgivenx/sample.py	/^def trim_samples(samples,nsamp,pbar=False):$/;"	f
+types	fgivenx/planckStyle.py	/^from getdist import types, plots$/;"	i
+use_plot_data	fgivenx/planckStyle.py	/^use_plot_data = getdist.use_plot_data$/;"	v
+version	fgivenx/planckStyle.py	/^    version = 'clik10.2'$/;"	v
+w	fgivenx/sample.py	/^    w = 1$/;"	v	class:Sample
+x	compute_contours.py	/^x = linspace(xmin,xmax,nx)$/;"	v
+x_limits	plot_fgivenx.py	/^x_limits = np.array([min(x),max(x)])$/;"	v
+xlabel	plot_fgivenx.py	/^xlabel = '$z$'$/;"	v
+xmax	compute_contours.py	/^xmax = 2.0       # maximum of x range $/;"	v
+xmin	compute_contours.py	/^xmin = 0.0$/;"	v
+y	compute_contours.py	/^y = linspace(ymin,ymax,ny)$/;"	v
+y_limits	plot_fgivenx.py	/^y_limits = np.array([min(y),max(y)])$/;"	v
+ylabel	plot_fgivenx.py	/^ylabel = '$w(z)$'$/;"	v
+ymax	compute_contours.py	/^ymax = -0.0      # maximum of y range        $/;"	v
+ymin	compute_contours.py	/^ymin = -2.0      # minimum of y range        $/;"	v
+z	compute_contours.py	/^z = compute_contour_plot(samples,x,y,progress_bar)$/;"	v
+z	plot_fgivenx.py	/^z = gaussian_filter(z, sigma=np.array(z.shape)\/100.0 , order=0)$/;"	v
+z	plot_fgivenx.py	/^z = np.sqrt(2)*erfinv(1-z)$/;"	v

@@ -78,15 +78,15 @@ ax.set_xlim(x_limits)
 ax.set_ylim(y_limits)
 
 # Label axes
-ax.set_ylabel(ylabel)
-ax.set_xlabel(xlabel)
+ax.set_ylabel(ylabel, fontsize=18)
+ax.set_xlabel(xlabel, fontsize=18)
 
 # Colorbar
 #cbaxis = fig.add_axes([0.9, 0.1, 0.03, 0.8]) 
 #
 colorbar = plt.colorbar(CS1,ticks = [0,1,2,3])
 colorbar.ax.set_yticklabels(['$0\sigma$','$1\sigma$','$2\sigma$','$3\sigma$'])
-colorbar.ax.tick_params(labelsize=12)
+colorbar.ax.tick_params(labelsize=18)
 colorbar.add_lines(CS2)
 
 

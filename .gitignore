@@ -4,3 +4,4 @@ plots/*.pdf
 plots/*.png
 contours/*.npy
 chains/*.txt
+*sonke*

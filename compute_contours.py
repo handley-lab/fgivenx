@@ -50,13 +50,13 @@ print "------------------"
 # --------
 nx   = 100       # resolution in x direction
 xmin = 0.0
-xmax = 2.0       # maximum of x range 
+xmax = 3.0       # maximum of x range 
 
 ny   = 100       # resolution in y direction 
 ymin = -2.0      # minimum of y range        
 ymax = -0.0      # maximum of y range        
 
-nsamp   = -1     # number of samples to keep ( <= 0 means keep all)
+nsamp   = -1000     # number of samples to keep ( <= 0 means keep all)
                  # Plots are quick to compute if nsamp~1000, and typically entirely stable
                  # if setting a low value of nsamp, users are recommend to run 
                  # several plots and compare stability
