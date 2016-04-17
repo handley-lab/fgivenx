@@ -28,7 +28,7 @@ def compute_slices(fsamples,xs,pbar=False):
     slices = []
 
     for f in fsamples:
-        slices.append(f(xs))
+        slices.append([f(x) for x in xs])
         if pbar: progress_bar()
                      
     return np.array(slices).T                   # return transpose
@@ -66,15 +66,19 @@ def compute_kernels(slices,weights,pbar=False):
 
 # compute_pmf
 # -----------
-#   Computes the 'probability mass function' of a probability density function
+#   Computes the 'probability mass function' of a probability density
+#   function
 #
 #          /
 #   M(p) = |          P(y) dy
 #          / P(y) < p
 #
-#   This is the cumulative distribution function expressed as a function of the probability
+#   This is the cumulative distribution function expressed as a
+#   function of the probability
 #
-#   We actually aim to compute M(y), which indicates the amount of probability contained outside the iso-probability contour at y
+#   We actually aim to compute M(y), which indicates the amount of
+#   probability contained outside the iso-probability contour passing
+#   through y
 #
 #
 #  ^ P(y)
@@ -112,7 +116,7 @@ def compute_kernels(slices,weights,pbar=False):
 #     1D array of M(y) values at each ys
 #
 def compute_pmf(ys,kernel):
-    nys   = ys.size         # get the number of y values
+    nys  = ys.size          # get the number of y values
     pmf  = np.zeros(nys)    # initialise the M(y) with zeros
     prob = kernel(ys)       # Compute the probablities at each point
     ii   = np.argsort(prob) # Compute sorted indices
@@ -121,6 +125,7 @@ def compute_pmf(ys,kernel):
     for i in ii:            # for each y value compute the cdf as a function of p
         cdf+=prob[i]/nys
         pmf[i] = cdf
+
     return pmf/cdf          # return it as normalised
 
 

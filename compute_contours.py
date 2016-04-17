@@ -38,10 +38,50 @@
 #
 # Any questions, please email Will Handley <wh260@mrao.cam.ac.uk>
 
-
-from numpy import linspace
+import numpy
 from fgivenx.contours import compute_contour_plot
-from fgivenx.read_data import read_and_trim, save_contours
+from fgivenx.read_data import save_contours
+from fgivenx.sample import trim_samples
+
+from fgivenx.data_storage import load_posterior, create_functional_posterior
+import sys
+
+import numpy
+
+# Load posteriors 
+chains_file = 'chains/mps10_detec_nliv200_ident_sub.txt'
+paramnames_file = 'chains/mps10_detec_nliv200_ident_sub.paramnames'
+posterior, paramnames = load_posterior(chains_file, paramnames_file)
+
+# Define the function
+def logspectrum(logE, params):
+    """ General spectrum """
+    logN0, alpha, beta, logE0, logEc = params
+
+    logdNdE = logN0
+    logdNdE -= (logE - logE0) * (alpha + beta*(logE - logE0) )
+    logdNdE -= numpy.exp(logE-logEc) - numpy.exp(logE0 - logEc)
+
+    return logdNdE
+
+
+def logspectrum_fix_E0_Ec(logE, params):
+    """ Spectrum with logE0 and logEc fixed """
+    logE0 = numpy.log(4016.0)
+    logEc = float('inf')
+    return logspectrum(logE, params + [logE0, logEc])
+
+
+# Create a set of function posteriors
+function = logspectrum_fix_E0_Ec
+chosen_parameters = ['log_N0_1','alpha_PS_1','beta_PS_1']
+
+functional_posterior = create_functional_posterior(posterior, function, chosen_parameters)
+
+nsamp = 1000
+functional_posterior = trim_samples(functional_posterior,nsamp)
+#print [f.w for f in functional_posterior]
+sys.exit(0)
 
 print "Computing Contours"
 print "------------------"
@@ -62,10 +102,9 @@ ymax = 1.0       # maximum of y range
 # several plots and compare stability
 nsamp = -1
 
-chains_file = 'chains/my_data.txt'  # where the chains are kept
 root = 'my_data'            # the root name for the other files
 
-progress_bar = False
+progress_bar = True
 
 # Computing contours
 # ------------------
@@ -81,12 +120,10 @@ progress_bar = False
 #     shouldn't be any additional irrelevant parameters
 #
 
-samples = read_and_trim(chains_file, nsamp, progress_bar)
-
 # Compute a grid for making a contour plot
-x = linspace(xmin, xmax, nx)
-y = linspace(ymin, ymax, ny)
-z = compute_contour_plot(samples, x, y, progress_bar)
+x = numpy.linspace(xmin, xmax, nx)
+y = numpy.linspace(ymin, ymax, ny)
+z = compute_contour_plot(numpy.array(functional_posterior), x, y, progress_bar)
 
 # Save the contours to file for later use
 save_contours(root, x, y, z)

@@ -24,7 +24,10 @@ def read_contours(root):
 
 
 
-def read_and_trim(filename,nsamp=0,pbar=False):
+
+
+
+def get_samples(filename, function, chosen_parameters, nsamp=0,pbar=False):
 
     # Read in all the samples
     # -----------------------
@@ -34,12 +37,14 @@ def read_and_trim(filename,nsamp=0,pbar=False):
     samples = []; f = open(filename,'r')
 
     for line in f:
-        line = line.split()                         # split the line into an array of strings 
-        w    = float(line.pop(0))                   # pop the weight and add it to the array                 
-        xy   = np.array([ float(c) for c in line ]) # extract the xy coordinates
-        n    = xy.size/2                            # get the number of (x,y) coordines on this line
-        x,y  = xy[:n],xy[n:]                        # extract the x and y coordinates from xy
-        samples.append(LinearSample(x,y,w))         # create the sample and add to the array
+        line   = line.split()                         # split the line into an array of strings 
+        w      = float(line.pop(0))                   # pop the weight and add it to the array                 
+        logL   = float(line.pop(0))/-2                # pop the loglikelihood
+        params = np.array([ float(c) for c in line ]) # extract all the params
+
+        n    = xy.size/2                              # get the number of (x,y) coordines on this line
+        x,y  = xy[:n],xy[n:]                          # extract the x and y coordinates from xy
+        samples.append(Sample(f,params))                 # create the sample and add to the array
         if pbar: progress_bar()
 
     samples = trim_samples(np.array(samples),nsamp)
