@@ -6,6 +6,9 @@ import numpy as np
 from scipy.ndimage import gaussian_filter
 from scipy.special import erfinv
 
+import cubehelix
+
+
 from matplotlib import pyplot as plt
 import os
 
@@ -15,11 +18,12 @@ print "-----------------"
 
 # Parameters
 # ----------
-root = 'my_data'      # root name for files
-color = plt.cm.Reds_r  # color scheme
+root  = 'my_data'      # root name for files
+#color = plt.cm.Reds_r  # color scheme
+color = cubehelix.cmap(reverse=False, start=0.0, rot=0.5, minLight=0.1)
 
-xlabel = '$x$'
-ylabel = '$y$'
+xlabel = '$z$'
+ylabel = '$w(z)$'
 
 max_sigma = 3.5
 
@@ -65,8 +69,8 @@ print "Plotting contours"
 CS2 = ax.contour(
     x, y, z,
     colors='k',
-    linewidths=0.5,
-    levels=[1, 2, 3], vmin=0, vmax=max_sigma
+    linewidths=1.0,
+    levels=[1, 2], vmin=0, vmax=max_sigma
     )
 
 
@@ -75,8 +79,8 @@ ax.set_xlim(x_limits)
 ax.set_ylim(y_limits)
 
 # Label axes
-ax.set_ylabel(ylabel)
-ax.set_xlabel(xlabel)
+ax.set_ylabel(ylabel, fontsize=18)
+ax.set_xlabel(xlabel, fontsize=18)
 
 # Colorbar
 #cbaxis = fig.add_axes([0.9, 0.1, 0.03, 0.8])
@@ -84,10 +88,35 @@ ax.set_xlabel(xlabel)
 colorbar = plt.colorbar(CS1, ticks=[0, 1, 2, 3])
 colorbar.ax.set_yticklabels(
     ['$0\sigma$', '$1\sigma$', '$2\sigma$', '$3\sigma$'])
-colorbar.ax.tick_params(labelsize=12)
+colorbar.ax.tick_params(labelsize=18)
 colorbar.add_lines(CS2)
 
 # fig.subplots_adjust(left=0.05,right=0.85)
+
+
+#For the toy Model Data - want to add white functions to show performance:
+# Need an xarray for the plots:
+###xarray = np.linspace(0.0, 1.0,1000)
+# yarray for the sin function: 
+#(only need the below line and can then plot)
+###yarray = [ np.sin(x*2*np.pi) for x in xarray ]
+# yarray for the linear zig-zag:
+#(create manually and finish by making yarray an np.array)
+###yarray = []
+###for x in xarray:
+###    if x<=0.25:
+###        yarray += [ 4.*x ]
+###    elif x>0.25 and x<=0.75:
+###        yarray += [ -4.*x +2. ]
+###    else:
+###        yarray += [ 4.*x -4. ]
+###yarray = np.array(yarray)
+
+#add the white plot
+###ax.plot( xarray, yarray, color='white')
+
+
+#fig.subplots_adjust(left=0.05,right=0.85)
 
 
 # Plot to file

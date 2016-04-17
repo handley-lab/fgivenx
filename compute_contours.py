@@ -88,19 +88,19 @@ print "------------------"
 
 # Settings
 # --------
-nx = 100       # resolution in x direction (this is normally sufficient)
+nx   = 100       # resolution in x direction (this is normally sufficient)
 xmin = 0.0       # minimum of x range
-xmax = 1.0       # maximum of x range
+xmax = 3.0       # maximum of x range
 
-ny = 100       # resolution in y direction (this is normally sufficient)
-ymin = 0.0        # minimum of y range
-ymax = 1.0       # maximum of y range
+ny   = 100       # resolution in y direction (this is normally sufficient)
+ymin = -2.0      # minimum of y range
+ymax = -0.0      # maximum of y range
 
 # number of samples to keep ( <= 0 means keep all)
 # Plots are quick to compute if nsamp~1000, and typically entirely stable
 # if setting a low value of nsamp, users are recommend to run
 # several plots and compare stability
-nsamp = -1
+nsamp = -1000
 
 root = 'my_data'            # the root name for the other files
 
