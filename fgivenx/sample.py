@@ -33,17 +33,13 @@ def trim_samples(samples,nsamp,pbar=False):
 
     weights *= nsamp/neff
 
-    if nsamp>0 and nsamp<ntarget:
-        weights *= nsamp/neff
-    else:
-        weights *= n
-
     if pbar: 
         progress_bar = ProgressBar(samples.size,message="trimming samples ")
     else:
         print "trimming samples"
+
     trimmed_samples = []
-    for w,s in zip(weights,samples):
+    for w, s in zip(weights,samples):
         if rand() < w:
             s.w = max(1.0,w)
             trimmed_samples.append(s)

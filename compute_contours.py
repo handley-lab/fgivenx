@@ -43,7 +43,7 @@ from fgivenx.contours import compute_contour_plot
 from fgivenx.read_data import save_contours
 from fgivenx.sample import trim_samples
 
-from fgivenx.data_storage import load_posterior, create_functional_posterior
+from fgivenx.data_storage import FunctionalPosterior
 import sys
 
 import numpy
@@ -51,7 +51,6 @@ import numpy
 # Load posteriors 
 chains_file = 'chains/mps10_detec_nliv200_ident_sub.txt'
 paramnames_file = 'chains/mps10_detec_nliv200_ident_sub.paramnames'
-posterior, paramnames = load_posterior(chains_file, paramnames_file)
 
 # Define the function
 def logspectrum(logE, params):
@@ -71,36 +70,34 @@ def logspectrum_fix_E0_Ec(logE, params):
     logEc = float('inf')
     return logspectrum(logE, params + [logE0, logEc])
 
-
 # Create a set of function posteriors
 function = logspectrum_fix_E0_Ec
 chosen_parameters = ['log_N0_1','alpha_PS_1','beta_PS_1']
 
-functional_posterior = create_functional_posterior(posterior, function, chosen_parameters)
+posterior = FunctionalPosterior(chains_file,paramnames_file)
+posterior.set_function(function,chosen_parameters)
 
-nsamp = 1000
-functional_posterior = trim_samples(functional_posterior,nsamp)
-#print [f.w for f in functional_posterior]
-sys.exit(0)
+
+# number of samples to keep ( <= 0 means keep all)
+# Plots are quick to compute if nsamp~1000, and typically entirely stable
+# if setting a low value of nsamp, users are recommend to run
+# several plots and compare stability
+nsamp = 100
+posterior.trim_samples(nsamp)
 
 print "Computing Contours"
 print "------------------"
 
 # Settings
 # --------
-nx   = 100       # resolution in x direction (this is normally sufficient)
-xmin = 0.0       # minimum of x range
-xmax = 3.0       # maximum of x range
+nx   = 100                     # resolution in x direction (this is normally sufficient)
+xmin = 2                       # minimum of x range
+xmax = 12                      # maximum of x range
 
-ny   = 100       # resolution in y direction (this is normally sufficient)
-ymin = -2.0      # minimum of y range
-ymax = -0.0      # maximum of y range
+ny   = 100      # resolution in y direction (this is normally sufficient)
+ymin = -20      # minimum of y range
+ymax = -5       # maximum of y range
 
-# number of samples to keep ( <= 0 means keep all)
-# Plots are quick to compute if nsamp~1000, and typically entirely stable
-# if setting a low value of nsamp, users are recommend to run
-# several plots and compare stability
-nsamp = -1000
 
 root = 'my_data'            # the root name for the other files
 
@@ -123,7 +120,7 @@ progress_bar = True
 # Compute a grid for making a contour plot
 x = numpy.linspace(xmin, xmax, nx)
 y = numpy.linspace(ymin, ymax, ny)
-z = compute_contour_plot(numpy.array(functional_posterior), x, y, progress_bar)
+z = compute_contour_plot(posterior, x, y, progress_bar)
 
 # Save the contours to file for later use
 save_contours(root, x, y, z)
