@@ -3,11 +3,7 @@ import numpy
 import matplotlib.pyplot
 
 from progress import ProgressBar
-
-import scipy.integrate
-
-from fgivenx.utils import find_all_roots,PMF
-from scipy.stats import gaussian_kde
+from fgivenx.utils import PMF
 from scipy.ndimage import gaussian_filter
 from scipy.special import erfinv
 
@@ -15,77 +11,56 @@ def load_contours(datafile):
     return pickle.load(open(datafile,'r'))
 
 class Contours(object):
-    def __init__(self, fsamples, x_range, nx, progress_bar = False):
+    def __init__(self, fsamples, x_range, nx=200, ny='nx', progress_bar = False):
+
+        if ny == 'nx':
+            ny = nx
 
         self.x = numpy.linspace(x_range[0], x_range[1], nx)
         slices  = compute_slices(fsamples,self.x,progress_bar)
         masses  = compute_masses(slices,progress_bar)
-        self.y, self.z = compute_zs(self.x,masses,progress_bar)
+        self.y, self.z = compute_zs(ny,masses,progress_bar)
 
     def save(self,datafile):
         """ save class to file """
         pickle.dump(self,open(datafile, 'w'))
 
-    def plot(self,ax,colors=matplotlib.pyplot.cm.Reds_r):
+    def plot(self,ax,colors=matplotlib.pyplot.cm.Reds_r,smooth=False,contour_levels=None,fineness=0.5,linewidths=1.0):
 
-        max_sigma = 3.5
-        fineness = 0.1
-        contour_levels = numpy.arange(0, 4, fineness)
+        # define the default contour lines as 1,2,3
+        if contour_levels == None:
+            contour_levels = [1, 2]
 
+        # Set up the fine contour gradation as 1 sigma above the levels above,
+        # and with specified fineness
+        fine_contour_levels = numpy.arange(0, contour_levels[-1] + 1, fineness)
+
+        # Create numpy arrays
         x = numpy.array(self.x)
         y = numpy.array(self.y)
         z = numpy.array(self.z)
 
-        # Put the limits into an array
-        x_limits = numpy.array([min(x), max(x)])
-        y_limits = numpy.array([min(y), max(y)])
-
-        # Gaussian filter the mass by a factor of 1%
-        #z = gaussian_filter(z, sigma=numpy.array(z.shape) / 100.0, order=0)
-
         # Convert to sigmas
         z = numpy.sqrt(2) * erfinv(1 - z)
 
+        # Gaussian filter if desired the sigmas by a factor of 1%
+        if smooth:
+            z = gaussian_filter(z, sigma=numpy.array(z.shape) / 100.0, order=0)
 
-        # Plotting
-        # --------
         # Plot the filled contours onto the axis ax
-        print "Plotting filled contours"
         for i in range(2):
-            CS1 = ax.contourf(
-                x, y, z,
-                cmap=colors,
-                levels=contour_levels, vmin=0, vmax=max_sigma
-                )
+            cbar = ax.contourf( x, y, z,
+                cmap=colors, levels=fine_contour_levels)
 
         # Plot some sigma-based contour lines
-        print "Plotting contours"
-        CS2 = ax.contour(
-            x, y, z,
-            colors='k',
-            linewidths=1.0,
-            levels=[1, 2], vmin=0, vmax=max_sigma
-            )
-
+        ax.contour( x, y, z,
+            colors='k', linewidths=linewidths, levels=contour_levels)
 
         # Set limits on axes
-        ax.set_xlim(x_limits)
-        ax.set_ylim(y_limits)
+        ax.set_xlim([min(x), max(x)])
+        ax.set_ylim([min(y), max(y)])
 
-        # Colorbar
-        #cbaxis = fig.add_axes([0.9, 0.1, 0.03, 0.8])
-        #
-        #colorbar = plt.colorbar(CS1, ticks=[0, 1, 2, 3])
-        #colorbar.ax.set_yticklabels(
-        #    ['$0\sigma$', '$1\sigma$', '$2\sigma$', '$3\sigma$'])
-        #colorbar.ax.tick_params(labelsize=18)
-        #colorbar.add_lines(CS2)
-
-
-
-
-
-
+        return cbar
 
 
 def compute_slices(fsamples,xs,pbar=False):
@@ -101,9 +76,9 @@ def compute_slices(fsamples,xs,pbar=False):
      """
 
     if pbar: 
-        progress_bar = ProgressBar(len(fsamples),message="computing slices ")
+        progress_bar = ProgressBar(len(xs),message="(1/3) computing slices ")
     else:
-        print "computing slices"
+        print "(1/3) computing slices"
 
     slices = []
     for x in xs:
@@ -116,27 +91,35 @@ def compute_slices(fsamples,xs,pbar=False):
 
 def compute_masses(slices,pbar=False):
 
-    if pbar: progress_bar = ProgressBar(len(slices),message="computing masses ")
-    else: print "computing masses"
+    if pbar: 
+        progress_bar = ProgressBar(len(slices),message="(2/3) computing masses ")
+    else: 
+        print "(2/3) computing masses"
     masses = []
 
     for s in slices:
         masses.append( PMF(s) ) 
-        if pbar: progress_bar()
+        if pbar: 
+            progress_bar()
 
     return masses
 
 
-def compute_zs(xs,masses,pbar=False):
-    if pbar: progress_bar = ProgressBar(len(ys),message="computing zs ")
-    else: print "computing zs"
+def compute_zs(ny,masses,pbar=False):
 
     upper = max([m.upper for m in masses])
     lower = min([m.lower for m in masses])
-    n = len(xs)
-    ys = numpy.linspace(lower,upper,n)
+    ys = numpy.linspace(lower,upper,ny)
+
+    if pbar: 
+        progress_bar = ProgressBar(len(ys),message="(3/3) computing zs    ")
+    else: 
+        print "(3/3) computing zs"
+
     zs = []
     for y in ys:
         zs.append([m(y) for m in masses])
+        if pbar: 
+            progress_bar()
 
     return ys, zs

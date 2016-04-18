@@ -1,41 +1,39 @@
 #!/usr/bin/python
+
+import matplotlib.pyplot
 from fgivenx.contours import load_contours
-from matplotlib import pyplot as plt
 
 
-# Parameters
-# ----------
+# Set up the grid of axes
+fig, axes = matplotlib.pyplot.subplots(2,5,sharex=True, sharey=True,figsize=(16,6))
 
-fig, axs = plt.subplots(2,5,sharex=True, sharey=True,figsize=(15,6))
-
-for i, ax in enumerate(axs.flatten()):
-    if i==10: 
-        break
+# plot the contours
+for i, ax in enumerate(axes.flat):
     contours = load_contours('contours/posterior' + str(i) + '.pkl')
+    colours = contours.plot(ax,colors=matplotlib.pyplot.cm.Greens_r)
 
-
-
-    contours.plot(ax,colors=plt.cm.Greens_r)
-
-    # Label axes
+# Label axes
+for i, ax in enumerate(axes.flat):
     label = 'Source ' + str(i+1)
     ax.text(0.9, 0.9, label,
             horizontalalignment='right',
             verticalalignment='top',
             transform=ax.transAxes)
 
-
-for ax in axs[-1,:]:
+# x labels
+for ax in axes[-1,:]:
     ax.set_xlabel('$\log E$')
 
-for ax in axs[:,0]:
+# y labels
+for ax in axes[:,0]:
     ax.set_ylabel('$\log \left[\\frac{dN}{dE}\\right]$')
 
-# Remove spacing between subplots
-#fig.subplots_adjust(wspace=0, hspace=0)
+# Tighten the axes together
 fig.tight_layout()
 
+# Add a colorbar (essential to do this after tight_layout)
+cbar = fig.colorbar(colours, ax=axes.ravel().tolist(),ticks=[1,2,3],pad=0.01)
+cbar.ax.set_yticklabels(['$1\sigma$', '$2\sigma$', '$3\sigma$'])
 
 # Plot to file
-# ------------
-plt.savefig('plots/posterior.pdf', bbox_inches='tight', pad_inches=0.02, dpi=400)
+matplotlib.pyplot.savefig('plots/posterior.pdf', bbox_inches='tight')

@@ -46,19 +46,29 @@ from fgivenx.contours import Contours
 from fgivenx.data_storage import FunctionalPosterior
 import sys
 
+# Settings
+# --------
+xmin = 4                       # minimum of x range
+xmax = 12                      # maximum of x range
+nsamp = 500                    # number of samples to use
+
 
 # Load posteriors 
 chains_file = 'chains/mps10_detec_nliv200_ident_sub.txt'
 paramnames_file = 'chains/mps10_detec_nliv200_ident_sub.paramnames'
 posterior = FunctionalPosterior(chains_file,paramnames_file)
 
-#self.f = interp1d(xdat,ydat,bounds_error=False,fill_value=0)
+#posterior.trim_samples(nsamp)
+posterior.trim_samples(nsamp)
 
+#self.f = interp1d(xdat,ydat,bounds_error=False,fill_value=0)
 
 # Define the function
 def logspectrum(logE, params):
-    """ General spectrum """
-    logN0, alpha, beta, logE0, logEc = params
+    """ Spectrum with logE0 and logEc fixed """
+    logE0 = numpy.log(4016.0)
+    logEc = float('inf')
+    logN0, alpha, beta = params
 
     logdNdE = logN0
     logdNdE -= (logE - logE0) * (alpha + beta*(logE - logE0) )
@@ -66,32 +76,15 @@ def logspectrum(logE, params):
 
     return logdNdE
 
-
-def logspectrum_fix_E0_Ec(logE, params):
-    """ Spectrum with logE0 and logEc fixed """
-    logE0 = numpy.log(4016.0)
-    logEc = float('inf')
-    return logspectrum(logE, params + [logE0, logEc])
-
-function = logspectrum_fix_E0_Ec
-
+function = logspectrum
 choices = [['log_N0_' + str(i), 'alpha_PS_' + str(i), 'beta_PS_' + str(i)] for i in range(1,11)]
 
-
-# Settings
-# --------
-nx   = 200                     # resolution in x direction (this is normally sufficient)
-xmin = 4                       # minimum of x range
-xmax = 12                      # maximum of x range
-nsamp = 1000
-
-posterior.trim_samples(nsamp)
 
 # Compute a grid for making a contour plot
 for i, chosen_parameters in enumerate(choices):
     print chosen_parameters
     posterior.set_function(function, chosen_parameters)
-    contours = Contours(posterior,[xmin, xmax], nx)
+    contours = Contours(posterior,[xmin, xmax],progress_bar=True)
     filename = 'contours/posterior' + str(i) + '.pkl'
     contours.save(filename)
 
