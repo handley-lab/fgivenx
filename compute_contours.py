@@ -52,6 +52,9 @@ import numpy
 chains_file = 'chains/mps10_detec_nliv200_ident_sub.txt'
 paramnames_file = 'chains/mps10_detec_nliv200_ident_sub.paramnames'
 
+#self.f = interp1d(xdat,ydat,bounds_error=False,fill_value=0)
+
+
 # Define the function
 def logspectrum(logE, params):
     """ General spectrum """

@@ -17,7 +17,14 @@ class Sample(object):
         self.w = w
 
     def __getitem__(self,paramname):
+        """ Return item value from paramname """
         return self.params_from_name[paramname]
+    def __str__(self):
+        """ String """
+        return "w=%s, logL=%s, params=%s" % (self.w, self.logL, self.params)
+    def __repr__(self):
+        """ Representation """
+        return self.__str__()
 
 class FunctionSample(Sample):
     """ class to store functional posterior sample """
@@ -26,7 +33,7 @@ class FunctionSample(Sample):
         """ Set the function to be evaluated, using the chosen parameters"""
 
         params = [self[p] for p in chosen_parameters]
-        self.f = lambda x,p=params: function(x,p)
+        self.f = lambda x, p=params: function(x, p)
 
     def __call__(self,x):
         """ return parameter with name """
@@ -34,8 +41,11 @@ class FunctionSample(Sample):
 
 
 class Posterior(object):
+    """ A set of posterior samples """
 
     def __init__(self,chains_file,paramnames_file):
+        """ Initialise from a chains_file and a paramnames file """
+
         # load the paramnames
         self.paramnames = []
         for line in open(paramnames_file,'r'):
@@ -51,13 +61,16 @@ class Posterior(object):
             self.samples.append(sample)
 
     def __iter__(self):
+        """ Iterate through the samples """
         return iter(self.samples)
 
     def __len__(self):
+        """ Number of samples """
         return len(self.samples)
 
     def trim_samples(self,nsamp=None):
-        
+        """ Trim samples """
+
         n = len(self)
         maxw = max([s.w for s in self])
 
@@ -77,9 +90,10 @@ class Posterior(object):
 
 
 class FunctionalPosterior(Posterior):
+    """ A posterior containing functions """
 
     def set_function(self,function,chosen_parameters):
-        # load function into each of these
+        """ Load the function into each of the posteriors """
         for sample in self:
             sample.__class__ = FunctionSample
             sample.set_function(function,chosen_parameters)
