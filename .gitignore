@@ -5,3 +5,5 @@ plots/*.png
 contours/*.npy
 chains/*.txt
 *sonke*
+*.pkl
+*.paramnames

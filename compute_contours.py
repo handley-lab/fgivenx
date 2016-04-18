@@ -50,6 +50,7 @@ import sys
 # Load posteriors 
 chains_file = 'chains/mps10_detec_nliv200_ident_sub.txt'
 paramnames_file = 'chains/mps10_detec_nliv200_ident_sub.paramnames'
+posterior = FunctionalPosterior(chains_file,paramnames_file)
 
 #self.f = interp1d(xdat,ydat,bounds_error=False,fill_value=0)
 
@@ -72,22 +73,9 @@ def logspectrum_fix_E0_Ec(logE, params):
     logEc = float('inf')
     return logspectrum(logE, params + [logE0, logEc])
 
-# Create a set of function posteriors
 function = logspectrum_fix_E0_Ec
 
 choices = [['log_N0_' + str(i), 'alpha_PS_' + str(i), 'beta_PS_' + str(i)] for i in range(1,11)]
-
-for chosen_parameters in choices: 
-    print chosen_parameters
-
-posteriors = [ FunctionalPosterior(chains_file,paramnames_file).set_function(function,chosen_parameters) 
-        for chosen_parameters in choices]
-
-
-nsamp = 1000
-for posterior in posteriors:
-    posterior.trim_samples(nsamp)
-
 
 
 # Settings
@@ -95,11 +83,14 @@ for posterior in posteriors:
 nx   = 200                     # resolution in x direction (this is normally sufficient)
 xmin = 4                       # minimum of x range
 xmax = 12                      # maximum of x range
+nsamp = 1000
 
+posterior.trim_samples(nsamp)
 
 # Compute a grid for making a contour plot
-for i, posterior in enumerate(posteriors):
-    print "==============" + str(i) + "================"
+for i, chosen_parameters in enumerate(choices):
+    print chosen_parameters
+    posterior.set_function(function, chosen_parameters)
     contours = Contours(posterior,[xmin, xmax], nx)
     filename = 'contours/posterior' + str(i) + '.pkl'
     contours.save(filename)

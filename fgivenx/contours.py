@@ -128,9 +128,15 @@ def compute_masses(slices,pbar=False):
 
 
 def compute_zs(xs,masses,pbar=False):
+    if pbar: progress_bar = ProgressBar(len(ys),message="computing zs ")
+    else: print "computing zs"
+
     upper = max([m.upper for m in masses])
     lower = min([m.lower for m in masses])
     n = len(xs)
     ys = numpy.linspace(lower,upper,n)
-    zs = [[m(y) for m in masses] for y in ys]
-    return ys,zs
+    zs = []
+    for y in ys:
+        zs.append([m(y) for m in masses])
+
+    return ys, zs
