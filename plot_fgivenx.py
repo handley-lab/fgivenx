@@ -10,7 +10,10 @@ fig, axes = matplotlib.pyplot.subplots(2,5,sharex=True, sharey=True,figsize=(16,
 # plot the contours
 for i, ax in enumerate(axes.flat):
     contours = load_contours('contours/posterior' + str(i) + '.pkl')
-    colours = contours.plot(ax,colors=matplotlib.pyplot.cm.Greens_r)
+    colours = contours.plot(ax,
+            colors=matplotlib.pyplot.cm.Greens_r,
+            fineness = 0.25
+            )
 
 # Label axes
 for i, ax in enumerate(axes.flat):
