@@ -112,7 +112,7 @@ def compute_zs(ny,masses,pbar=False):
     ys = numpy.linspace(lower,upper,ny)
 
     if pbar: 
-        progress_bar = ProgressBar(len(ys),message="(3/3) computing zs    ")
+        progress_bar = ProgressBar(len(ys),message="(3/3) computing zs     ")
     else: 
         print "(3/3) computing zs"
 

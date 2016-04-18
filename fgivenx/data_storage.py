@@ -86,7 +86,7 @@ class Posterior(object):
                 trimmed_samples = list(numpy.random.choice(trimmed_samples,nsamp))
 
         self.samples = trimmed_samples
-        print "Samples trimmed from " , n, " to ", len(self)
+        return self
 
 
 class FunctionalPosterior(Posterior):
