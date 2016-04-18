@@ -18,6 +18,9 @@ def plot_contours(ax,root,colors=matplotlib.pyplot.cm.Reds_r):
     # -------------
     print "Reading contours from file"
     x, y, z = read_contours(root)
+    print len(x)
+    print len(y)
+    print z.shape
 
 
     # Initial processing

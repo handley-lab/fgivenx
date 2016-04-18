@@ -1,17 +1,90 @@
-import numpy as np
+import pickle
+import numpy
+import matplotlib.pyplot
+
 from progress import ProgressBar
 
 import scipy.integrate
 
-from fgivenx.utils import find_all_roots, pairwise
+from fgivenx.utils import find_all_roots,PMF
 from scipy.stats import gaussian_kde
+from scipy.ndimage import gaussian_filter
+from scipy.special import erfinv
 
-def compute_contour_plot(fsamples,x,y,progress_bar=False):
-    """From a set of function samples, compute the mass function on an x-y grid."""
-    slices  = compute_slices(fsamples,x,progress_bar)
-    kernels = compute_kernels(slices,progress_bar)  
-    masses  = compute_masses(kernels,y,progress_bar)
-    return masses
+def load_contours(datafile):
+    return pickle.load(open(datafile,'r'))
+
+class Contours(object):
+    def __init__(self, fsamples, x_range, nx, progress_bar = False):
+
+        self.x = numpy.linspace(x_range[0], x_range[1], nx)
+        slices  = compute_slices(fsamples,self.x,progress_bar)
+        masses  = compute_masses(slices,progress_bar)
+        self.y, self.z = compute_zs(self.x,masses,progress_bar)
+
+    def save(self,datafile):
+        """ save class to file """
+        pickle.dump(self,open(datafile, 'w'))
+
+    def plot(self,ax,colors=matplotlib.pyplot.cm.Reds_r):
+
+        max_sigma = 3.5
+        fineness = 0.1
+        contour_levels = numpy.arange(0, 4, fineness)
+
+        x = numpy.array(self.x)
+        y = numpy.array(self.y)
+        z = numpy.array(self.z)
+
+        # Put the limits into an array
+        x_limits = numpy.array([min(x), max(x)])
+        y_limits = numpy.array([min(y), max(y)])
+
+        # Gaussian filter the mass by a factor of 1%
+        #z = gaussian_filter(z, sigma=numpy.array(z.shape) / 100.0, order=0)
+
+        # Convert to sigmas
+        z = numpy.sqrt(2) * erfinv(1 - z)
+
+
+        # Plotting
+        # --------
+        # Plot the filled contours onto the axis ax
+        print "Plotting filled contours"
+        for i in range(2):
+            CS1 = ax.contourf(
+                x, y, z,
+                cmap=colors,
+                levels=contour_levels, vmin=0, vmax=max_sigma
+                )
+
+        # Plot some sigma-based contour lines
+        print "Plotting contours"
+        CS2 = ax.contour(
+            x, y, z,
+            colors='k',
+            linewidths=1.0,
+            levels=[1, 2], vmin=0, vmax=max_sigma
+            )
+
+
+        # Set limits on axes
+        ax.set_xlim(x_limits)
+        ax.set_ylim(y_limits)
+
+        # Colorbar
+        #cbaxis = fig.add_axes([0.9, 0.1, 0.03, 0.8])
+        #
+        #colorbar = plt.colorbar(CS1, ticks=[0, 1, 2, 3])
+        #colorbar.ax.set_yticklabels(
+        #    ['$0\sigma$', '$1\sigma$', '$2\sigma$', '$3\sigma$'])
+        #colorbar.ax.tick_params(labelsize=18)
+        #colorbar.add_lines(CS2)
+
+
+
+
+
 
 
 
@@ -21,165 +94,43 @@ def compute_slices(fsamples,xs,pbar=False):
     from P( y(x) | x ) for several x's.
 
     Inputs:
-      fsamples  : an array of interpolation functions (see sample.py)
+      fsamples  : an array of functional samples
       xs        : an array of x coordinates
     Output:
      A 2D array containing samples from P
      """
 
-    if pbar: progress_bar = ProgressBar(len(fsamples),message="computing slices ")
-    else: print "computing slices"
+    if pbar: 
+        progress_bar = ProgressBar(len(fsamples),message="computing slices ")
+    else:
+        print "computing slices"
+
     slices = []
-
-    for f in fsamples:
-        slices.append([f(x) for x in xs])
-        if pbar: progress_bar()
+    for x in xs:
+        slices.append([f(x) for f in fsamples])
+        if pbar: 
+            progress_bar()
                      
-    return np.array(slices).T                   # return transpose
-
-def compute_weights(fsamples):
-
-    weights = np.array([f.w for f in fsamples])
-    weights /= max(weights)
-                     
-    return weights
+    return slices
 
 
-# compute_kernels
-# ---------------
-#
-#   Converts samples from P( y(x) | x ) to kernel density estimates using weighted_kde.gaussian_kde
-#
-#   Inputs:
-#     slices  : 2D array of samples from P( y(x) | x ) for several x's (as produced by compute_slices)
-#   Output:
-#     A 1D array of kernel density estimates of the distribution P( y(x) | x ) for each of the x's
-#
-def compute_kernels(slices,pbar=False):
-    if pbar: progress_bar = ProgressBar(slices.size,message="computing kernels")
-    else: print "computing kernels"
-    kernels = []
+def compute_masses(slices,pbar=False):
 
-    for s in slices:
-        kernels.append(gaussian_kde(s))
-        if pbar: progress_bar()
-                     
-    return np.array(kernels)
-
-
-# compute_pmf
-# -----------
-#   Computes the 'probability mass function' of a probability density
-#   function
-#
-#          /
-#   M(p) = |          P(y) dy
-#          / P(y) < p
-#
-#   This is the cumulative distribution function expressed as a
-#   function of the probability
-#
-#   We actually aim to compute M(y), which indicates the amount of
-#   probability contained outside the iso-probability contour passing
-#   through y
-#
-#
-#  ^ P(y)
-#  |                       .....
-#  |                     .       .
-# p|- - - - - - - - - - . - - - - . - - - - - - - - - - - 
-#  |                   .#         #.
-#  |                  .##         ##.
-#  |                  .##         ##.
-#  |                 .###         ###.       M(p) is the shaded area
-#  |                 .###         ###.
-#  |                 .###         ###.
-#  |                .####         ####.
-#  |                .####         ####.
-#  |              ..#####         #####..
-#  |          ....#######         #######....
-#  |         .###########         ###########.
-#  +-----------------------------------------------------> y 
-#
-#   ^ M(p)                        ^ M(y)                   
-#   |                             |                        
-#  1|                +++         1|         + 
-#   |               +             |        + +
-#   |       ++++++++              |       +   +            
-#   |     ++                      |     ++     ++          
-#   |   ++                        |   ++         ++        
-#   |+++                          |+++             +++     
-#   +---------------------> p     +---------------------> y
-#  0                   1                                   
-#
-#   Inputs:
-#     kernel : a kernel density estimate of P(y)
-#     ys     : set of y values
-#   Output:
-#     1D array of M(y) values at each ys
-#
-def compute_pmf(ys,kernel):
-    pmf = []
-
-    d = ys[0] - ys[-1]
-    yl = ys[0] - d*100
-    yu = ys[-1] + d*100
-
-    # compute the probablities
-    ps = kernel(ys)
-    p_grid = [kernel(yl)] + list(ps) + [kernel(yu)]
-    y_grid = [yl] + list(ys) + [yu]
-
-    for p in ps:
-        y0s = find_all_roots(y_grid,p_grid,p,kernel)
-        if len(y0s) % 2 == 0:
-            lowers = [-np.inf] + y0s[::2]
-            uppers = y0s[1::2] + [-np.inf]
-
-            total = 0.0
-            for l, u in zip(lowers,uppers):
-                total += kernel.integrate_box_1d(l,u)
-            pmf.append(1-total)
-        elif len(y0s)==1:
-            pmf.append(1.0)
-        else:
-            pmf.append(1.0)
-            
-    return pmf
-
-#    nys  = ys.size          # get the number of y values
-#    pmf  = np.zeros(nys)    # initialise the M(y) with zeros
-#    prob = kernel(ys)       # Compute the probablities at each point
-#    ii   = np.argsort(prob) # Compute sorted indices
-#    cdf  = 0                # Initialise cumulative density functions
-#
-#    for i in ii:            # for each y value compute the cdf as a function of p
-#        cdf+=prob[i]/nys
-#        pmf[i] = cdf
-#
-#    return pmf/cdf          # return it as normalised
-
-
-
-# compute_masses
-# --------------
-#   Converts a set of functions P( y(x) | x ) into a grid of probability mass functions
-#
-#   Inputs:
-#     kernels   : array of kernel density estimates of the distribution P( y(x) | x ) for each of the x's
-#                 (as produced by compute_kernels)
-#     ys        : an array of y coordinates
-#   Output:
-#     A 2D array indicating M(x,y) where for each x, M(y) is the probability mass function of P( y(x) | x )
-#
-def compute_masses(kernels,y,pbar=False):
-
-    if pbar: progress_bar = ProgressBar(kernels.size,message="computing masses ")
+    if pbar: progress_bar = ProgressBar(len(slices),message="computing masses ")
     else: print "computing masses"
     masses = []
 
-    for k in kernels:
-        masses.append( compute_pmf(y,k) )         # compute M(x,y) for each value
+    for s in slices:
+        masses.append( PMF(s) ) 
         if pbar: progress_bar()
 
-    return np.array(masses).T             # return the transpose
+    return masses
+
+
+def compute_zs(xs,masses,pbar=False):
+    upper = max([m.upper for m in masses])
+    lower = min([m.lower for m in masses])
+    n = len(xs)
+    ys = numpy.linspace(lower,upper,n)
+    zs = [[m(y) for m in masses] for y in ys]
+    return ys,zs

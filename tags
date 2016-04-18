@@ -1,31 +1,30 @@
+Contours	fgivenx/contours.py	/^class Contours(object):$/
 FunctionSample	fgivenx/data_storage.py	/^class FunctionSample(Sample):$/
 FunctionalPosterior	fgivenx/data_storage.py	/^class FunctionalPosterior(Posterior):$/
-LinearSample	fgivenx/sample.py	/^class LinearSample(Sample):$/
+PMF	fgivenx/utils.py	/^class PMF(object):$/
 Posterior	fgivenx/data_storage.py	/^class Posterior(object):$/
 ProgressBar	fgivenx/progress.py	/^class ProgressBar(object):$/
 Sample	fgivenx/data_storage.py	/^class Sample(object):$/
-Sample	fgivenx/sample.py	/^class Sample(object):$/
 __call__	fgivenx/data_storage.py	/^    def __call__(self,x):$/
 __call__	fgivenx/progress.py	/^    def __call__(self):$/
-__call__	fgivenx/sample.py	/^    def __call__(self,x):$/
+__call__	fgivenx/utils.py	/^    def __call__(self,t):$/
 __getitem__	fgivenx/data_storage.py	/^    def __getitem__(self,paramname):$/
+__init__	fgivenx/contours.py	/^    def __init__(self, fsamples, x_range, nx, prog/
 __init__	fgivenx/data_storage.py	/^    def __init__(self, params, paramnames, logL, w/
 __init__	fgivenx/data_storage.py	/^    def __init__(self,chains_file,paramnames_file)/
 __init__	fgivenx/planckStyle.py	/^    def __init__(self):$/
 __init__	fgivenx/progress.py	/^    def __init__(self,n,message=" "):$/
-__init__	fgivenx/sample.py	/^    def __init__(self, xdat, ydat, w=1):$/
+__init__	fgivenx/utils.py	/^    def __init__(self,samples):$/
 __init__	fgivenx/weighted_kde.py	/^    def __init__(self, dataset, bw_method=None, we/
 __iter__	fgivenx/data_storage.py	/^    def __iter__(self):$/
-__repr__	fgivenx/sample.py	/^    def __repr__(self):$/
-__str__	fgivenx/sample.py	/^    def __str__(self):$/
+__len__	fgivenx/data_storage.py	/^    def __len__(self):$/
+__repr__	fgivenx/data_storage.py	/^    def __repr__(self):$/
+__str__	fgivenx/data_storage.py	/^    def __str__(self):$/
 _compute_covariance	fgivenx/weighted_kde.py	/^    def _compute_covariance(self):$/
 belowTitleLine	fgivenx/planckStyle.py	/^    def belowTitleLine(self, colsPerParam, numResu/
-compute_contour_plot	fgivenx/contours.py	/^def compute_contour_plot(fsamples,x,y,progress_bar/
-compute_kernels	fgivenx/contours.py	/^def compute_kernels(slices,weights,pbar=False):$/
-compute_masses	fgivenx/contours.py	/^def compute_masses(kernels,y,pbar=False):$/
-compute_pmf	fgivenx/contours.py	/^def compute_pmf(ys,kernel):$/
+compute_masses	fgivenx/contours.py	/^def compute_masses(slices,pbar=False):$/
 compute_slices	fgivenx/contours.py	/^def compute_slices(fsamples,xs,pbar=False):$/
-compute_weights	fgivenx/contours.py	/^def compute_weights(fsamples):$/
+compute_zs	fgivenx/contours.py	/^def compute_zs(xs,masses,pbar=False):$/
 doExport	fgivenx/planckStyle.py	/^    def doExport(self, fname=None, adir=None, wate/
 endTable	fgivenx/planckStyle.py	/^    def endTable(self):$/
 evaluate	fgivenx/weighted_kde.py	/^    def evaluate(self, points):$/
@@ -43,13 +42,16 @@ getRoot	fgivenx/planckStyle.py	/^    def getRoot(self, paramtag, datatag, return
 getSinglePlotter	fgivenx/planckStyle.py	/^def getSinglePlotter(ratio=3 \/ 4., plot_data=None,/
 getSubplotPlotter	fgivenx/planckStyle.py	/^def getSubplotPlotter(plot_data=None, chain_dir=No/
 get_samples	fgivenx/read_data.py	/^def get_samples(filename, function, chosen_paramet/
+load_contours	fgivenx/contours.py	/^def load_contours(datafile):$/
 pairwise	fgivenx/utils.py	/^def pairwise(iterable):$/
 planckPlotter	fgivenx/planckStyle.py	/^class planckPlotter(plots.GetDistPlotter):$/
 planckStyleTableFormatter	fgivenx/planckStyle.py	/^class planckStyleTableFormatter(types.NoLineTableF/
 planck_lensing	fgivenx/planckStyle.py	/^def planck_lensing(omm, sigma):$/
+plot	fgivenx/contours.py	/^    def plot(self,ax,colors=matplotlib.pyplot.cm.R/
 plotBounds	fgivenx/planckStyle.py	/^def plotBounds(omm, data, c='gray'):$/
 plot_contours	fgivenx/plot_contours.py	/^def plot_contours(ax,root,colors=matplotlib.pyplot/
 read_contours	fgivenx/read_data.py	/^def read_contours(root):$/
+save	fgivenx/contours.py	/^    def save(self,datafile):$/
 save_contours	fgivenx/read_data.py	/^def save_contours(root,x,y,z):$/
 scotts_factor	fgivenx/weighted_kde.py	/^    def scotts_factor(self):$/
 setRc	fgivenx/planckStyle.py	/^def setRc():$/
@@ -60,4 +62,4 @@ silverman_factor	fgivenx/weighted_kde.py	/^    def silverman_factor(self):$/
 startTable	fgivenx/planckStyle.py	/^    def startTable(self, ncol, colsPerResult, numR/
 textAsColumn	fgivenx/planckStyle.py	/^    def textAsColumn(self, txt, latex=False, separ/
 titleSubColumn	fgivenx/planckStyle.py	/^    def titleSubColumn(self, colsPerResult, title)/
-trim_samples	fgivenx/sample.py	/^def trim_samples(samples,nsamp,pbar=False):$/
+trim_samples	fgivenx/data_storage.py	/^    def trim_samples(self,nsamp=None):$/

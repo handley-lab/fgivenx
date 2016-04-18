@@ -97,3 +97,5 @@ class FunctionalPosterior(Posterior):
         for sample in self:
             sample.__class__ = FunctionSample
             sample.set_function(function,chosen_parameters)
+
+        return self
