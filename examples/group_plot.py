@@ -39,4 +39,4 @@ cbar = fig.colorbar(colours, ax=axes.ravel().tolist(),ticks=[1,2,3],pad=0.01)
 cbar.ax.set_yticklabels(['$1\sigma$', '$2\sigma$', '$3\sigma$'])
 
 # Plot to file
-matplotlib.pyplot.savefig('plots/posterior.pdf', bbox_inches='tight')
+matplotlib.pyplot.savefig('plots/posterior_group.pdf', bbox_inches='tight')
