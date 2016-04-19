@@ -56,15 +56,16 @@ class Contours(object):
         """ save class to file """
         pickle.dump(self,open(datafile, 'w'))
 
-    def plot(self,ax,colors=matplotlib.pyplot.cm.Reds_r,smooth=False,contour_levels=None,fineness=0.5,linewidths=1.0):
+    def plot(self,ax,colors=matplotlib.pyplot.cm.Reds_r,smooth=False,contour_levels=None,fine_contour_level=None,fineness=0.5,linewidths=1.0):
 
-        # define the default contour lines as 1,2,3
+        # define the default contour lines as 1,2
         if contour_levels == None:
             contour_levels = [1, 2]
 
         # Set up the fine contour gradation as 1 sigma above the levels above,
         # and with specified fineness
-        fine_contour_levels = numpy.arange(0, contour_levels[-1] + 1, fineness)
+        if fine_contour_level == None:
+            fine_contour_levels = numpy.arange(0, contour_levels[-1] + 1, fineness)
 
         # Create numpy arrays
         x = numpy.array(self.x)
@@ -91,6 +92,7 @@ class Contours(object):
         ax.set_xlim([min(x), max(x)])
         ax.set_ylim([min(y), max(y)])
 
+        # Return the contours for use as a colourbar later
         return cbar
 
 
