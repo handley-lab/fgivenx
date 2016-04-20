@@ -124,7 +124,7 @@ class FunctionSample(Sample):
                 Returns
                 -------
                 float
-                    The value of f(x;theta).
+                    The value of f(x|theta).
 
             chosen_parameters: List[str]
                 The names of the parameters from sample that the function uses
@@ -134,7 +134,7 @@ class FunctionSample(Sample):
         self._function = lambda x, p=params: f(x, p)
 
     def __call__(self, x):
-        """ Value of f(x;theta), with theta equal to the sample parameters. """
+        """ Value of f(x|theta), with theta equal to the sample parameters. """
         return self._function(x)
 
 
