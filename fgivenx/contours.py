@@ -81,9 +81,6 @@ class Contours(object):
         # Compute densities across the grid
         self.z = [[m(y) for m in masses] for y in self.y]
 
-        self.cbar = None
-
-
     def save(self, datafile):
         """ Save contours to file """
         pickle.dump(self, open(datafile, 'w'))
@@ -95,7 +92,8 @@ class Contours(object):
              contour_line_levels='[1,2]',
              linewidths=1.0,
              contour_color_levels='numpy.arange(0, contour_line_levels[-1] + 1, fineness)',
-             fineness=0.5):
+             fineness=0.5,
+             remove_white_lines=True):
         """ Plot computed contours.
 
             Parameters
@@ -123,6 +121,9 @@ class Contours(object):
             fineness: float, optional
                 (Default: 0.1)
                 Spacing of contour color levels.
+            remove_white_lines: bool, optional
+                (Default: True)
+                Remove the white lines on the computer screen.
 
 
 
@@ -157,6 +158,9 @@ class Contours(object):
 
         # Plot the filled contours onto the axis ax
         cbar = ax.contourf(x, y, z, cmap=colors, levels=contour_color_levels)
+        # Remove those annoying white lines
+        for c in cbar.collections:
+            c.set_edgecolor("face")
 
         # Plot some sigma-based contour lines
         ax.contour(x, y, z, colors='k', linewidths=linewidths, levels=contour_line_levels)
