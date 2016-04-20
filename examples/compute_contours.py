@@ -36,7 +36,7 @@ posterior = FunctionalPosterior(chains_file,paramnames_file).trim_samples(nsamp)
 posterior.set_function(f, chosen_parameters)
 
 # Compute the contours
-contours = Contours(posterior,[xmin, xmax],progress_bar=True)
+contours = Contours(posterior,[xmin, xmax])
 
 # Save the contours
 contours.save('contours/posterior.pkl')

@@ -32,11 +32,10 @@
 import pickle
 import numpy
 import matplotlib.pyplot
+import scipy
 
 from fgivenx.utils import PMF
-from scipy.ndimage import gaussian_filter
-from scipy.special import erfinv
-from tqdm import tqdm as pbar
+from fgivenx.tqdm.tqdm import tqdm as pbar
 
 def load_contours(datafile):
     return pickle.load(open(datafile,'r'))
@@ -93,11 +92,11 @@ class Contours(object):
         z = numpy.array(self.z)
 
         # Convert to sigmas
-        z = numpy.sqrt(2) * erfinv(1 - z)
+        z = numpy.sqrt(2) * scipy.special.erfinv(1 - z)
 
         # Gaussian filter if desired the sigmas by a factor of 1%
         if smooth:
-            z = gaussian_filter(z, sigma=numpy.array(z.shape) / 100.0, order=0)
+            z = scipy.ndimage.gaussian_filter(z, sigma=numpy.array(z.shape) / 100.0, order=0)
 
         # Plot the filled contours onto the axis ax
         for i in range(2):
