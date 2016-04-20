@@ -66,7 +66,7 @@ class Contours(object):
         self.x = numpy.linspace(x_range[0], x_range[1], nx)
 
         # Compute masses at each value of x
-        masses = [PMF(posterior(x)) for x in pbar(self.x, desc="computing masses")]
+        masses = [PMF(posterior(x)) for x in pbar(self.x, desc="  computing masses")]
 
         # Compute upper and lower bounds on y
         self.upper = max([m.upper for m in masses])

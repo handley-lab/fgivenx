@@ -57,6 +57,7 @@ posterior = FunctionalPosterior(chains_file, paramnames_file)
 trimmed_posterior = posterior.trim_samples(nsamp)
 
 for i, chosen_parameters in enumerate(choices):
+    print "Computing contours for f(x|" + ','.join(chosen_parameters) + ")"
     # Generate some functional posteriors
     trimmed_posterior.set_function(f, chosen_parameters)
 

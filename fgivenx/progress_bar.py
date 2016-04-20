@@ -11,4 +11,4 @@ except ImportError:
 
 def pbar(iterator, desc=None):
     """ Wrapper function for progress bar """
-    return tqdm(iterator, desc=desc)
+    return tqdm(iterator, desc=desc, leave=False)
