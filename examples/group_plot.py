@@ -1,35 +1,22 @@
 #!/usr/bin/python
-
 import matplotlib.pyplot
 from fgivenx.contours import load_contours
 
-
 # Set up the grid of axes
-fig, axes = matplotlib.pyplot.subplots(2,5,sharex=True, sharey=True,figsize=(16,6))
+fig, axes = matplotlib.pyplot.subplots(2,2,sharex=True, sharey=True,figsize=(6,6))
 
 # plot the contours
 for i, ax in enumerate(axes.flat):
     contours = load_contours('contours/posterior' + str(i) + '.pkl')
-    colours = contours.plot(ax,
-            colors=matplotlib.pyplot.cm.Greens_r,
-            fineness = 0.25
-            )
-
-# Label axes
-for i, ax in enumerate(axes.flat):
-    label = 'Source ' + str(i+1)
-    ax.text(0.9, 0.9, label,
-            horizontalalignment='right',
-            verticalalignment='top',
-            transform=ax.transAxes)
+    colours = contours.plot(ax)
 
 # x labels
 for ax in axes[-1,:]:
-    ax.set_xlabel('$\log E$')
+    ax.set_xlabel('$x$')
 
 # y labels
 for ax in axes[:,0]:
-    ax.set_ylabel('$\log \left[\\frac{dN}{dE}\\right]$')
+    ax.set_ylabel('$y$')
 
 # Tighten the axes together
 fig.tight_layout()

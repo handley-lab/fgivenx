@@ -17,18 +17,14 @@ def f(x, theta):
 
     return m * x + c
 
-choices = [['m_' + str(i), 'c_' + str(i)] for i in range(1,11)]
+chosen_parameters = ['m_1', 'c_1']
 
 
 # Computing contours
 # ------------------
-# load the posteriors from file
-posterior = FunctionalPosterior(chains_file,paramnames_file).trim_samples(nsamp)
+# load the posteriors from file, and set the function
+posterior = FunctionalPosterior(chains_file, paramnames_file).trim_samples(nsamp).set_function(f, chosen_parameters)
 
-for i, chosen_parameters in enumerate(choices):
-    # Generate some functional posteriors
-    posterior.set_function(f, chosen_parameters)
-
-    # Compute the contours and save
-    contours = Contours(posterior,[xmin, xmax])
-    contours.save('contours/posterior' + str(i) + '.pkl')
+# Compute the contours and save
+contours = Contours(posterior,[xmin, xmax])
+contours.save('contours/posterior.pkl')
