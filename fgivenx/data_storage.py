@@ -99,3 +99,9 @@ class FunctionalPosterior(Posterior):
             sample.set_function(function,chosen_parameters)
 
         return self
+
+    def given_x(self,x):
+        return [s(x) for s in self]
+
+    def __call__(self,x):
+        return self.given_x(x)

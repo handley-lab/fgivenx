@@ -33,38 +33,58 @@ import pickle
 import numpy
 import matplotlib.pyplot
 
-from progress import ProgressBar
 from fgivenx.utils import PMF
 from scipy.ndimage import gaussian_filter
 from scipy.special import erfinv
+from tqdm import tqdm as pbar
 
 def load_contours(datafile):
     return pickle.load(open(datafile,'r'))
 
 class Contours(object):
-    def __init__(self, fsamples, x_range, nx=200, ny='nx', progress_bar = False):
+
+    def __init__(self, fsamples, x_range, nx=200, ny='nx'):
 
         if ny == 'nx':
             ny = nx
 
+        # Set up x coordinates
         self.x = numpy.linspace(x_range[0], x_range[1], nx)
-        slices  = compute_slices(fsamples,self.x,progress_bar)
-        masses  = compute_masses(slices,progress_bar)
-        self.y, self.z = compute_zs(ny,masses,progress_bar)
+
+        # Compute masses at each value of x
+        masses = [PMF(fsamples(x)) for x in pbar(self.x, desc="computing masses")]
+
+        # Compute upper and lower bounds on y
+        self.upper = max([m.upper for m in masses])
+        self.lower = min([m.lower for m in masses])
+
+        # Set up y coordinates
+        self.y = numpy.linspace(self.lower, self.upper, ny)
+        
+        # Compute densities across the grid
+        self.z = [[m(y) for m in masses] for y in self.y]
+
 
     def save(self,datafile):
         """ save class to file """
         pickle.dump(self,open(datafile, 'w'))
 
-    def plot(self,ax,colors=matplotlib.pyplot.cm.Reds_r,smooth=False,contour_levels=None,fine_contour_level=None,fineness=0.5,linewidths=1.0):
+
+    def plot(self,ax,
+            colors=matplotlib.pyplot.cm.Reds_r,
+            smooth=False,
+            contour_levels='[1,2]',
+            fine_contour_levels='numpy.arange(0, contour_levels[-1] + 1, fineness)',
+            fineness=0.5,
+            linewidths=1.0):
 
         # define the default contour lines as 1,2
-        if contour_levels == None:
+        if contour_levels == '[1,2]':
             contour_levels = [1, 2]
 
         # Set up the fine contour gradation as 1 sigma above the levels above,
         # and with specified fineness
-        if fine_contour_level == None:
+        if fine_contour_levels == 'numpy.arange(0, contour_levels[-1] + 1, fineness)':
             fine_contour_levels = numpy.arange(0, contour_levels[-1] + 1, fineness)
 
         # Create numpy arrays
@@ -94,65 +114,3 @@ class Contours(object):
 
         # Return the contours for use as a colourbar later
         return cbar
-
-
-def compute_slices(fsamples,xs,pbar=False):
-    """
-    Convert a set of interpolation functions to a set of samples 
-    from P( y(x) | x ) for several x's.
-
-    Inputs:
-      fsamples  : an array of functional samples
-      xs        : an array of x coordinates
-    Output:
-     A 2D array containing samples from P
-     """
-
-    if pbar: 
-        progress_bar = ProgressBar(len(xs),message="(1/3) computing slices ")
-    else:
-        print "(1/3) computing slices"
-
-    slices = []
-    for x in xs:
-        slices.append([f(x) for f in fsamples])
-        if pbar: 
-            progress_bar()
-                     
-    return slices
-
-
-def compute_masses(slices,pbar=False):
-
-    if pbar: 
-        progress_bar = ProgressBar(len(slices),message="(2/3) computing masses ")
-    else: 
-        print "(2/3) computing masses"
-    masses = []
-
-    for s in slices:
-        masses.append( PMF(s) ) 
-        if pbar: 
-            progress_bar()
-
-    return masses
-
-
-def compute_zs(ny,masses,pbar=False):
-
-    upper = max([m.upper for m in masses])
-    lower = min([m.lower for m in masses])
-    ys = numpy.linspace(lower,upper,ny)
-
-    if pbar: 
-        progress_bar = ProgressBar(len(ys),message="(3/3) computing zs     ")
-    else: 
-        print "(3/3) computing zs"
-
-    zs = []
-    for y in ys:
-        zs.append([m(y) for m in masses])
-        if pbar: 
-            progress_bar()
-
-    return ys, zs

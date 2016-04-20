@@ -65,31 +65,28 @@ class PMF(object):
 
         # Compute the kernel density estimator from the samples
         kernel = scipy.stats.gaussian_kde(samples)
-        ts = kernel.resample(10000)[0]
+
+        # Generate enough samples to get good 2 sigma contours
+        n = 10000
+        ts = kernel.resample(n)[0]
+
+        # Sort the samples in t, and find their probabilities
+        ts.sort()
         ps = kernel(ts)
 
-        n = float(len(ts))
+        # Compute the cumulative distribution function M(t) by 
+        # sorting the ps, and finding the position in that sort
+        # We then store this as a log
+        ms = numpy.log(scipy.stats.rankdata(ps)/float(n))
 
-        # Sort the grid by probability
-        sort_by_p = [(p,t) for p, t in zip(ps,ts)]
-        sort_by_p.sort()
-
-        # Compute the cumulative distribution function
-        cdf = [(t,(i+1)/n) for i,(_,t) in enumerate(sort_by_p)]
-        cdf.sort()
-
-        # define the function
-        self.pmf = scipy.interpolate.interp1d(
-                [t for t,_ in cdf],
-                [numpy.log(m) for _,m in cdf],
-                bounds_error=False, 
-                fill_value=-numpy.inf
-                )
+        # create an interpolating function of M(t)
+        self.logpmf = scipy.interpolate.interp1d( ts, ms,
+                bounds_error=False, fill_value=-numpy.inf)
         self.lower = min(ts)
         self.upper = max(ts)
 
     def __call__(self,t):
-        return numpy.exp(self.pmf(t))
+        return numpy.exp(self.logpmf(t))
 
 
 
