@@ -35,7 +35,7 @@ import matplotlib.pyplot
 import scipy
 
 from fgivenx.utils import PMF
-from fgivenx.tqdm.tqdm import tqdm as pbar
+from fgivenx.progress_bar import pbar
 
 def load_contours(datafile):
     return pickle.load(open(datafile,'r'))

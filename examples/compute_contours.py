@@ -23,7 +23,7 @@ def f(logE, params):
 
     return logdNdE
 
-chosen_parameters = ['log_N0_1', 'alpha_PS_1', 'beta_PS_1']
+chosen_parameters = ['log_N0_1', 'alpha_1', 'beta_1']
 
 
 # Computing contours
