@@ -55,9 +55,12 @@ class Contours(object):
         ny: int, optional
             (Default: nx)
             Number of bins in y.
+        message: str, optional
+            (Default: "computing masses")
+            Message to put with progress bar
     """
 
-    def __init__(self, posterior, x_range, nx=200, ny='nx'):
+    def __init__(self, posterior, x_range, nx=200, ny='nx', message="computing masses"):
 
         if ny == 'nx':
             ny = nx
@@ -66,7 +69,7 @@ class Contours(object):
         self.x = numpy.linspace(x_range[0], x_range[1], nx)
 
         # Compute masses at each value of x
-        masses = [PMF(posterior(x)) for x in pbar(self.x, desc="computing masses")]
+        masses = [PMF(posterior(x)) for x in pbar(self.x, desc=message)]
 
         # Compute upper and lower bounds on y
         self.upper = max([m.upper for m in masses])
