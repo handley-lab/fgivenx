@@ -62,4 +62,5 @@ for i, chosen_parameters in enumerate(choices):
 
     # Create the contours and save
     contourfile = 'contours/posterior' + str(i) + '.pkl'
-    contours = Contours(trimmed_posterior, (xmin, xmax)).save(contourfile)
+    message = "(" + str(i+1) + "/4) Computing contours for f(x|" + ','.join(chosen_parameters) + ")"
+    contours = Contours(trimmed_posterior, (xmin, xmax), message=message).save(contourfile)
