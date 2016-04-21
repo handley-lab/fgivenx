@@ -60,10 +60,14 @@ class Contours(object):
             Message to put with progress bar
     """
 
-    def __init__(self, posterior, x_range, nx=200, ny='nx', message="computing masses"):
+    def __init__(self, posterior, x_range, **kwargs):
+        # Get inputs
+        nx = kwargs.pop('nx', 200)
+        ny = kwargs.pop('ny', nx)
+        message = kwargs.pop('message', "computing masses")
 
-        if ny == 'nx':
-            ny = nx
+        if kwargs:
+            raise TypeError('Unexpected **kwargs in Contours constructor: %r' % kwargs)
 
         # Set up x coordinates
         self.x = numpy.linspace(x_range[0], x_range[1], nx)
@@ -86,14 +90,7 @@ class Contours(object):
         pickle.dump(self, open(datafile, 'w'))
         return self
 
-    def plot(self, ax,
-             colors=matplotlib.pyplot.cm.Reds_r,
-             smooth=False,
-             contour_line_levels='[1,2]',
-             linewidths=1.0,
-             contour_color_levels='numpy.arange(0, contour_line_levels[-1] + 1, fineness)',
-             fineness=0.5,
-             remove_white_lines=True):
+    def plot(self, ax, **kwargs):
         """ Plot computed contours.
 
             Parameters
@@ -103,7 +100,7 @@ class Contours(object):
                 Typically generated with:
                     fig, ax = matplotlib.pyplot.subplots()
 
-            colours: matplotlib.colors.LinearSegmentedColormap, optional
+            colors: matplotlib.colors.LinearSegmentedColormap, optional
                 (Default: matplotlib.pyplot.cm.Reds_r)
                 Color scheme to plot with. Recommend plotting in reverse
             smooth: bool, optional
@@ -121,28 +118,28 @@ class Contours(object):
             fineness: float, optional
                 (Default: 0.1)
                 Spacing of contour color levels.
-            remove_white_lines: bool, optional
-                (Default: True)
-                Remove the white lines on the computer screen.
-
-
 
             Returns
             -------
             cbar: matplotlib.contour.QuadContourSet
-                Colours to create a global colour bar
+                Colors to create a global colour bar
 
             Functionality mostly determined by modifications to ax
         """
+        # Get inputs
+        colors = kwargs.pop('colors', matplotlib.pyplot.cm.Reds_r)
+        smooth = kwargs.pop('smooth', False)
 
-        # define the default contour lines as 1,2
-        if contour_line_levels == '[1,2]':
-            contour_line_levels = [1, 2]
+        linewidths = kwargs.pop('linewidths', 1.0)
+        contour_line_levels = kwargs.pop('contour_line_levels', [1, 2])
 
-        # Set up the fine contour gradation as 1 sigma above the levels above,
-        # and with specified fineness
-        if contour_color_levels == 'numpy.arange(0, contour_line_levels[-1] + 1, fineness)':
-            contour_color_levels = numpy.arange(0, contour_line_levels[-1] + 1, fineness)
+        fineness = kwargs.pop('fineness', 0.5)
+        default_color_levels = numpy.arange(0, contour_line_levels[-1] + 1, fineness)
+        contour_color_levels = kwargs.pop('contour_color_levels', default_color_levels)
+
+        if kwargs:
+            raise TypeError('Unexpected **kwargs in Contour plot method: %r' % kwargs)
+
 
         # Create numpy arrays
         x = numpy.array(self.x)
