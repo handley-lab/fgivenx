@@ -1,32 +1,4 @@
-""" This script computes the grid for contours of a function
-    reconstruction plot.
-
-    If one has
-     * independent variable x
-     * dependent variable y
-     * functional form y = f(x,theta) parameterised by theta
-
-    Assuming that you have obtained samples of theta from an MCMC
-    process, we aim to compute:
-
-                  /
-    P( y | x ) =  | P( y = f(x,theta) | x, theta ) dtheta ,  (1)
-                  /
-
-    which gives our degree of knowledge for each y value given an x value.
-
-    In fact, for a more representative plot, we are not actually
-    interested in the value of the probability density (1), but in fact
-    require the "iso-probablity posterior mass:"
-
-                        /
-    m( y | x ) =        | P(y'|x) dy'
-                        /
-                P(y'|x) < P(y|x)
-
-    We thus need to compute this function on a rectangular grid of x and y's
-
-    Any questions, please email Will Handley <wh260@mrao.cam.ac.uk>
+""" Module for computing and plotting contours
 """
 import pickle
 import numpy
@@ -43,12 +15,41 @@ def load_contours(datafile):
 class Contours(object):
     """ Calculate and plot contours.
 
+        This script computes the grid for contours of a function
+        reconstruction plot.
+
+        If one has
+         * independent variable x
+         * dependent variable y
+         * functional form y = f(x,theta) parameterised by theta
+
+        Assuming that you have obtained samples of theta from an MCMC
+        process, we aim to compute:
+
+                      /
+        P( y | x ) =  | P( y = f(x,theta) | x, theta ) dtheta ,  (1)
+                      /
+
+        which gives our degree of knowledge for each y value given an x value.
+
+        In fact, for a more representative plot, we are not actually
+        interested in the value of the probability density (1), but in fact
+        require the "iso-probablity posterior mass:"
+
+                            /
+        m( y | x ) =        | P(y'|x) dy'
+                            /
+                    P(y'|x) < P(y|x)
+
+        We thus need to compute this function on a rectangular grid of x and y's 
+
         Parameters
         ----------
         posterior: FunctionPosterior
             set of equally weighted functional posterior samples.
         xrange: tuple(float,float)
             minimum and maximum of independent variable.
+
         nx: int, optional
             (Default: 200)
             Number of bins in x.
@@ -155,6 +156,7 @@ class Contours(object):
 
         # Plot the filled contours onto the axis ax
         cbar = ax.contourf(x, y, z, cmap=colors, levels=contour_color_levels)
+
         # Remove those annoying white lines
         for c in cbar.collections:
             c.set_edgecolor("face")

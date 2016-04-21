@@ -16,7 +16,6 @@ class Sample(object):
         w: float
             The posterior weight of the sample. Need not be normalised.
 
-
         Attributes
         ----------
         params: List[float]
@@ -57,11 +56,26 @@ class Sample(object):
 
 
 class Posterior(object):
-    """ A set of posterior samples """
+    """ A set of posterior samples.
+
+        Container-style iterable object with __getitem__, __len__,
+        and __iter__ commands as usual.
+
+        Parameters
+        ----------
+        chains_file: str
+            Name of the file where the posterior samples are stored.
+            These should be a text data file with columns:
+                weight  log-likelihood  <parameters>
+            Typically this file is produced by getdist.
+        paramnames_file: str
+            Where the names of the the parameters are stored. This
+            should be a text file with one parameter name per line
+            (no spaces), in the order they appear in chains_file.
+            Typically this file is produced by getdist.
+    """
 
     def __init__(self, chains_file, paramnames_file):
-        """ Initialise from a chains_file and a paramnames file """
-
         # load the paramnames
         self.paramnames = []
         for line in open(paramnames_file, 'r'):
@@ -83,7 +97,16 @@ class Posterior(object):
         return len(self.samples)
 
     def trim_samples(self, nsamp=None):
-        """ Trim samples """
+        """ Trim samples.
+
+            Thins weighted samples to an equally weighted set, and
+            then further thins to nsamp if specified.
+
+            Parameters
+            ----------
+            nsamp: int, optional:
+                The number of posterior samples to be kept
+        """
 
         maxw = max([s.w for s in self])
 
@@ -104,8 +127,10 @@ class Posterior(object):
 class FunctionSample(Sample):
     """ Functional posterior sample
 
-        This is derived from the Sample class.
-        Please look there for initialisers and attributes.
+        This is derived from the Sample class, but adds a function
+        f(x|theta) where theta is some subset of the posterior sample
+        parameters.  Please look there for initialisers and
+        attributes.
     """
 
     def set_function(self, f, chosen_parameters):
@@ -133,13 +158,15 @@ class FunctionSample(Sample):
         params = [self[p] for p in chosen_parameters]
         self._function = lambda x, p=params: f(x, p)
 
+        return self
+
     def __call__(self, x):
         """ Value of f(x|theta), with theta equal to the sample parameters. """
         return self._function(x)
 
 
 class FunctionalPosterior(Posterior):
-    """ A posterior containing functions """
+    """ A posterior containing FunctionSample s """
 
     def set_function(self, function, chosen_parameters):
         """ Load the function into each of the posteriors """
@@ -152,6 +179,8 @@ class FunctionalPosterior(Posterior):
     def __call__(self, x):
         """ Return a set of samples of the functions value at x.
 
+            i.e. returns { f(x|theta) for theta in samples }
+
             Parameters
             ----------
             x: float
@@ -162,4 +191,4 @@ class FunctionalPosterior(Posterior):
             List[float]
                 The value of f at specified x for every sample.
         """
-        return [s(x) for s in self]
+        return [f(x) for f in self]
