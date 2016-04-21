@@ -56,6 +56,13 @@ class PMF(object):
         ----------
         samples: List[float]
             Array of samples from a probability density P(t).
+
+        Attributes
+        ----------
+        lower: float
+            lower bound of function f(x|theta) at this x
+        upper: float
+            upper bound of function f(x|theta) at this x
     """
 
     def __init__(self, samples):
@@ -65,7 +72,7 @@ class PMF(object):
 
         # Generate enough samples to get good 2 sigma contours
         n = 10000
-        ts = kernel.resample(n)[0]
+        [ts] = kernel.resample(n)
 
         # Sort the samples in t, and find their probabilities
         ts.sort()
@@ -74,12 +81,12 @@ class PMF(object):
         # Compute the cumulative distribution function M(t) by
         # sorting the ps, and finding the position in that sort
         # We then store this as a log
-        ms = numpy.log(scipy.stats.rankdata(ps) / float(n))
+        logms = numpy.log(scipy.stats.rankdata(ps) / float(n))
 
-        # create an interpolating function of M(t)
-        self.logpmf = scipy.interpolate.interp1d(ts, ms, bounds_error=False, fill_value=-numpy.inf)
+        # create an interpolating function of log(M(t))
+        self._logpmf = scipy.interpolate.interp1d(ts, logms, bounds_error=False, fill_value=-numpy.inf)
         self.lower = min(ts)
         self.upper = max(ts)
 
     def __call__(self, t):
-        return numpy.exp(self.logpmf(t))
+        return numpy.exp(self._logpmf(t))

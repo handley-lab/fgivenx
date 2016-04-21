@@ -51,13 +51,13 @@ choices = [['m_' + str(i), 'c_' + str(i)] for i in range(1, 5)]
 
 # Computing contours
 # ------------------
-# load the posteriors from file
+# load the posteriors from file, and trim them
 nsamp = 500
 posterior = FunctionalPosterior(chains_file, paramnames_file)
 trimmed_posterior = posterior.trim_samples(nsamp)
 
 for i, chosen_parameters in enumerate(choices):
-    # Generate some functional posteriors
+    # set the function
     trimmed_posterior.set_function(f, chosen_parameters)
 
     # Create the contours and save
