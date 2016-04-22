@@ -26,12 +26,27 @@ class Sample(object):
             The posterior weight of the sample. Need not be normalised.
     """
 
-    def __init__(self, params, paramnames, logL, w=1):
-        self.params = params
-        self._params_from_name = {p:t for p, t in zip(paramnames, params)}
-        self._params_from_name['logL'] = logL
-        self.logL = logL
-        self.w = w
+
+    def __init__(self, line, paramnames):
+        """ Initialise a posterior sample from a line from a getdist file.
+            
+            Lines in a getdist file are typically:
+                weight -2*logL param1 param2 ... paramN
+
+            Parameters
+            ----------
+            line: str
+                Pure getdist line.
+            paramnames: List[str]
+                List of parameter names.
+        """
+        line = line.split()
+        self.w = float(line[0])
+        self.logL = float(line[1])/(-2.0)
+        self.params = [float(t) for t in line[2:]]
+        self._params_from_name = {p:t for p, t in zip(paramnames, self.params)}
+        self._params_from_name['logL'] = self.logL
+
 
     def __getitem__(self, paramname):
         """ Return item value from paramname
@@ -53,75 +68,6 @@ class Sample(object):
 
     def __repr__(self):
         return self.__str__()
-
-
-class Posterior(object):
-    """ A set of posterior samples.
-
-        Container-style iterable object with __getitem__, __len__,
-        and __iter__ commands as usual.
-
-        Parameters
-        ----------
-        chains_file: str
-            Name of the file where the posterior samples are stored.
-            These should be a text data file with columns:
-                weight  log-likelihood  <parameters>
-            Typically this file is produced by getdist.
-        paramnames_file: str
-            Where the names of the the parameters are stored. This
-            should be a text file with one parameter name per line
-            (no spaces), in the order they appear in chains_file.
-            Typically this file is produced by getdist.
-    """
-
-    def __init__(self, chains_file, paramnames_file):
-        # load the paramnames
-        self.paramnames = []
-        for line in open(paramnames_file, 'r'):
-            line = line.split()
-            paramname = line[0]
-            self.paramnames.append(paramname)
-
-        self.samples = []
-        for line in open(chains_file, 'r'):
-            line = line.split()
-            w, logL, params = float(line[0]), float(line[1]), [float(t) for t in line[2:]]
-            sample = Sample(params, self.paramnames, logL, w)
-            self.samples.append(sample)
-
-    def __iter__(self):
-        return iter(self.samples)
-
-    def __len__(self):
-        return len(self.samples)
-
-    def trim_samples(self, nsamp=None):
-        """ Trim samples.
-
-            Thins weighted samples to an equally weighted set, and
-            then further thins to nsamp if specified.
-
-            Parameters
-            ----------
-            nsamp: int, optional:
-                The number of posterior samples to be kept
-        """
-
-        maxw = max([s.w for s in self])
-
-        trimmed_samples = []
-        for s in self:
-            if numpy.random.rand() < s.w/maxw:
-                s.w = 1.0
-                trimmed_samples.append(s)
-
-        if nsamp is not None:
-            if nsamp < len(trimmed_samples):
-                trimmed_samples = list(numpy.random.choice(trimmed_samples, nsamp))
-
-        self.samples = trimmed_samples
-        return self
 
 
 class FunctionSample(Sample):
@@ -165,15 +111,78 @@ class FunctionSample(Sample):
         return self._function(x)
 
 
+
+class Posterior(list):
+    """ A set of posterior samples.
+
+        Container-style iterable object derived from list.
+
+        Parameters
+        ----------
+        chains_file: str
+            Name of the file where the posterior samples are stored.
+            These should be a text data file with columns:
+                weight  log-likelihood  <parameters>
+            Typically this file is produced by getdist.
+        paramnames_file: str
+            Where the names of the the parameters are stored. This
+            should be a text file with one parameter name per line
+            (no spaces), in the order they appear in chains_file.
+            Typically this file is produced by getdist.
+    """
+
+    def __init__(self, chains_file, paramnames_file, SampleType=Sample):
+        # load the paramnames
+        filename = open(paramnames_file, 'r')
+        paramnames = [line.split()[0] for line in filename]
+
+        # Load the list
+        super(list, self).__init__()
+        for line in open(chains_file, 'r') :
+            self.append(SampleType(line, paramnames))
+
+    def trim_samples(self, nsamp=None):
+        """ Trim samples.
+
+            Thins weighted samples to an equally weighted set, and
+            then further thins to nsamp if specified.
+
+            Parameters
+            ----------
+            nsamp: int, optional:
+                The number of posterior samples to be kept
+        """
+
+        # Find the max weight
+        maxw = max([s.w for s in self])
+
+        # delete each sample with a probability w/maxw
+        for s in self:
+            if numpy.random.rand() < s.w/maxw:
+                s.w = 1.0
+            else:
+                self.remove(s)
+        
+        # Remove any more at random we still need to be lower
+        if nsamp is not None:
+            numpy.random.shuffle(self)
+            del self[nsamp:]
+
+        return self
+
+
+
 class FunctionalPosterior(Posterior):
     """ A posterior containing FunctionSample s """
+
+    def __init__(self, chains_file, paramnames_file):
+        super(FunctionalPosterior,self).__init__(chains_file, paramnames_file, FunctionSample)
+
 
     def set_function(self, function, chosen_parameters):
         """ Load the function into each of the posteriors """
         for sample in self:
-            sample.__class__ = FunctionSample
             sample.set_function(function, chosen_parameters)
-
         return self
 
     def __call__(self, x):

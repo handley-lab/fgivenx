@@ -11,9 +11,10 @@ class PMF(object):
 
         From P(t) we define:
 
-               /
-        M(p) = |          P(t) dt
-               / P(t) < p
+                  /
+        M(p) =    | P(t) dt
+                  / 
+              P(t) < p
 
         This is the cumulative distribution function expressed as a
         function of the probability
