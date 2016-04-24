@@ -4,7 +4,7 @@
     (see examples/group_compute_contours.py for an example).
 """
 import matplotlib.pyplot
-from fgivenx.contours import load_contours
+from fgivenx.contours import Contours
 
 # Set up the grid of axes
 fig, axes = matplotlib.pyplot.subplots(2, 2, sharex=True, sharey=True, figsize=(6, 6))
@@ -12,7 +12,7 @@ fig, axes = matplotlib.pyplot.subplots(2, 2, sharex=True, sharey=True, figsize=(
 # plot the contours
 for i, ax in enumerate(axes.flat):
     contourfile = 'contours/posterior' + str(i) + '.pkl'
-    contours = load_contours(contourfile)
+    contours = Contours.load(contourfile)
     colours = contours.plot(ax)
 
 # x labels

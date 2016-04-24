@@ -8,10 +8,6 @@ import scipy
 from fgivenx.utils import PMF
 from fgivenx.progress_bar import pbar
 
-def load_contours(datafile):
-    """ Load contours from file. """
-    return pickle.load(open(datafile, 'r'))
-
 class Contours(object):
     """ Calculate and plot contours.
 
@@ -41,7 +37,7 @@ class Contours(object):
                             /
                     P(y'|x) < P(y|x)
 
-        We thus need to compute this function on a rectangular grid of x and y's 
+        We thus need to compute this function on a rectangular grid of x and y's.
 
         Parameters
         ----------
@@ -86,9 +82,32 @@ class Contours(object):
         # Compute densities across the grid
         self.z = [[m(y) for m in masses] for y in self.y]
 
-    def save(self, datafile):
-        """ Save contours to file """
-        pickle.dump(self, open(datafile, 'w'))
+    @classmethod
+    def load(cls, filename):
+        """ Factory function to load contours from pickle file.
+
+            Usage
+            -----
+            contours = Contours.load('contours/my_contours.pkl')
+
+
+            Parameters
+            ----------
+            filename: str
+                The name of the file.
+        """
+        return pickle.load(open(filename, 'r'))
+
+
+    def save(self, filename):
+        """ Save contours to pickle file.
+
+            Parameters
+            ----------
+            filename: str
+                The name of the file.
+        """
+        pickle.dump(self, open(filename, 'w'))
         return self
 
     def plot(self, ax, **kwargs):

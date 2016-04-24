@@ -4,14 +4,14 @@
     (see compute_contours.py for an example).
 """
 import matplotlib.pyplot
-from fgivenx.contours import load_contours
+from fgivenx.contours import Contours
 
 # Set up the grid of axes
 fig, ax = matplotlib.pyplot.subplots()
 
 # plot the contours
 contourfile = 'contours/posterior.pkl'
-contours = load_contours(contourfile)
+contours = Contours.load(contourfile)
 colours = contours.plot(ax)
 
 # x & y labels

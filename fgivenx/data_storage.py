@@ -29,7 +29,7 @@ class Sample(object):
 
     def __init__(self, line, paramnames):
         """ Initialise a posterior sample from a line from a getdist file.
-            
+
             Lines in a getdist file are typically:
                 weight -2*logL param1 param2 ... paramN
 
@@ -78,6 +78,9 @@ class FunctionSample(Sample):
         parameters.  Please look there for initialisers and
         attributes.
     """
+    def __init__(self, line, paramnames):
+        super(FunctionSample, self).__init__(line, paramnames)
+        self._f = None
 
     def set_function(self, f, chosen_parameters):
         """ Set the function to be evaluated, using the chosen parameters
@@ -102,13 +105,13 @@ class FunctionSample(Sample):
         """
 
         params = [self[p] for p in chosen_parameters]
-        self._function = lambda x, p=params: f(x, p)
+        self._f = lambda x, p=params: f(x, p)
 
         return self
 
     def __call__(self, x):
         """ Value of f(x|theta), with theta equal to the sample parameters. """
-        return self._function(x)
+        return self._f(x)
 
 
 
@@ -132,13 +135,15 @@ class Posterior(list):
     """
 
     def __init__(self, chains_file, paramnames_file, SampleType=Sample):
+        # Call the list initialiser
+        super(Posterior, self).__init__()
+
         # load the paramnames
         filename = open(paramnames_file, 'r')
         paramnames = [line.split()[0] for line in filename]
 
         # Load the list
-        super(list, self).__init__()
-        for line in open(chains_file, 'r') :
+        for line in open(chains_file, 'r'):
             self.append(SampleType(line, paramnames))
 
     def trim_samples(self, nsamp=None):
@@ -162,7 +167,7 @@ class Posterior(list):
                 s.w = 1.0
             else:
                 self.remove(s)
-        
+
         # Remove any more at random we still need to be lower
         if nsamp is not None:
             numpy.random.shuffle(self)
@@ -176,7 +181,7 @@ class FunctionalPosterior(Posterior):
     """ A posterior containing FunctionSample s """
 
     def __init__(self, chains_file, paramnames_file):
-        super(FunctionalPosterior,self).__init__(chains_file, paramnames_file, FunctionSample)
+        super(FunctionalPosterior, self).__init__(chains_file, paramnames_file, FunctionSample)
 
 
     def set_function(self, function, chosen_parameters):
