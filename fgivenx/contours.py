@@ -96,7 +96,7 @@ class Contours(object):
             filename: str
                 The name of the file.
         """
-        return pickle.load(open(filename, 'r'))
+        return pickle.load(open(filename, 'rb'))
 
 
     def save(self, filename):
@@ -107,7 +107,7 @@ class Contours(object):
             filename: str
                 The name of the file.
         """
-        pickle.dump(self, open(filename, 'w'))
+        pickle.dump(self, open(filename, 'wb'))
         return self
 
     def plot(self, ax, **kwargs):
