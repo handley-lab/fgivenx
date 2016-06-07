@@ -138,6 +138,13 @@ class Contours(object):
             fineness: float, optional
                 (Default: 0.1)
                 Spacing of contour color levels.
+            x_trans: function: Float -> Float
+                (Default: x->x)
+                Function to transform the x coordinates by
+            y_trans: function: Float -> Float
+                (Default: y->y)
+                Function to transform the y coordinates by
+                
 
             Returns
             -------
@@ -157,13 +164,18 @@ class Contours(object):
         default_color_levels = numpy.arange(0, contour_line_levels[-1] + 1, fineness)
         contour_color_levels = kwargs.pop('contour_color_levels', default_color_levels)
 
+        x_trans = kwargs.pop('x_trans', lambda x: x)
+        x_trans = numpy.vectorize(x_trans)
+        y_trans = kwargs.pop('y_trans', lambda y: y)
+        y_trans = numpy.vectorize(y_trans)
+
         if kwargs:
             raise TypeError('Unexpected **kwargs in Contour plot method: %r' % kwargs)
 
 
         # Create numpy arrays
-        x = numpy.array(self.x)
-        y = numpy.array(self.y)
+        x = x_trans(numpy.array(self.x))
+        y = y_trans(numpy.array(self.y))
         z = numpy.array(self.z)
 
         # Convert to sigmas

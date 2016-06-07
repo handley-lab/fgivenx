@@ -104,14 +104,14 @@ class FunctionSample(Sample):
                 The names of the parameters from sample that the function uses
         """
 
-        params = [self[p] for p in chosen_parameters]
-        self._f = lambda x, p=params: f(x, p)
+        self.params = [self[p] for p in chosen_parameters]
+        self._f = f
 
         return self
 
     def __call__(self, x):
         """ Value of f(x|theta), with theta equal to the sample parameters. """
-        return self._f(x)
+        return self._f(x,self.params)
 
 
 
@@ -134,17 +134,18 @@ class Posterior(list):
             Typically this file is produced by getdist.
     """
 
-    def __init__(self, chains_file, paramnames_file, SampleType=Sample):
+    def __init__(self, chains_file=None, paramnames_file=None, SampleType=Sample):
         # Call the list initialiser
         super(Posterior, self).__init__()
 
         # load the paramnames
-        filename = open(paramnames_file, 'r')
-        paramnames = [line.split()[0] for line in filename]
+        if paramnames_file is not None:
+            paramnames = [line.split()[0] for line in open(paramnames_file, 'r') ]
 
         # Load the list
-        for line in open(chains_file, 'r'):
-            self.append(SampleType(line, paramnames))
+        if chains_file is not None:
+            for line in open(chains_file, 'r'):
+                self.append(SampleType(line, paramnames))
 
     def trim_samples(self, nsamp=None):
         """ Trim samples.
@@ -160,27 +161,34 @@ class Posterior(list):
 
         # Find the max weight
         maxw = max([s.w for s in self])
+        new_samples = type(self)()
 
         # delete each sample with a probability w/maxw
         for s in self:
             if numpy.random.rand() < s.w/maxw:
                 s.w = 1.0
-            else:
-                self.remove(s)
+                new_samples.append(s)
 
         # Remove any more at random we still need to be lower
         if nsamp is not None:
-            numpy.random.shuffle(self)
-            del self[nsamp:]
+            numpy.random.shuffle(new_samples)
+            del new_samples[nsamp:]
 
+        self = new_samples
         return self
 
-
+    def normalise(self, evidence=1.0):
+        """ Normalise so that the samples sum to evidence
+        """
+        wtot = sum([s.w for s in self])
+        for s in self:
+            s.w *= evidence/wtot
+    
 
 class FunctionalPosterior(Posterior):
     """ A posterior containing FunctionSample s """
 
-    def __init__(self, chains_file, paramnames_file):
+    def __init__(self, chains_file=None, paramnames_file=None):
         super(FunctionalPosterior, self).__init__(chains_file, paramnames_file, FunctionSample)
 
 
