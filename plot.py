@@ -7,7 +7,8 @@ import matplotlib.pyplot
 from fgivenx.contours import Contours
 
 # Set up the grid of axes
-fig, ax = matplotlib.pyplot.subplots()
+fig = matplotlib.pyplot.figure()
+ax = fig.add_subplot(1,1,1)
 
 # plot the contours
 contourfile = 'contours/posterior.pkl'

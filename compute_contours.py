@@ -38,7 +38,7 @@ from fgivenx.data_storage import FunctionalPosterior
 xmin = -5
 xmax = 5
 chains_file = 'chains/test.txt'              # posterior files
-paramnames_file = 'chains/test.paramnames'   # paramnames  file
+paramnames_file = 'chains/test.paramnames'   # paramnames file
 
 def f(x, theta):
     """ Simple y = m x + c """

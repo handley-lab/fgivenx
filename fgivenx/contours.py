@@ -5,6 +5,8 @@ import numpy
 import matplotlib.pyplot
 import scipy
 
+from joblib import Parallel, delayed
+
 from fgivenx.utils import PMF
 from fgivenx.progress_bar import pbar
 
@@ -55,6 +57,9 @@ class Contours(object):
         message: str, optional
             (Default: "computing masses")
             Message to put with progress bar
+        parallel: int, optional
+            (Default: 1)
+            Number of (openmp) cores to run on
     """
 
     def __init__(self, posterior, x_range, **kwargs):
@@ -62,6 +67,7 @@ class Contours(object):
         nx = kwargs.pop('nx', 200)
         ny = kwargs.pop('ny', nx)
         message = kwargs.pop('message', "computing masses")
+        parallel = kwargs.pop('parallel', 1)
 
         if kwargs:
             raise TypeError('Unexpected **kwargs in Contours constructor: %r' % kwargs)
@@ -70,7 +76,7 @@ class Contours(object):
         self.x = numpy.linspace(x_range[0], x_range[1], nx)
 
         # Compute masses at each value of x
-        masses = [PMF(posterior(x)) for x in pbar(self.x, desc=message)]
+        masses = Parallel(n_jobs=parallel)(delayed(PMF)(posterior(x)) for x in pbar(self.x, desc=message))
 
         # Compute upper and lower bounds on y
         self.upper = max([m.upper for m in masses])
@@ -80,7 +86,7 @@ class Contours(object):
         self.y = numpy.linspace(self.lower, self.upper, ny)
 
         # Compute densities across the grid
-        self.z = [[m(y) for m in masses] for y in self.y]
+        self.z = numpy.array([[m(y) for m in masses] for y in self.y])
 
     @classmethod
     def load(cls, filename):
@@ -174,9 +180,9 @@ class Contours(object):
 
 
         # Create numpy arrays
-        x = x_trans(numpy.array(self.x))
-        y = y_trans(numpy.array(self.y))
-        z = numpy.array(self.z)
+        x = x_trans(self.x)
+        y = y_trans(self.y)
+        z = self.z
 
         # Convert to sigmas
         z = numpy.sqrt(2) * scipy.special.erfinv(1 - z)
