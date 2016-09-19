@@ -1,6 +1,7 @@
 """ Objects for holding posteriors and samples.
 """
 import numpy.random
+import pickle
 
 class Sample(object):
     """ Posterior sample.
@@ -161,7 +162,7 @@ class Posterior(list):
 
         # Find the max weight
         maxw = max([s.w for s in self])
-        new_samples = type(self)()
+        old_samples = type(self)()
 
         # delete each sample with a probability w/maxw
         for s in self:
@@ -174,7 +175,7 @@ class Posterior(list):
             numpy.random.shuffle(new_samples)
             del new_samples[nsamp:]
 
-        self = new_samples
+        self[:] = new_samples[:]
         return self
 
     def normalise(self, evidence=1.0):
@@ -183,6 +184,32 @@ class Posterior(list):
         wtot = sum([s.w for s in self])
         for s in self:
             s.w *= evidence/wtot
+
+        return self
+
+    @classmethod
+    def load(cls, filename):
+        """ Factory function to load posteriors from pickle file.
+
+            Parameters
+            ----------
+            filename: str
+                The name of the file.
+        """
+        return pickle.load(open(filename, 'rb'))
+
+
+    def save(self, filename):
+        """ Save posteriors to pickle file.
+
+            Parameters
+            ----------
+            filename: str
+                The name of the file.
+        """
+        pickle.dump(self, open(filename, 'wb'))
+        return self
+
     
 
 class FunctionalPosterior(Posterior):
