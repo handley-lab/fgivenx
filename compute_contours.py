@@ -57,4 +57,4 @@ posterior = FunctionalPosterior(chains_file, paramnames_file).set_function(f, ch
 trimmed_posterior = posterior.trim_samples(nsamp)
 # Create the contours and save
 contourfile = 'contours/posterior.pkl'
-contours = Contours(trimmed_posterior, (xmin, xmax)).save(contourfile)
+contours = Contours(trimmed_posterior, (xmin, xmax), parallel=1).save(contourfile)

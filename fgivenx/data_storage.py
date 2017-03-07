@@ -162,7 +162,7 @@ class Posterior(list):
 
         # Find the max weight
         maxw = max([s.w for s in self])
-        old_samples = type(self)()
+        new_samples = type(self)()
 
         # delete each sample with a probability w/maxw
         for s in self:
