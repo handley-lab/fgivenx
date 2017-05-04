@@ -5,7 +5,10 @@ import numpy
 import matplotlib.pyplot
 import scipy
 
-from joblib import Parallel, delayed
+try:
+    from joblib import Parallel, delayed
+except ModuleNotFoundError:
+    print("Advice: Install joblib to use openmp parallelisation")
 
 from fgivenx.utils import PMF
 from fgivenx.progress_bar import pbar
@@ -76,7 +79,10 @@ class Contours(object):
         self.x = numpy.linspace(x_range[0], x_range[1], nx)
 
         # Compute masses at each value of x
-        masses = Parallel(n_jobs=parallel)(delayed(PMF)(posterior(x)) for x in pbar(self.x, desc=message))
+        try:
+            masses = Parallel(n_jobs=parallel)(delayed(PMF)(posterior(x)) for x in pbar(self.x, desc=message))
+        except NameError:
+            masses = [PMF(posterior(x)) for x in pbar(self.x, desc=message)]
 
         # Compute upper and lower bounds on y
         self.upper = max([m.upper for m in masses])
