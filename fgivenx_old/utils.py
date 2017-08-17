@@ -1,4 +1,4 @@
-""" Compute the probability mass function """
+""" Utilities for computing the probability mass function. """
 import scipy.stats
 import scipy.interpolate
 import numpy
