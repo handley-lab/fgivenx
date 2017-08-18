@@ -2,23 +2,25 @@ import fgivenx
 import numpy
 import matplotlib.pyplot
 
-file_root = 'chains/test'
-params = ['m1', 'c1']
-samples, weights = fgivenx.samples_from_getdist_chains(file_root, params)
-
+# Define a simple straight line function, parameters theta=(m,c)
 def f(x, theta):
-    """ Simple y = m x + c function. """
     m, c = theta
     return m * x + c
 
+# Create some sample gradient and intercepts
+nsamples = 1000
+ms = numpy.random.normal(loc=1,size=nsamples)
+cs = numpy.random.normal(loc=0,size=nsamples) 
+samples = numpy.array([(m,c) for m,c in zip(ms,cs)])
 
-xmin, xmax = -5, 5
+# Examine the function over a range of x's
+xmin, xmax = -2, 2
 nx = 100
 x = numpy.linspace(xmin, xmax, nx)
 
-x, y, z = fgivenx.compute_contours(f, x, samples, weights=weights)
+# Compute the contours
+x, y, z = fgivenx.compute_contours(f, x, samples)
 
+# Plot 
 fig, ax = matplotlib.pyplot.subplots()
 cbar = fgivenx.plot(x, y, z, ax)
-
-fig.savefig('plot.pdf')
