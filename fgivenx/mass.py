@@ -88,3 +88,11 @@ class PMF(object):
     def __call__(self, t):
         """ Evaluate the pmf at a set of samples t. """
         return numpy.exp(self._logpmf(t))
+
+
+def compute_masses(fsamps, y):
+    """ Compute the masses at each x for a range of y.
+    """
+    return numpy.array([
+                        PMF(s)(y) for s in tqdm.tqdm(fsamps)
+                        ]).transpose() 

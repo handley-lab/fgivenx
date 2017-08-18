@@ -8,7 +8,7 @@ setup(name='fgivenx',
       author_email='wh260@cam.ac.uk',
       url=None,
       packages=['fgivenx'],
-      install_requires=['numpy','pickle','matplotlib','scipy'],
+      install_requires=['numpy','pickle','matplotlib','scipy','joblib','mpi4py'],
       description='Functional Posterior Plotter',
       long_description=
       """ Functional Posterior Plotter.

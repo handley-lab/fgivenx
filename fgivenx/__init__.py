@@ -11,6 +11,7 @@
     import fgivenx
     import numpy
     import matplotlib.pyplot
+    import fgivenx.plot
 
 
     # Define a simple straight line function, parameters theta=(m,c)
@@ -34,7 +35,7 @@
 
     # Plot
     fig, ax = matplotlib.pyplot.subplots()
-    cbar = fgivenx.plot(x, y, z, ax)
+    cbar = fgivenx.plot.plot(x, y, z, ax)
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -79,8 +80,6 @@ def compute_contours(f, x, samples, **kwargs):
     if not len(samples.shape) is 2:
         raise ValueError("samples should be a 2D numpy array")
 
-    x = numpy.array(x)
-
     weights = kwargs.pop('weights', None)
     ntrim = kwargs.pop('ntrim', 0)
     ny = kwargs.pop('ny', 100)
@@ -88,9 +87,12 @@ def compute_contours(f, x, samples, **kwargs):
     if weights is not None:
         samples = samples.trim_samples(samples, weights, ntrim)
 
-    fsamples = compute_samples(f, x, samples)
-    print(fsamples.shape)
-    y = numpy.linspace(fsamples.min(), fsamples.max(), ny)
-    z = numpy.array([PMF(s)(y) for s in tqdm.tqdm(fsamples)]).transpose()
+    x = numpy.array(x)
+
+    fsamps = compute_samples(f, x, samples)
+
+    y = numpy.linspace(fsamps.min(), fsamps.max(), ny)
+
+    z = compute_masses(fsamps, y)
 
     return x, y, z

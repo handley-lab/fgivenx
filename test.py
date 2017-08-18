@@ -1,6 +1,8 @@
 import fgivenx
+import fgivenx.plot
 import numpy
 import matplotlib.pyplot
+
 
 # Define a simple straight line function, parameters theta=(m,c)
 def f(x, theta):
@@ -23,4 +25,4 @@ x, y, z = fgivenx.compute_contours(f, x, samples)
 
 # Plot 
 fig, ax = matplotlib.pyplot.subplots()
-cbar = fgivenx.plot(x, y, z, ax)
+cbar = fgivenx.plot.plot(x, y, z, ax)
