@@ -26,3 +26,5 @@ x, y, z = fgivenx.compute_contours(f, x, samples, parallel='openmp')
 # Plot 
 fig, ax = matplotlib.pyplot.subplots()
 cbar = fgivenx.plot.plot(x, y, z, ax)
+
+fig.savefig('plot.pdf')
