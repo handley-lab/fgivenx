@@ -4,7 +4,7 @@ import functools
 from fgivenx.parallel import openmp_apply, mpi_apply
 
 
-def trim_samples(samples, weights, nsamp=0):
+def trim_samples(samples, weights, ntrim=0):
     """ Make samples equally weighted, and trim if desired.
 
     Parameters
@@ -15,7 +15,9 @@ def trim_samples(samples, weights, nsamp=0):
     weights: numpy.array
         See argument of fgivenx.compute_contours for more detail.
 
-    nsamps: int
+    Keywords
+    --------
+    ntrim: int
         Number of samples to trim to. If <=0 do nothing.
     """
 
@@ -25,7 +27,7 @@ def trim_samples(samples, weights, nsamp=0):
 
     new_samples = samples[choices]
 
-    if nsamp > 0:
+    if ntrim > 0:
         new_samples = numpy.random.choice(new_samples)
 
     return new_samples

@@ -12,13 +12,13 @@
     Assuming that you have obtained samples of theta from an MCMC
     process, we aim to compute the density:
 
-                  /                                              
-    P( y | x ) =  | P( y = f(x;theta) | x, theta ) dtheta ,  (1) 
-                  /                                              
+                  /
+    P( y | x ) =  | P( y = f(x;theta) | x, theta ) dtheta ,  (1)
+                  /
 
-                  /                                                      
-               =  | dirac_delta( y - f(x;theta) ) P(theta) dtheta ,  (2) 
-                  /                                                      
+                  /
+               =  | dirac_delta( y - f(x;theta) ) P(theta) dtheta ,  (2)
+                  /
 
     which gives our degree of knowledge for each y value given an x value.
 
@@ -81,7 +81,6 @@
 
 """
 import numpy
-import tqdm
 from fgivenx.mass import compute_masses
 from fgivenx.samples import compute_samples, trim_samples
 
@@ -97,32 +96,75 @@ def compute_contours(f, x, samples, **kwargs):
     x : array-like
         Descriptor of x values to evaluate.
 
-    samples: numpy.array
-        2D Array of theta samples. samples.shape=(# of samples, len(theta),)
+    samples: array-like
+        2D Array of theta samples. shape should be (# of samples, len(theta),)
 
     Keywords
     --------
-    parallel: str (optional)
+    weights: array-like
+        Sample weights if samples are not equally weighted.
+        len(weights) must equal len(samples)
+
+    parallel: str
         Type of parallelisation to use. Must be either 'openmp' or 'mpi'.
+
+    ntrim: int
+        Number of samples to trim to (useful if your posterior is oversampled)
+
+    ny: int
+        Resolution of y axis
+
+    y: array-like
+        explicit descriptor of y values to evaluate.
+
     """
 
-    if not len(samples.shape) is 2:
-        raise ValueError("samples should be a 2D numpy array")
-
     weights = kwargs.pop('weights', None)
+    parallel = kwargs.pop('parallel')
     ntrim = kwargs.pop('ntrim', 0)
     ny = kwargs.pop('ny', 100)
+    y = kwargs.pop('y', None)
 
-    parallel = kwargs.pop('parallel')
+    # Argument checking
+    # =================
+    # f
+    if not callable(f):
+        raise ValueError("first argument f must be function of two variables")
 
+    # samples
+    samples = numpy.array(samples, dtype='double')
+    if len(samples.shape) is not 2:
+        raise ValueError("samples should be a 2D array")
+
+    # x
+    x = numpy.array(x, dtype='double')
+    if len(x.shape) is not 1:
+        raise ValueError("x should be a 1D array")
+
+    # weights
     if weights is not None:
-        samples = samples.trim_samples(samples, weights, ntrim)
+        weights = numpy.array(weights, dtype='double')
+        if len(weights) != len(samples):
+            raise ValueError("length of samples (%i) != length of weights (%i)"
+                             % (len(samples), len(weights)))
+    else:
+        weights = numpy.ones(len(samples), dtype='double')
 
-    x = numpy.array(x)
+    # y
+    if y is not None:
+        y = numpy.array(y, dtype='double')
+        if len(x.shape) is not 1:
+            raise ValueError("y should be a 1D array")
+
+    # Computation
+    # ===========
+
+    samples = trim_samples(samples, weights, ntrim)
 
     fsamps = compute_samples(f, x, samples, parallel=parallel)
 
-    y = numpy.linspace(fsamps.min(), fsamps.max(), ny)
+    if y is None:
+        y = numpy.linspace(fsamps.min(), fsamps.max(), ny)
 
     z = compute_masses(fsamps, y, parallel=parallel)
 
