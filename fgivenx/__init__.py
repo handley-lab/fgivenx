@@ -1,12 +1,39 @@
-""" fgivenx module
+""" fgivenx module.
 
-    Methods
-    -------
-    - samples_from_getdist_chains
-    - compute_contours
+    This module provides utilities for computing the grid for contours of a
+    function reconstruction plot.
+
+    Assume one has
+     * posterior probability distribution P(theta) described by samples
+     * independent variable x
+     * dependent variable y
+     * functional form y = f(x;theta) parameterised by theta
+
+    Assuming that you have obtained samples of theta from an MCMC
+    process, we aim to compute the density:
+
+                  /                                              
+    P( y | x ) =  | P( y = f(x;theta) | x, theta ) dtheta ,  (1) 
+                  /                                              
+
+                  /                                                      
+               =  | dirac_delta( y - f(x;theta) ) P(theta) dtheta ,  (2) 
+                  /                                                      
+
+    which gives our degree of knowledge for each y value given an x value.
+
+    In fact, for a more representative plot, we are not actually
+    interested in the value of the probability density (1), but in fact
+    require the "iso-probablity posterior mass:"
+
+                        /
+    m( y | x ) =        | P(y'|x) dy'
+                        /
+                P(y'|x) < P(y|x)
+
+    We thus need to compute this function on a rectangular grid of x and y's.
 
     Example usage
-    -------------
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     import fgivenx
     import numpy
@@ -55,8 +82,8 @@
 """
 import numpy
 import tqdm
-from fgivenx.mass import PMF
-from fgivenx.samples import compute_samples
+from fgivenx.mass import compute_masses
+from fgivenx.samples import compute_samples, trim_samples
 
 
 def compute_contours(f, x, samples, **kwargs):
@@ -75,6 +102,8 @@ def compute_contours(f, x, samples, **kwargs):
 
     Keywords
     --------
+    parallel: str (optional)
+        Type of parallelisation to use. Must be either 'openmp' or 'mpi'.
     """
 
     if not len(samples.shape) is 2:
@@ -84,15 +113,17 @@ def compute_contours(f, x, samples, **kwargs):
     ntrim = kwargs.pop('ntrim', 0)
     ny = kwargs.pop('ny', 100)
 
+    parallel = kwargs.pop('parallel')
+
     if weights is not None:
         samples = samples.trim_samples(samples, weights, ntrim)
 
     x = numpy.array(x)
 
-    fsamps = compute_samples(f, x, samples)
+    fsamps = compute_samples(f, x, samples, parallel=parallel)
 
     y = numpy.linspace(fsamps.min(), fsamps.max(), ny)
 
-    z = compute_masses(fsamps, y)
+    z = compute_masses(fsamps, y, parallel=parallel)
 
     return x, y, z

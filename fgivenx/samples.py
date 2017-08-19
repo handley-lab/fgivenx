@@ -1,5 +1,7 @@
 import numpy
 import tqdm
+import functools
+from fgivenx.parallel import openmp_apply, mpi_apply
 
 
 def trim_samples(samples, weights, nsamp=0):
@@ -29,20 +31,37 @@ def trim_samples(samples, weights, nsamp=0):
     return new_samples
 
 
-def compute_samples(f, x, samples):
+def compute_samples(f, x, samples, **kwargs):
     """ Apply f(x,theta) to x array and theta in samples.
 
     Parameters
     ----------
     See arguments of fgivenx.compute_contours
 
+    Keywords
+    --------
+    parallel: str
+        See arguments of fgivenx.compute_contours
+
     Returns
     -------
     An array of samples at each x. shape=(len(x),len(samples),)
     """
-    return numpy.array([
-                        f(x, theta) for theta in tqdm.tqdm(samples)
-                        ]).transpose()
+
+    parallel = kwargs.pop('parallel','')
+
+    if parallel is 'openmp':
+        array = openmp_apply(f, samples, precurry=(x,))
+    elif parallel is 'mpi':
+        array = mpi_apply(f, samples)
+
+    elif parallel is '':
+        array = [f(x,theta) for theta in tqdm.tqdm(samples)]
+    else:
+        raise ValueError("keyword parallel=%s not recognised,"
+                         "options are 'openmp' or 'mpi'" % parallel)
+
+    return numpy.array(array).transpose() 
 
 
 def samples_from_getdist_chains(file_root, params):

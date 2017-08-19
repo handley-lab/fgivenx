@@ -2,9 +2,11 @@
 import scipy.stats
 import scipy.interpolate
 import numpy
+import tqdm
+from fgivenx.parallel import openmp_apply, mpi_apply
 
 
-class PMF(object):
+def PMF(samples,t=None):
     """ Compute the probability mass function.
 
         The set of samples defines a probability density P(t),
@@ -59,40 +61,43 @@ class PMF(object):
         samples: List[float]
             Array of samples from a probability density P(t).
     """
+    # Compute the kernel density estimator from the samples
+    kernel = scipy.stats.gaussian_kde(samples)
 
-    def __init__(self, samples):
-        # Compute the kernel density estimator from the samples
-        kernel = scipy.stats.gaussian_kde(samples)
+    # Generate enough samples to get good 2 sigma contours
+    n = 1000
+    if len(samples) < n:
+        [ts] = kernel.resample(n)
+    else:
+        ts = samples
 
-        # Generate enough samples to get good 2 sigma contours
-        n = 1000
-        if len(samples) < n:
-            [ts] = kernel.resample(n)
-        else:
-            ts = samples
+    # Sort the samples in t, and find their probabilities
+    ts.sort()
+    ps = kernel(ts)
 
-        # Sort the samples in t, and find their probabilities
-        ts.sort()
-        ps = kernel(ts)
+    # Compute the cumulative distribution function M(t) by
+    # sorting the ps, and finding the position in that sort
+    # We then store this as a log
+    logms = numpy.log(scipy.stats.rankdata(ps) / float(len(ts)))
 
-        # Compute the cumulative distribution function M(t) by
-        # sorting the ps, and finding the position in that sort
-        # We then store this as a log
-        logms = numpy.log(scipy.stats.rankdata(ps) / float(len(ts)))
-
-        # create an interpolating function of log(M(t))
-        self._logpmf = scipy.interpolate.interp1d(ts, logms,
-                                                  bounds_error=False,
-                                                  fill_value=-numpy.inf)
-
-    def __call__(self, t):
-        """ Evaluate the pmf at a set of samples t. """
-        return numpy.exp(self._logpmf(t))
+    # create an interpolating function of log(M(t))
+    logpmf = scipy.interpolate.interp1d(ts, logms,
+                                        bounds_error=False,
+                                        fill_value=-numpy.inf)
+    if t is not None:
+        return numpy.exp(logpmf(t))
+    else:
+        return logpmf
 
 
-def compute_masses(fsamps, y):
+def compute_masses(fsamps, y, **kwargs):
     """ Compute the masses at each x for a range of y.
     """
-    return numpy.array([
-                        PMF(s)(y) for s in tqdm.tqdm(fsamps)
-                        ]).transpose() 
+    parallel = kwargs.pop('parallel','')
+
+    if parallel is 'openmp':
+        array = openmp_apply(PMF,fsamps,postcurry=(y,))
+    else:
+        array = [PMF(s,y) for s in tqdm.tqdm(fsamps)]
+
+    return numpy.array(array).transpose() 

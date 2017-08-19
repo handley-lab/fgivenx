@@ -5,7 +5,7 @@ from joblib import Parallel, delayed
 from mpi4py import MPI
 
 
-def openmp_apply(f, array, nprocs=None):
+def openmp_apply(f, array, nprocs=None, **kwargs):
     """ Apply a function to an array with openmp parallelisation.
 
     Equivalent to [f(x) for x in array], but parallelised. Will parallelise
@@ -23,7 +23,16 @@ def openmp_apply(f, array, nprocs=None):
     --------
     nprocs: int
         Force to parallelise with nprocs.
+
+    precurry: tuple
+        arguments to pass to f before 
+
+    postcurry: tuple
+        arguments to pass to f after 
     """
+
+    precurry = kwargs.pop('precurry',())
+    postcurry = kwargs.pop('postcurry',())
 
     if nprocs is None:
         if not os.environ['OMP_NUM_THREADS']:
@@ -35,10 +44,10 @@ def openmp_apply(f, array, nprocs=None):
             print("Warning: You have requested to use openmp, but environment"
                   "variable OMP_NUM_THREADS=1")
 
-        nprocs = os.environ['OMP_NUM_THREADS']
+        nprocs = int(os.environ['OMP_NUM_THREADS'])
 
     return Parallel(n_jobs=nprocs)(
-                                   delayed(f)(x) for x in tqdm.tqdm(array)
+                                   delayed(f)(*precurry,x,*postcurry) for x in tqdm.tqdm(array)
                                   )
 
 
