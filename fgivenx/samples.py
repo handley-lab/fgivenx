@@ -1,6 +1,5 @@
 import numpy
 import tqdm
-import functools
 from fgivenx.parallel import openmp_apply, mpi_apply
 
 
@@ -50,19 +49,21 @@ def compute_samples(f, x, samples, **kwargs):
     An array of samples at each x. shape=(len(x),len(samples),)
     """
 
-    parallel = kwargs.pop('parallel','')
+    parallel = kwargs.pop('parallel', '')
+    nprocs = kwargs.pop('nprocs', None)
+    comm = kwargs.pop('comm', None)
 
     if parallel is 'openmp':
-        array = openmp_apply(f, samples, precurry=(x,))
+        array = openmp_apply(f, samples, precurry=(x,), nprocs=nprocs)
     elif parallel is 'mpi':
-        array = mpi_apply(lambda theta: f(x,theta), samples)
+        array = mpi_apply(lambda theta: f(x, theta), samples, comm=comm)
     elif parallel is '':
-        array = [f(x,theta) for theta in tqdm.tqdm(samples)]
+        array = [f(x, theta) for theta in tqdm.tqdm(samples)]
     else:
         raise ValueError("keyword parallel=%s not recognised,"
                          "options are 'openmp' or 'mpi'" % parallel)
 
-    return numpy.array(array).transpose() 
+    return numpy.array(array).transpose()
 
 
 def samples_from_getdist_chains(file_root, params):
@@ -101,5 +102,3 @@ def samples_from_getdist_chains(file_root, params):
     samples = data[:, indices]
 
     return samples, weights
-
-

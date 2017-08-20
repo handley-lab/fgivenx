@@ -6,7 +6,7 @@ import tqdm
 from fgivenx.parallel import openmp_apply, mpi_apply
 
 
-def PMF(samples,t=None):
+def PMF(samples, t=None):
     """ Compute the probability mass function.
 
         The set of samples defines a probability density P(t),
@@ -93,13 +93,15 @@ def PMF(samples,t=None):
 def compute_masses(fsamps, y, **kwargs):
     """ Compute the masses at each x for a range of y.
     """
-    parallel = kwargs.pop('parallel','')
+    parallel = kwargs.pop('parallel', '')
+    nprocs = kwargs.pop('nprocs', None)
+    comm = kwargs.pop('comm', None)
 
     if parallel is 'openmp':
-        array = openmp_apply(PMF,fsamps,postcurry=(y,))
+        array = openmp_apply(PMF, fsamps, postcurry=(y,), nprocs=nprocs)
     elif parallel is 'mpi':
-        array = mpi_apply(lambda s: PMF(s,y), fsamps)
+        array = mpi_apply(lambda s: PMF(s, y), fsamps, comm=comm)
     else:
-        array = [PMF(s,y) for s in tqdm.tqdm(fsamps)]
+        array = [PMF(s, y) for s in tqdm.tqdm(fsamps)]
 
-    return numpy.array(array).transpose() 
+    return numpy.array(array).transpose()

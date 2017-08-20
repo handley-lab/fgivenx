@@ -124,6 +124,8 @@ def compute_contours(f, x, samples, **kwargs):
     ntrim = kwargs.pop('ntrim', 0)
     ny = kwargs.pop('ny', 100)
     y = kwargs.pop('y', None)
+    nprocs = kwargs.pop('nprocs', None)
+    comm = kwargs.pop('comm', None)
 
     # Argument checking
     # =================
@@ -161,11 +163,13 @@ def compute_contours(f, x, samples, **kwargs):
 
     samples = trim_samples(samples, weights, ntrim)
 
-    fsamps = compute_samples(f, x, samples, parallel=parallel)
+    fsamps = compute_samples(f, x, samples, parallel=parallel,
+                             nprocs=nprocs, comm=comm)
 
     if y is None:
         y = numpy.linspace(fsamps.min(), fsamps.max(), ny)
 
-    z = compute_masses(fsamps, y, parallel=parallel)
+    z = compute_masses(fsamps, y, parallel=parallel,
+                       nprocs=nprocs, comm=comm)
 
     return x, y, z

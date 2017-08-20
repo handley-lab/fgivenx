@@ -25,31 +25,29 @@ def openmp_apply(f, array, **kwargs):
         Force to parallelise with nprocs.
 
     precurry: tuple
-        arguments to pass to f before 
+        arguments to pass to f before
 
     postcurry: tuple
-        arguments to pass to f after 
+        arguments to pass to f after
     """
 
-    precurry = kwargs.pop('precurry',())
-    postcurry = kwargs.pop('postcurry',())
-    nprocs = kwargs.pop('nprocs',None)
+    precurry = kwargs.pop('precurry', ())
+    postcurry = kwargs.pop('postcurry', ())
+    nprocs = kwargs.pop('nprocs', None)
 
     if nprocs is None:
         try:
             nprocs = int(os.environ['OMP_NUM_THREADS'])
             if nprocs is 1:
-                print("Warning: You have requested to use openmp, but environment"
-                      "variable OMP_NUM_THREADS=1")
+                print("Warning: You have requested to use openmp,"
+                      "but environment variable OMP_NUM_THREADS=1")
         except KeyError:
             raise EnvironmentError(
                     "You have requested to use openmp, but the environment"
                     "variable OMP_NUM_THREADS is not set")
 
-
-    return Parallel(n_jobs=nprocs)(
-                                   delayed(f)(*precurry,x,*postcurry) for x in tqdm.tqdm(array)
-                                  )
+    return Parallel(n_jobs=nprocs)(delayed(f)(*precurry, x, *postcurry)
+                                   for x in tqdm.tqdm(array))
 
 
 def mpi_apply(function, array, **kwargs):
@@ -72,12 +70,14 @@ def mpi_apply(function, array, **kwargs):
 
     if not MPI.Is_initialized():
         MPI.Init()
-    comm = kwargs.pop('comm', MPI.COMM_WORLD)
+    comm = kwargs.pop('comm', None)
+
+    if comm is None:
+        comm = MPI.COMM_WORLD
 
     array_local = mpi_scatter_array(array, comm)
 
     if comm.Get_rank() is 0:
-        print("rank 0")
         array_local = tqdm.tqdm(array_local)
 
     answer_local = numpy.array([function(x) for x in array_local])
@@ -93,7 +93,7 @@ def mpi_scatter_array(array, comm):
     n = len(array)
     nprocs = comm.Get_size()
 
-    sendcounts = numpy.empty(nprocs,dtype='int')
+    sendcounts = numpy.empty(nprocs, dtype='int')
     sendcounts.fill(n//nprocs)
     sendcounts[:n-sum(sendcounts)] += 1
 
@@ -107,7 +107,8 @@ def mpi_scatter_array(array, comm):
     sendcounts *= numpy.prod(shape[1:])
     displacements *= numpy.prod(shape[1:])
 
-    comm.Scatterv([array, sendcounts, displacements, MPI.DOUBLE], array_local)
+    comm.Scatterv([array, sendcounts, displacements, MPI.DOUBLE],
+                  array_local)
     return array_local
 
 
@@ -122,5 +123,6 @@ def mpi_gather_array(array_local, comm):
     sendcounts *= numpy.prod(shape[1:])
     displacements *= numpy.prod(shape[1:])
 
-    comm.Allgatherv(array_local, [array, sendcounts, displacements, MPI.DOUBLE])
+    comm.Allgatherv(array_local,
+                    [array, sendcounts, displacements, MPI.DOUBLE])
     return array
