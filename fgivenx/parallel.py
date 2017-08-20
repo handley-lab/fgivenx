@@ -60,53 +60,52 @@ def mpi_apply(function, array, **kwargs):
     function:
         function maps x -> y where x and y are numpy ND arrays, and the
         dimensionality of x is determined by xdims
+
     array:
         ndarray to apply function to
 
     Keywords
+    --------
     comm:
         MPI communicator. If not supplied, one will be created
     """
 
+    if not MPI.Is_initialized():
+        MPI.Init()
     comm = kwargs.pop('comm', MPI.COMM_WORLD)
-    rank = comm.Get_rank()
 
     array_local = mpi_scatter_array(array, comm)
-    if rank is 0:
-        answer_local = numpy.array([function(x)
-                                    for x in tqdm.tqdm(array_local)])
-    else:
-        answer_local = numpy.array([function(x)
-                                    for x in array_local])
+
+    if comm.Get_rank() is 0:
+        print("rank 0")
+        array_local = tqdm.tqdm(array_local)
+
+    answer_local = numpy.array([function(x) for x in array_local])
 
     return mpi_gather_array(answer_local, comm)
 
 
 def mpi_scatter_array(array, comm):
     """ Scatters an array across all processes across the first axis"""
+    array = array.astype('d').copy()
+
     rank = comm.Get_rank()
+    n = len(array)
+    nprocs = comm.Get_size()
 
-    if rank is 0:
-        array = array.astype('d').copy()
-        n = len(array)
-        nprocs = comm.Get_size()
+    sendcounts = numpy.empty(nprocs,dtype='int')
+    sendcounts.fill(n//nprocs)
+    sendcounts[:n-sum(sendcounts)] += 1
 
-        sendcounts = numpy.array([n//nprocs]*nprocs)
-        sendcounts[:n-sum(sendcounts)] += 1
+    displacements = sendcounts.cumsum() - sendcounts
 
-        displacements = numpy.insert(numpy.cumsum(sendcounts)[:-1], 0, 0)
+    shape = array.shape
 
-        shape = array.shape
-    else:
-        sendcounts = displacements = shape = None
-
-    shape = comm.bcast(shape)
-    sendcount = comm.scatter(sendcounts)
+    sendcount = sendcounts[rank]
     array_local = numpy.zeros((sendcount,) + shape[1:])
 
-    if rank is 0:
-        sendcounts *= numpy.prod(shape[1:])
-        displacements *= numpy.prod(shape[1:])
+    sendcounts *= numpy.prod(shape[1:])
+    displacements *= numpy.prod(shape[1:])
 
     comm.Scatterv([array, sendcounts, displacements, MPI.DOUBLE], array_local)
     return array_local
@@ -114,17 +113,14 @@ def mpi_scatter_array(array, comm):
 
 def mpi_gather_array(array_local, comm):
     """ Gathers an array from all processes"""
-    rank = comm.Get_rank()
-    sendcounts = numpy.array(comm.gather(len(array_local)))
     shape = array_local.shape
 
-    if rank is 0:
-        displacements = numpy.insert(numpy.cumsum(sendcounts)[:-1], 0, 0)
-        array = numpy.zeros((numpy.sum(sendcounts),) + shape[1:])
-        sendcounts *= numpy.prod(shape[1:])
-        displacements *= numpy.prod(shape[1:])
-    else:
-        displacements = array = None
+    sendcounts = numpy.array(comm.allgather(len(array_local)))
+    displacements = sendcounts.cumsum() - sendcounts
 
-    comm.Gatherv(array_local, [array, sendcounts, displacements, MPI.DOUBLE])
+    array = numpy.zeros((sum(sendcounts),) + shape[1:])
+    sendcounts *= numpy.prod(shape[1:])
+    displacements *= numpy.prod(shape[1:])
+
+    comm.Allgatherv(array_local, [array, sendcounts, displacements, MPI.DOUBLE])
     return array

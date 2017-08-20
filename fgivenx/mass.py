@@ -97,6 +97,8 @@ def compute_masses(fsamps, y, **kwargs):
 
     if parallel is 'openmp':
         array = openmp_apply(PMF,fsamps,postcurry=(y,))
+    elif parallel is 'mpi':
+        array = mpi_apply(lambda s: PMF(s,y), fsamps)
     else:
         array = [PMF(s,y) for s in tqdm.tqdm(fsamps)]
 

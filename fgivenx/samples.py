@@ -55,8 +55,7 @@ def compute_samples(f, x, samples, **kwargs):
     if parallel is 'openmp':
         array = openmp_apply(f, samples, precurry=(x,))
     elif parallel is 'mpi':
-        array = mpi_apply(f, samples)
-
+        array = mpi_apply(lambda theta: f(x,theta), samples)
     elif parallel is '':
         array = [f(x,theta) for theta in tqdm.tqdm(samples)]
     else:
