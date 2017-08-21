@@ -7,7 +7,7 @@ def readme():
         return f.read()
 
 setup(name='fgivenx',
-      version='1.0.0',
+      version='1.0.1',
       author='Will Handley',
       author_email='wh260@cam.ac.uk',
       url=None,
