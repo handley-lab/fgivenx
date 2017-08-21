@@ -118,7 +118,7 @@ def compute_masses(fsamps, y, **kwargs):
 
     masses = numpy.array(masses).transpose().copy()
 
-    if cache is not None:
+    if cache is not None and rank(comm) is 0:
         cache.masses = y, masses
 
     return masses

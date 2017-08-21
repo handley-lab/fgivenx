@@ -4,6 +4,16 @@ import numpy
 from joblib import Parallel, delayed
 from mpi4py import MPI
 
+def rank(comm):
+    if MPI.Is_initialized():
+        if comm is None:
+            return MPI.COMM_WORLD.Get_rank()
+        else:
+            return comm.Get_rank()
+    else:
+        return 0
+
+
 
 def openmp_apply(f, array, **kwargs):
     """ Apply a function to an array with openmp parallelisation.
@@ -77,7 +87,7 @@ def mpi_apply(function, array, **kwargs):
 
     array_local = mpi_scatter_array(array, comm)
 
-    if comm.Get_rank() is 0:
+    if rank(comm) is 0:
         array_local = tqdm.tqdm(array_local)
 
     answer_local = numpy.array([function(x) for x in array_local])
@@ -89,7 +99,6 @@ def mpi_scatter_array(array, comm):
     """ Scatters an array across all processes across the first axis"""
     array = array.astype('d').copy()
 
-    rank = comm.Get_rank()
     n = len(array)
     nprocs = comm.Get_size()
 
@@ -101,7 +110,7 @@ def mpi_scatter_array(array, comm):
 
     shape = array.shape
 
-    sendcount = sendcounts[rank]
+    sendcount = sendcounts[rank(comm)]
     array_local = numpy.zeros((sendcount,) + shape[1:])
 
     sendcounts *= numpy.prod(shape[1:])

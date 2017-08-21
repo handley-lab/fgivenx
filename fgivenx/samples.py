@@ -1,6 +1,6 @@
 import numpy
 import tqdm
-from fgivenx.parallel import openmp_apply, mpi_apply
+from fgivenx.parallel import openmp_apply, mpi_apply, rank
 from fgivenx.io import CacheError
 
 
@@ -79,7 +79,7 @@ def compute_samples(f, x, samples, **kwargs):
 
     fsamps = numpy.array(fsamps).transpose().copy()
 
-    if cache is not None:
+    if cache is not None and rank(comm) is 0:
         cache.fsamps = x, fsamps
 
     return fsamps
