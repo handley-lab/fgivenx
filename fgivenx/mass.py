@@ -4,6 +4,7 @@ import scipy.interpolate
 import numpy
 import tqdm
 from fgivenx.parallel import openmp_apply, mpi_apply
+from fgivenx.io import CacheError
 
 
 def PMF(samples, t=None):
@@ -58,30 +59,26 @@ def PMF(samples, t=None):
 
         Parameters
         ----------
-        samples: List[float]
+        samples: array-like
             Array of samples from a probability density P(t).
+        
+        t: array-like
+            Array to evaluate the PDF at
     """
     # Compute the kernel density estimator from the samples
     kernel = scipy.stats.gaussian_kde(samples)
 
-    # Generate enough samples to get good 2 sigma contours
-    n = 1000
-    if len(samples) < n:
-        [ts] = kernel.resample(n)
-    else:
-        ts = samples
-
     # Sort the samples in t, and find their probabilities
-    ts.sort()
-    ps = kernel(ts)
+    samples.sort()
+    ps = kernel(samples)
 
     # Compute the cumulative distribution function M(t) by
     # sorting the ps, and finding the position in that sort
     # We then store this as a log
-    logms = numpy.log(scipy.stats.rankdata(ps) / float(len(ts)))
+    logms = numpy.log(scipy.stats.rankdata(ps) / float(len(samples)))
 
     # create an interpolating function of log(M(t))
-    logpmf = scipy.interpolate.interp1d(ts, logms,
+    logpmf = scipy.interpolate.interp1d(samples, logms,
                                         bounds_error=False,
                                         fill_value=-numpy.inf)
     if t is not None:
@@ -96,12 +93,32 @@ def compute_masses(fsamps, y, **kwargs):
     parallel = kwargs.pop('parallel', '')
     nprocs = kwargs.pop('nprocs', None)
     comm = kwargs.pop('comm', None)
+    cache = kwargs.pop('cache', None)
 
-    if parallel is 'openmp':
-        array = openmp_apply(PMF, fsamps, postcurry=(y,), nprocs=nprocs)
+    if cache is not None:
+        try:
+            y_cache, masses = cache.masses
+            if numpy.array_equal(y, y_cache):
+                print("Reading masses from cache")
+                return masses
+            else:
+                print("y sampling changed since last computation, recomputing")
+        except CacheError:
+            pass
+
+    if parallel is '':
+        masses = [PMF(s, y) for s in tqdm.tqdm(fsamps)]
+    elif parallel is 'openmp':
+        masses = openmp_apply(PMF, fsamps, postcurry=(y,), nprocs=nprocs)
     elif parallel is 'mpi':
-        array = mpi_apply(lambda s: PMF(s, y), fsamps, comm=comm)
+        masses = mpi_apply(lambda s: PMF(s, y), fsamps, comm=comm)
     else:
-        array = [PMF(s, y) for s in tqdm.tqdm(fsamps)]
+        raise ValueError("keyword parallel=%s not recognised,"
+                         "options are 'openmp' or 'mpi'" % parallel)
 
-    return numpy.array(array).transpose()
+    masses = numpy.array(masses).transpose().copy()
+
+    if cache is not None:
+        cache.masses = y, masses
+
+    return masses

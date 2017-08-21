@@ -21,7 +21,7 @@ nx = 100
 x = numpy.linspace(xmin, xmax, nx)
 
 # Compute the contours
-x, y, z = fgivenx.compute_contours(f, x, samples, parallel='mpi')
+x, y, z = fgivenx.compute_contours(f, x, samples, cache='cache/test')
 
 # Plot 
 fig, ax = matplotlib.pyplot.subplots()

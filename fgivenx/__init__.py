@@ -83,6 +83,7 @@
 import numpy
 from fgivenx.mass import compute_masses
 from fgivenx.samples import compute_samples, trim_samples
+from fgivenx.io import Cache
 
 
 def compute_contours(f, x, samples, **kwargs):
@@ -115,17 +116,20 @@ def compute_contours(f, x, samples, **kwargs):
         Resolution of y axis
 
     y: array-like
-        explicit descriptor of y values to evaluate.
+        Explicit descriptor of y values to evaluate.
 
+    cache: str
+        Location to store cache files.
     """
 
     weights = kwargs.pop('weights', None)
-    parallel = kwargs.pop('parallel')
+    parallel = kwargs.pop('parallel', '')
     ntrim = kwargs.pop('ntrim', 0)
     ny = kwargs.pop('ny', 100)
     y = kwargs.pop('y', None)
     nprocs = kwargs.pop('nprocs', None)
     comm = kwargs.pop('comm', None)
+    cache = kwargs.pop('cache',None)
 
     # Argument checking
     # =================
@@ -158,18 +162,21 @@ def compute_contours(f, x, samples, **kwargs):
         if len(x.shape) is not 1:
             raise ValueError("y should be a 1D array")
 
+    #cache 
+    if cache is not None:
+        cache = Cache(cache)
     # Computation
     # ===========
 
     samples = trim_samples(samples, weights, ntrim)
 
     fsamps = compute_samples(f, x, samples, parallel=parallel,
-                             nprocs=nprocs, comm=comm)
+                             nprocs=nprocs, comm=comm, cache=cache)
 
     if y is None:
         y = numpy.linspace(fsamps.min(), fsamps.max(), ny)
 
     z = compute_masses(fsamps, y, parallel=parallel,
-                       nprocs=nprocs, comm=comm)
+                       nprocs=nprocs, comm=comm, cache=cache)
 
     return x, y, z

@@ -1,6 +1,7 @@
 import numpy
 import tqdm
 from fgivenx.parallel import openmp_apply, mpi_apply
+from fgivenx.io import CacheError
 
 
 def trim_samples(samples, weights, ntrim=0):
@@ -52,18 +53,36 @@ def compute_samples(f, x, samples, **kwargs):
     parallel = kwargs.pop('parallel', '')
     nprocs = kwargs.pop('nprocs', None)
     comm = kwargs.pop('comm', None)
+    cache = kwargs.pop('cache', None)
 
-    if parallel is 'openmp':
-        array = openmp_apply(f, samples, precurry=(x,), nprocs=nprocs)
+    if cache is not None:
+        try:
+            x_cache, fsamps = cache.fsamps
+            if numpy.array_equal(x, x_cache):
+                print("Reading f samples from cache")
+                return fsamps
+            else:
+                print("x sampling changed since last computation, recomputing")
+                del cache.masses
+        except CacheError:
+            pass
+
+    if parallel is '':
+        fsamps = [f(x, theta) for theta in tqdm.tqdm(samples)]
+    elif parallel is 'openmp':
+        fsamps = openmp_apply(f, samples, precurry=(x,), nprocs=nprocs)
     elif parallel is 'mpi':
-        array = mpi_apply(lambda theta: f(x, theta), samples, comm=comm)
-    elif parallel is '':
-        array = [f(x, theta) for theta in tqdm.tqdm(samples)]
+        fsamps = mpi_apply(lambda theta: f(x, theta), samples, comm=comm)
     else:
         raise ValueError("keyword parallel=%s not recognised,"
                          "options are 'openmp' or 'mpi'" % parallel)
 
-    return numpy.array(array).transpose()
+    fsamps = numpy.array(fsamps).transpose().copy()
+
+    if cache is not None:
+        cache.fsamps = x, fsamps
+
+    return fsamps
 
 
 def samples_from_getdist_chains(file_root, params):
