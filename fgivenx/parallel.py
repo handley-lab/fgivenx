@@ -56,7 +56,7 @@ def openmp_apply(f, array, **kwargs):
                     "You have requested to use openmp, but the environment"
                     "variable OMP_NUM_THREADS is not set")
 
-    return Parallel(n_jobs=nprocs)(delayed(f)(*precurry, x, *postcurry)
+    return Parallel(n_jobs=nprocs)(delayed(f)(*(precurry +(x,)+ postcurry))
                                    for x in tqdm.tqdm(array))
 
 

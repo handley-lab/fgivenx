@@ -2,7 +2,7 @@ import os
 import pickle
 import errno
 
-class CacheError(FileNotFoundError):
+class CacheError(IOError):
     pass
 
 class CacheFile(object):
@@ -13,7 +13,7 @@ class CacheFile(object):
         try:
             with open(self.filename(obj),"rb") as f:
                 return pickle.load(f)
-        except FileNotFoundError:
+        except IOError:
             raise CacheError
     
     def __set__(self, obj, value):

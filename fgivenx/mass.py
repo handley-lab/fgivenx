@@ -3,7 +3,7 @@ import scipy.stats
 import scipy.interpolate
 import numpy
 import tqdm
-from fgivenx.parallel import openmp_apply, mpi_apply
+from fgivenx.parallel import openmp_apply, mpi_apply, rank
 from fgivenx.io import CacheError
 
 
