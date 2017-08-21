@@ -1,11 +1,7 @@
-*.pdf
+MANIFEST
 *.pyc
 *.swp
-plots/*.pdf
-plots/*.png
-contours/*.npy
-chains/*.txt
 *.pkl
-*.paramnames
 tags
 build
+dist
