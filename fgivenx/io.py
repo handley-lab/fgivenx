@@ -17,7 +17,7 @@ class CacheFile(object):
                 return pickle.load(f)
         except IOError:
 
-            calling_function = inspect.getouterframes(inspect.currentframe())[1].function
+            calling_function = inspect.getouterframes(inspect.currentframe())[1][3]
             raise CacheError(calling_function + ": No cache file present")
     
     def __set__(self, obj, value):
@@ -27,7 +27,7 @@ class CacheFile(object):
     def __delete__(self, obj):
         try:
             os.remove(self.filename(obj))
-        except IOError:
+        except OSError:
             pass
 
     def filename(self, obj):
@@ -76,7 +76,7 @@ class DKLCache(SampleCache):
 
 def check_cache(cache, *args):
 
-    calling_function = inspect.getouterframes(inspect.currentframe())[1].function
+    calling_function = inspect.getouterframes(inspect.currentframe())[1][3]
 
     if len(cache)-1 != len(args):
         raise ValueError("Wrong number of arguments passed to check_cache")
