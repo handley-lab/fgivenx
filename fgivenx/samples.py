@@ -111,12 +111,10 @@ def samples_from_getdist_chains(params,file_root=None,chains_file=None,paramname
     weights = data[:, 0]
 
     # Get the paramnames
-    paramnames = numpy.loadtxt(paramnames_file, dtype=str)
-    if len(paramnames.shape) is 2:
-        paramnames = paramnames[:, 0]
+    paramnames = [line.split()[0]  for line in open(paramnames_file,'r')]
 
     # Get the relevant samples
-    indices = [2+list(paramnames).index(p) for p in params]
+    indices = [2+paramnames.index(p) for p in params]
     samples = data[:, indices]
 
     return samples, weights
