@@ -83,7 +83,8 @@
 import numpy
 from fgivenx.mass import compute_masses
 from fgivenx.samples import compute_samples, trim_samples
-from fgivenx.io import Cache
+from fgivenx.io import SampleCache, DKLCache
+from fgivenx.dkl import compute_dkl
 
 
 def compute_contours(f, x, samples, **kwargs):
@@ -130,6 +131,7 @@ def compute_contours(f, x, samples, **kwargs):
     nprocs = kwargs.pop('nprocs', None)
     comm = kwargs.pop('comm', None)
     cache = kwargs.pop('cache',None)
+    prior = kwargs.pop('prior',False)
 
     # Argument checking
     # =================
@@ -164,7 +166,7 @@ def compute_contours(f, x, samples, **kwargs):
 
     #cache 
     if cache is not None:
-        cache = Cache(cache)
+        cache = SampleCache(cache)
     # Computation
     # ===========
 
@@ -177,6 +179,26 @@ def compute_contours(f, x, samples, **kwargs):
         y = numpy.linspace(fsamps.min(), fsamps.max(), ny)
 
     z = compute_masses(fsamps, y, parallel=parallel,
-                       nprocs=nprocs, comm=comm, cache=cache)
+                       nprocs=nprocs, comm=comm, cache=cache, prior=prior)
 
     return x, y, z
+
+def compute_kullback_liebler(f, x, samples, prior_samples, **kwargs):
+
+    nprocs = kwargs.pop('nprocs', None)
+    parallel = kwargs.pop('parallel', '')
+    comm = kwargs.pop('comm', None)
+    cache = kwargs.pop('cache',None)
+
+    cache = DKLCache(cache)
+
+    fsamps = compute_samples(f, x, samples, parallel=parallel,
+                             nprocs=nprocs, comm=comm, cache=cache.posterior())
+
+    fsamps_prior = compute_samples(f, x, prior_samples, parallel=parallel,
+                                   nprocs=nprocs, comm=comm, cache=cache.prior())
+
+    dkls = compute_dkl(x, fsamps, fsamps_prior, parallel=parallel,
+                       nprocs=nprocs, comm=comm, cache=cache) 
+
+    return x, dkls

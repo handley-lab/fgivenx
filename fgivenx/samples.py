@@ -1,7 +1,7 @@
 import numpy
 import tqdm
 from fgivenx.parallel import openmp_apply, mpi_apply, rank
-from fgivenx.io import CacheError
+from fgivenx.io import CacheError, check_cache
 
 
 def trim_samples(samples, weights, ntrim=0):
@@ -57,15 +57,10 @@ def compute_samples(f, x, samples, **kwargs):
 
     if cache is not None:
         try:
-            x_cache, fsamps = cache.fsamps
-            if numpy.array_equal(x, x_cache):
-                print("Reading f samples from cache")
-                return fsamps
-            else:
-                print("x sampling changed since last computation, recomputing")
-                del cache.masses
-        except CacheError:
-            pass
+            return check_cache(cache.fsamps, x, samples)  
+        except CacheError as e:
+            print(e.args[0])
+            del cache.masses
 
     if parallel is '':
         fsamps = [f(x, theta) for theta in tqdm.tqdm(samples)]
@@ -80,7 +75,7 @@ def compute_samples(f, x, samples, **kwargs):
     fsamps = numpy.array(fsamps).transpose().copy()
 
     if cache is not None and rank(comm) is 0:
-        cache.fsamps = x, fsamps
+        cache.fsamps = x, samples, fsamps
 
     return fsamps
 

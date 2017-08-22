@@ -4,7 +4,7 @@ import scipy.interpolate
 import numpy
 import tqdm
 from fgivenx.parallel import openmp_apply, mpi_apply, rank
-from fgivenx.io import CacheError
+from fgivenx.io import CacheError, check_cache
 
 
 def PMF(samples, t=None):
@@ -95,16 +95,12 @@ def compute_masses(fsamps, y, **kwargs):
     comm = kwargs.pop('comm', None)
     cache = kwargs.pop('cache', None)
 
+
     if cache is not None:
         try:
-            y_cache, masses = cache.masses
-            if numpy.array_equal(y, y_cache):
-                print("Reading masses from cache")
-                return masses
-            else:
-                print("y sampling changed since last computation, recomputing")
-        except CacheError:
-            pass
+            return check_cache(cache.masses, fsamps, y)  
+        except CacheError as e:
+            print(e.args[0])
 
     if parallel is '':
         masses = [PMF(s, y) for s in tqdm.tqdm(fsamps)]
@@ -119,6 +115,6 @@ def compute_masses(fsamps, y, **kwargs):
     masses = numpy.array(masses).transpose().copy()
 
     if cache is not None and rank(comm) is 0:
-        cache.masses = y, masses
+        cache.masses = fsamps, y, masses
 
     return masses
