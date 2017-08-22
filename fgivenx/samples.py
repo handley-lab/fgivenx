@@ -80,18 +80,18 @@ def compute_samples(f, x, samples, **kwargs):
     return fsamps
 
 
-def samples_from_getdist_chains(file_root, params):
+def samples_from_getdist_chains(params,file_root=None,chains_file=None,paramnames_file=None):
     """ Extract samples and weights from getdist chains.
 
     Parameters
     ----------
+    params: list(str)
+        Names of parameters to be supplied to second argument of f(x|theta).
+
     file_root: str
         Root name for getdist chains files. This script requires
         - file_root.txt
         - file_root.paramnames
-
-    params: list(str)
-        Names of parameters to be supplied to second argument of f(x|theta).
 
     Returns
     -------
@@ -103,11 +103,15 @@ def samples_from_getdist_chains(file_root, params):
     """
 
     # Get the full data
-    data = numpy.loadtxt(file_root + '.txt')
+    if file_root is not None:
+        chains_file = file_root + '.txt'
+        paramnames_file = file_root + '.paramnames' 
+
+    data = numpy.loadtxt(chains_file '.txt')
     weights = data[:, 0]
 
     # Get the paramnames
-    paramnames = numpy.loadtxt(file_root + '.paramnames', dtype=str)
+    paramnames = numpy.loadtxt(paramnames_file, dtype=str)
     if len(paramnames.shape) is 2:
         paramnames = paramnames[:, 0]
 

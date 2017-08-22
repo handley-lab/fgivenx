@@ -71,10 +71,10 @@
 
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    file_root = 'chains/test'
     params = ['m','c']
-    samples, weights = fgivenx.samples.samples_from_getdist_chains(file_root,
-                                                                   params)
+    file_root = 'chains/test'
+    samples, weights = fgivenx.samples.samples_from_getdist_chains(params,
+                                                                   file_root)
     x, y, z = fgivenx.compute_contours(f, x, samples, weights=weights)
 
 
