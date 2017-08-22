@@ -21,6 +21,9 @@ def trim_samples(samples, weights, ntrim=0):
         Number of samples to trim to. If <=0 do nothing.
     """
 
+    state = numpy.random.get_state()
+
+    numpy.random.seed(1)
     n = len(weights)
     weights /= weights.max()
     choices = numpy.random.rand(n) < weights
@@ -28,9 +31,12 @@ def trim_samples(samples, weights, ntrim=0):
     new_samples = samples[choices]
 
     if ntrim > 0:
-        new_samples = numpy.random.choice(new_samples)
+        choices = numpy.random.choice(len(new_samples), ntrim, replace=False)
+        new_samples = new_samples[choices]
 
-    return new_samples
+    numpy.random.set_state(state)
+
+    return new_samples.copy()
 
 
 def compute_samples(f, x, samples, **kwargs):
@@ -60,7 +66,6 @@ def compute_samples(f, x, samples, **kwargs):
             return check_cache(cache.fsamps, x, samples)  
         except CacheError as e:
             print(e.args[0])
-            del cache.masses
 
     if parallel is '':
         fsamps = [f(x, theta) for theta in tqdm.tqdm(samples)]

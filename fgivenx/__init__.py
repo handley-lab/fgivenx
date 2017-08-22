@@ -189,14 +189,21 @@ def compute_kullback_liebler(f, x, samples, prior_samples, **kwargs):
     parallel = kwargs.pop('parallel', '')
     comm = kwargs.pop('comm', None)
     cache = kwargs.pop('cache',None)
+    ntrim = kwargs.pop('ntrim', 0)
+    weights = kwargs.pop('weights', None)
+    prior_weights = kwargs.pop('prior_weights', None)
 
     cache = DKLCache(cache)
+    samples = trim_samples(samples, weights, ntrim)
+    prior_samples = trim_samples(prior_samples, prior_weights, ntrim)
 
     fsamps = compute_samples(f, x, samples, parallel=parallel,
-                             nprocs=nprocs, comm=comm, cache=cache.posterior())
+                             nprocs=nprocs, comm=comm, cache=cache.posterior(),
+                             ntrim=ntrim, weights=weights)
 
     fsamps_prior = compute_samples(f, x, prior_samples, parallel=parallel,
-                                   nprocs=nprocs, comm=comm, cache=cache.prior())
+                                   nprocs=nprocs, comm=comm, cache=cache.prior(),
+                                   ntrim=ntrim, weights=weights)
 
     dkls = compute_dkl(x, fsamps, fsamps_prior, parallel=parallel,
                        nprocs=nprocs, comm=comm, cache=cache) 
