@@ -83,7 +83,7 @@
 import numpy
 from fgivenx.mass import compute_masses
 from fgivenx.samples import compute_samples, trim_samples
-from fgivenx.io import SampleCache, DKLCache
+from fgivenx.io import Cache
 from fgivenx.dkl import compute_dkl
 
 
@@ -92,13 +92,13 @@ def compute_contours(f, x, samples, **kwargs):
 
     Parameters
     ----------
-    f : function
+    f : function or list of functions
         f(x|theta)
 
     x : array-like
         Descriptor of x values to evaluate.
 
-    samples: array-like
+    samples: array-like or list of array-like
         2D Array of theta samples. shape should be (# of samples, len(theta),)
 
     Keywords
@@ -121,6 +121,9 @@ def compute_contours(f, x, samples, **kwargs):
 
     cache: str
         Location to store cache files.
+
+    logZ: array-like
+        evidences to weight functions by
     """
 
     weights = kwargs.pop('weights', None)
@@ -171,10 +174,6 @@ def compute_contours(f, x, samples, **kwargs):
         if len(x.shape) is not 1:
             raise ValueError("y should be a 1D array")
 
-    #cache 
-    if cache is not None:
-        cache = SampleCache(cache)
-
     logZs = numpy.array(logZs)
 
     # Computation
@@ -224,13 +223,12 @@ def compute_kullback_liebler(f, x, samples, prior_samples, **kwargs):
     DKLs = []
 
     for fi, c, s, p, w in zip(f, cache, samples, prior_samples, weights):
-        c = DKLCache(c)
         fsamps = compute_samples([fi], x, [s], parallel=parallel,
-                                 nprocs=nprocs, comm=comm, cache=c.posterior(),
+                                 nprocs=nprocs, comm=comm, cache=c,
                                  ntrim=ntrim, weights=w)
 
         fsamps_prior = compute_samples([fi], x, [p], parallel=parallel,
-                                       nprocs=nprocs, comm=comm, cache=c.prior(),
+                                       nprocs=nprocs, comm=comm, cache=c + '_prior',
                                        ntrim=ntrim, weights=w)
 
         dkls = compute_dkl(x, fsamps, fsamps_prior, parallel=parallel,

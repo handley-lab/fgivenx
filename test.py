@@ -2,7 +2,6 @@ import numpy
 import matplotlib.pyplot
 import fgivenx
 import fgivenx.plot
-from fgivenx.io import DKLCache
 
 # Model definitions
 # =================
@@ -33,15 +32,15 @@ x = numpy.linspace(xmin, xmax, nx)
 
 
 # Set the cache
-cache = DKLCache('cache/test')
+cache = 'cache/test'
 parallel = 'openmp'
 
 # Compute the dkls
 x, dkls = fgivenx.compute_kullback_liebler(f, x, samples, prior_samples, cache=cache, parallel=parallel, nprocs=8)
 
 # Compute the contours
-x, y, z = fgivenx.compute_contours(f, x, samples, cache=cache.posterior(), parallel=parallel, nprocs=8)
-_, y_prior, z_prior = fgivenx.compute_contours(f, x, prior_samples, cache=cache.prior(), parallel=parallel, nprocs=8)
+x, y, z = fgivenx.compute_contours(f, x, samples, cache=cache, parallel=parallel, nprocs=8)
+_, y_prior, z_prior = fgivenx.compute_contours(f, x, prior_samples, cache=cache+'_prior', parallel=parallel, nprocs=8)
 
 
 # Plotting

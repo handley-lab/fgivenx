@@ -1,7 +1,7 @@
 import numpy
 import tqdm
 from fgivenx.parallel import openmp_apply, mpi_apply, rank
-from fgivenx.io import CacheError, check_cache
+from fgivenx.io import CacheError, Cache
 
 
 def trim_samples(samples, weights, ntrim=-1):
@@ -54,8 +54,9 @@ def compute_samples(f, x, samples, **kwargs):
     cache = kwargs.pop('cache', None)
 
     if cache is not None:
+        cache = Cache(cache + '_fsamples')
         try:
-            return check_cache(cache.fsamps, x, samples)  
+            return cache.check(x, samples)  
         except CacheError as e:
             print(e.args[0])
 
@@ -76,7 +77,7 @@ def compute_samples(f, x, samples, **kwargs):
     fsamples = numpy.concatenate(fsamples)
 
     if cache is not None and rank(comm) is 0:
-        cache.fsamps = x, samples, fsamples
+        cache.data = x, samples, fsamples
 
     return fsamples
 

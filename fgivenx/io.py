@@ -8,9 +8,6 @@ class CacheError(IOError):
     pass
 
 class CacheFile(object):
-    def __init__(self, extension='.pkl'):
-        self.extension = extension
-
     def __get__(self, obj, type=None):
         try:
             with open(self.filename(obj),"rb") as f:
@@ -31,14 +28,17 @@ class CacheFile(object):
             pass
 
     def filename(self, obj):
-        return obj.file_root + self.extension
+        return obj.file_root + '.pkl'
 
     def dirname(self,obj):
         return os.path.dirname(self.filename(obj))
 
-class BaseCache(object):
+class Cache(object):
+
+    data = CacheFile()
+
     def __init__(self, file_root):
-        if isinstance(file_root, BaseCache):
+        if isinstance(file_root, Cache):
             self.file_root = file_root.file_root
         else:
             self.file_root = file_root
@@ -51,41 +51,16 @@ class BaseCache(object):
                 if exc.errno != errno.EEXIST:
                     raise
 
-class SampleCache(BaseCache):
-    fsamps = CacheFile('_fsamps.pkl')
-    masses = CacheFile('_masses.pkl')
+    def check(self, *args):
 
-    #def __init__(self, file_root):
-    #    super(SampleCache,self).__init__(file_root)
+        calling_function = inspect.getouterframes(inspect.currentframe())[1][3]
 
+        if len(self.data)-1 != len(args):
+            raise ValueError("Wrong number of arguments passed to Cache.check")
 
-class DKLCache(SampleCache):
-    fsamps_prior = CacheFile('_prior_fsamps.pkl')
-    masses_prior = CacheFile('_prior_masses.pkl')
-    dkls = CacheFile('_dkl.pkl')
+        for x, x_check in zip(self.data, args):
+            if not numpy.array_equal(x,x_check):
+                raise CacheError(calling_function + ": values have changed, recomputing")
 
-    #def __init__(self, file_root):
-    #    super(DKLCache,self).__init__(file_root)
-
-    def posterior(self):
-        return SampleCache(self.file_root)
-
-    def prior(self):
-        return SampleCache(self.file_root + '_prior')
-
-
-def check_cache(cache, *args):
-
-    calling_function = inspect.getouterframes(inspect.currentframe())[1][3]
-
-    if len(cache)-1 != len(args):
-        raise ValueError("Wrong number of arguments passed to check_cache")
-
-    for x, x_check in zip(cache, args):
-        if not numpy.array_equal(x,x_check):
-            raise CacheError(calling_function + ": values have changed, recomputing")
-
-    print(calling_function + ": reading from cache")
-    return cache[-1]
-
-
+        print(calling_function + ": reading from cache")
+        return self.data[-1]

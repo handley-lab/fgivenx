@@ -1,7 +1,7 @@
 import tqdm
 import numpy
 from scipy.stats import gaussian_kde
-from fgivenx.io import CacheError, check_cache
+from fgivenx.io import CacheError, Cache
 from fgivenx.parallel import openmp_apply, mpi_apply, rank
 
 def dkl(arrays):
@@ -21,8 +21,9 @@ def compute_dkl(x, fsamps, prior_fsamps, **kwargs):
     cache = kwargs.pop('cache', None)
 
     if cache is not None:
+        cache = Cache(cache + '_dkl')
         try:
-            return check_cache(cache.dkls, x, fsamps, prior_fsamps)  
+            return cache.check(x, fsamps, prior_fsamps)  
         except CacheError as e:
             print(e.args[0])
 
@@ -41,7 +42,7 @@ def compute_dkl(x, fsamps, prior_fsamps, **kwargs):
     dkls = numpy.array(dkls)
 
     if cache is not None and rank(comm) is 0:
-        cache.dkls = x, fsamps, prior_fsamps, dkls
+        cache.data = x, fsamps, prior_fsamps, dkls
 
     return dkls
 
