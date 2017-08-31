@@ -125,38 +125,45 @@ def compute_contours(f, x, samples, **kwargs):
 
     weights = kwargs.pop('weights', None)
     parallel = kwargs.pop('parallel', '')
-    ntrim = kwargs.pop('ntrim', 0)
+    ntrim = kwargs.pop('ntrim', -1)
     ny = kwargs.pop('ny', 100)
     y = kwargs.pop('y', None)
     nprocs = kwargs.pop('nprocs', None)
     comm = kwargs.pop('comm', None)
     cache = kwargs.pop('cache',None)
     prior = kwargs.pop('prior',False)
+    logZs = kwargs.pop('logZs',False) 
 
     # Argument checking
     # =================
     # f
-    if not callable(f):
-        raise ValueError("first argument f must be function of two variables")
+    if not logZs:
+        logZs = [0]
+        f = [f]
+        samples = [samples]
+        weights = [weights]
+
+    if [i for i in f if not callable(i)]:
+        raise ValueError("first argument f must be function (or list of functions) of two variables")
 
     # samples
-    samples = numpy.array(samples, dtype='double')
-    if len(samples.shape) is not 2:
+    samples = [numpy.array(s, dtype='double') for s in samples]
+    if [i for i in samples if len(i.shape) is not 2]:
         raise ValueError("samples should be a 2D array")
 
     # x
-    x = numpy.array(x, dtype='double')
     if len(x.shape) is not 1:
         raise ValueError("x should be a 1D array")
 
     # weights
-    if weights is not None:
-        weights = numpy.array(weights, dtype='double')
-        if len(weights) != len(samples):
+    weights = [numpy.array(i, dtype='double') if i is not None 
+               else numpy.ones(len(s), dtype='double')  
+               for i, s in zip(weights, samples)]
+
+    for w, s in zip(weights,samples):
+        if len(w) != len(s):
             raise ValueError("length of samples (%i) != length of weights (%i)"
-                             % (len(samples), len(weights)))
-    else:
-        weights = numpy.ones(len(samples), dtype='double')
+                             % (len(s), len(w)))
 
     # y
     if y is not None:
@@ -167,10 +174,22 @@ def compute_contours(f, x, samples, **kwargs):
     #cache 
     if cache is not None:
         cache = SampleCache(cache)
+
+    logZs = numpy.array(logZs)
+
     # Computation
     # ===========
+    Zs = numpy.exp(logZs-logZs.max())
+    weights = [w/w.sum()*Z for w, Z in zip(weights,Zs)]
+    wmax = max([w.max() for w in weights])
+    weights = [w/wmax for w in weights]
+    ntot = sum([w.sum() for w in weights])
+    if ntrim < ntot:
+        weights = [w*ntrim/ntot for w in weights]
 
-    samples = trim_samples(samples, weights, ntrim)
+
+    for i, (s, w) in enumerate(zip(samples, weights)):
+        samples[i] = trim_samples(s, w)
 
     fsamps = compute_samples(f, x, samples, parallel=parallel,
                              nprocs=nprocs, comm=comm, cache=cache)
@@ -192,20 +211,35 @@ def compute_kullback_liebler(f, x, samples, prior_samples, **kwargs):
     ntrim = kwargs.pop('ntrim', 0)
     weights = kwargs.pop('weights', None)
     prior_weights = kwargs.pop('prior_weights', None)
+    logZs = kwargs.pop('logZs',False) 
 
-    cache = DKLCache(cache)
-    samples = trim_samples(samples, weights, ntrim)
-    prior_samples = trim_samples(prior_samples, prior_weights, ntrim)
+    if not logZs:
+        logZs = [0]
+        f = [f]
+        samples = [samples]
+        prior_samples = [prior_samples]
+        weights = [weights]
+        cache = [cache]
 
-    fsamps = compute_samples(f, x, samples, parallel=parallel,
-                             nprocs=nprocs, comm=comm, cache=cache.posterior(),
-                             ntrim=ntrim, weights=weights)
+    DKLs = []
 
-    fsamps_prior = compute_samples(f, x, prior_samples, parallel=parallel,
-                                   nprocs=nprocs, comm=comm, cache=cache.prior(),
-                                   ntrim=ntrim, weights=weights)
+    for fi, c, s, p, w in zip(f, cache, samples, prior_samples, weights):
+        c = DKLCache(c)
+        fsamps = compute_samples([fi], x, [s], parallel=parallel,
+                                 nprocs=nprocs, comm=comm, cache=c.posterior(),
+                                 ntrim=ntrim, weights=w)
 
-    dkls = compute_dkl(x, fsamps, fsamps_prior, parallel=parallel,
-                       nprocs=nprocs, comm=comm, cache=cache) 
+        fsamps_prior = compute_samples([fi], x, [p], parallel=parallel,
+                                       nprocs=nprocs, comm=comm, cache=c.prior(),
+                                       ntrim=ntrim, weights=w)
 
-    return x, dkls
+        dkls = compute_dkl(x, fsamps, fsamps_prior, parallel=parallel,
+                           nprocs=nprocs, comm=comm, cache=c) 
+        DKLs.append(dkls)
+
+    logZs = numpy.array(logZs)
+    DKLs = numpy.array(DKLs)
+
+    Zs = numpy.exp(logZs-logZs.max())
+    Zs /= Zs.sum()
+    return x, numpy.sum(Zs * DKLs.transpose(), axis=1)

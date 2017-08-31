@@ -4,7 +4,7 @@ from fgivenx.parallel import openmp_apply, mpi_apply, rank
 from fgivenx.io import CacheError, check_cache
 
 
-def trim_samples(samples, weights, ntrim=0):
+def trim_samples(samples, weights, ntrim=-1):
     """ Make samples equally weighted, and trim if desired.
 
     Parameters
@@ -15,10 +15,6 @@ def trim_samples(samples, weights, ntrim=0):
     weights: numpy.array
         See argument of fgivenx.compute_contours for more detail.
 
-    Keywords
-    --------
-    ntrim: int
-        Number of samples to trim to. If <=0 do nothing.
     """
 
     state = numpy.random.get_state()
@@ -29,10 +25,6 @@ def trim_samples(samples, weights, ntrim=0):
     choices = numpy.random.rand(n) < weights
 
     new_samples = samples[choices]
-
-    if ntrim > 0:
-        choices = numpy.random.choice(len(new_samples), ntrim, replace=False)
-        new_samples = new_samples[choices]
 
     numpy.random.set_state(state)
 
@@ -67,22 +59,26 @@ def compute_samples(f, x, samples, **kwargs):
         except CacheError as e:
             print(e.args[0])
 
-    if parallel is '':
-        fsamps = [f(x, theta) for theta in tqdm.tqdm(samples)]
-    elif parallel is 'openmp':
-        fsamps = openmp_apply(f, samples, precurry=(x,), nprocs=nprocs)
-    elif parallel is 'mpi':
-        fsamps = mpi_apply(lambda theta: f(x, theta), samples, comm=comm)
-    else:
-        raise ValueError("keyword parallel=%s not recognised,"
-                         "options are 'openmp' or 'mpi'" % parallel)
+    fsamples = []
+    for fi, s in zip(f, samples):
+        if parallel is '':
+            fsamps = [fi(x, theta) for theta in tqdm.tqdm(s)]
+        elif parallel is 'openmp':
+            fsamps = openmp_apply(fi, s, precurry=(x,), nprocs=nprocs)
+        elif parallel is 'mpi':
+            fsamps = mpi_apply(lambda theta: fi(x, theta), s, comm=comm)
+        else:
+            raise ValueError("keyword parallel=%s not recognised,"
+                             "options are 'openmp' or 'mpi'" % parallel)
+        if len(fsamps) > 0:
+            fsamples.append(numpy.array(fsamps).transpose().copy())
 
-    fsamps = numpy.array(fsamps).transpose().copy()
+    fsamples = numpy.concatenate(fsamples)
 
     if cache is not None and rank(comm) is 0:
-        cache.fsamps = x, samples, fsamps
+        cache.fsamps = x, samples, fsamples
 
-    return fsamps
+    return fsamples
 
 
 def samples_from_getdist_chains(params,file_root=None,chains_file=None,paramnames_file=None):

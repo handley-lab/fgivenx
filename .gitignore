@@ -1,6 +1,6 @@
 MANIFEST
 *.pyc
-*.swp
+*.sw*
 *.pkl
 tags
 build
