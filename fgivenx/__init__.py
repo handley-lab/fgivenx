@@ -128,23 +128,32 @@ def compute_contours(f, x, samples, **kwargs):
 
     weights = kwargs.pop('weights', None)
     parallel = kwargs.pop('parallel', '')
-    ntrim = kwargs.pop('ntrim', -1)
+    ntrim = kwargs.pop('ntrim', 100000)
     ny = kwargs.pop('ny', 100)
     y = kwargs.pop('y', None)
     nprocs = kwargs.pop('nprocs', None)
     comm = kwargs.pop('comm', None)
     cache = kwargs.pop('cache',None)
     prior = kwargs.pop('prior',False)
-    logZs = kwargs.pop('logZs',False) 
+    logZs = kwargs.pop('logZs',None) 
 
     # Argument checking
     # =================
     # f
-    if not logZs:
+    if logZs is None:
         logZs = [0]
         f = [f]
         samples = [samples]
         weights = [weights]
+    elif len(logZs) != len(f):
+            raise ValueError("num logZs (%i) != num sets of functions (%i)"
+                             % (len(logZs), len(f)))
+    elif len(logZs) != len(samples):
+            raise ValueError("num logZs (%i) != num sets of samples (%i)"
+                             % (len(logZs), len(samples)))
+    elif len(logZs) != len(weights):
+            raise ValueError("num logZs (%i) != num sets of weights (%i)"
+                             % (len(logZs), len(weights)))
 
     if [i for i in f if not callable(i)]:
         raise ValueError("first argument f must be function (or list of functions) of two variables")
@@ -207,32 +216,50 @@ def compute_kullback_liebler(f, x, samples, prior_samples, **kwargs):
     parallel = kwargs.pop('parallel', '')
     comm = kwargs.pop('comm', None)
     cache = kwargs.pop('cache',None)
-    ntrim = kwargs.pop('ntrim', 0)
+    ntrim = kwargs.pop('ntrim', 100000)
     weights = kwargs.pop('weights', None)
     prior_weights = kwargs.pop('prior_weights', None)
-    logZs = kwargs.pop('logZs',False) 
+    logZs = kwargs.pop('logZs', None) 
 
-    if not logZs:
+    if logZs is None:
         logZs = [0]
         f = [f]
         samples = [samples]
         prior_samples = [prior_samples]
         weights = [weights]
+        prior_weights = [prior_weights]
         cache = [cache]
 
     DKLs = []
 
-    for fi, c, s, p, w in zip(f, cache, samples, prior_samples, weights):
+    for fi, c, s, ps, w, pw in zip(f, cache, samples, prior_samples, weights, prior_weights):
+
+        if w is None:
+            w = numpy.ones(len(s))
+        w /= w.max()
+        ntot = w.sum()
+        if ntrim < ntot:
+            w *= ntrim/ntot
+        s = trim_samples(s,w)
+
+        if pw is None:
+            pw = numpy.ones(len(ps))
+        pw /= pw.max()
+        ntot = pw.sum()
+        if ntrim < ntot:
+            pw *= ntrim/ntot
+        ps = trim_samples(ps,pw)
+
+
         fsamps = compute_samples([fi], x, [s], parallel=parallel,
                                  nprocs=nprocs, comm=comm, cache=c,
-                                 ntrim=ntrim, weights=w)
+                                 weights=[w])
 
-        fsamps_prior = compute_samples([fi], x, [p], parallel=parallel,
+        fsamps_prior = compute_samples([fi], x, [ps], parallel=parallel,
                                        nprocs=nprocs, comm=comm, cache=c + '_prior',
-                                       ntrim=ntrim, weights=w)
+                                       weights=[pw])
 
-        dkls = compute_dkl(x, fsamps, fsamps_prior, parallel=parallel,
-                           nprocs=nprocs, comm=comm, cache=c) 
+        dkls = compute_dkl(x, fsamps, fsamps_prior, parallel=parallel, nprocs=nprocs, cache=c) 
         DKLs.append(dkls)
 
     logZs = numpy.array(logZs)

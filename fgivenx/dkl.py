@@ -17,7 +17,6 @@ def compute_dkl(x, fsamps, prior_fsamps, **kwargs):
 
     parallel = kwargs.pop('parallel', '')
     nprocs = kwargs.pop('nprocs', None)
-    comm = kwargs.pop('comm', None)
     cache = kwargs.pop('cache', None)
 
     if cache is not None:
@@ -27,21 +26,19 @@ def compute_dkl(x, fsamps, prior_fsamps, **kwargs):
         except CacheError as e:
             print(e.args[0])
 
-    zip_fsamps = numpy.stack([fsamps,prior_fsamps],axis=1)
+    zip_fsamps = list(zip(fsamps, prior_fsamps))
 
     if parallel is '':
         dkls = [dkl(arrays) for arrays in tqdm.tqdm(zip_fsamps)]
     elif parallel is 'openmp':
         dkls = openmp_apply(dkl, zip_fsamps, nprocs=nprocs)
-    elif parallel is 'mpi':
-        dkls = mpi_apply(dkl, zip_fsamps, comm=comm)
     else:
         raise ValueError("keyword parallel=%s not recognised,"
                          "options are 'openmp' or 'mpi'" % parallel)
 
     dkls = numpy.array(dkls)
 
-    if cache is not None and rank(comm) is 0:
+    if cache is not None:
         cache.data = x, fsamps, prior_fsamps, dkls
 
     return dkls

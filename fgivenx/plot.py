@@ -8,35 +8,35 @@ def plot(x, y, z, ax, **kwargs):
 
         Parameters
         ----------
+        x, y, z : numpy arrays
+            See arguments to matplotlib.pyplot.contour
         ax: matplotlib.axes._subplots.AxesSubplot
             Axes to plot the contours onto.
             Typically generated with:
                 fig, ax = matplotlib.pyplot.subplots()
 
-        colors: matplotlib.colors.LinearSegmentedColormap, optional
+        Keywords
+        --------
+        colors: matplotlib.colors.LinearSegmentedColormap
             (Default: matplotlib.pyplot.cm.Reds_r)
             Color scheme to plot with. Recommend plotting in reverse
-        smooth: bool, optional
+        smooth: bool
             (Default: False)
             Whether to smooth the contours.
-        contour_line_levels: List[float], optional
+        contour_line_levels: List[float]
             (Default: [1,2])
             Contour lines to be plotted.
-        linewidth: float, optional
+        linewidth: float
             (Default: 0.1)
             Thickness of contour lines
-        contour_color_levels: List[float], optional
+        contour_color_levels: List[float]
             (Default: numpy.arange(0, contour_line_levels[-1] + 1, fineness))
             Contour color levels.
-        fineness: float, optional
+        fineness: float
             (Default: 0.1)
             Spacing of contour color levels.
-        x_trans: function: Float -> Float
-            (Default: x->x)
-            Function to transform the x coordinates by
-        y_trans: function: Float -> Float
-            (Default: y->y)
-            Function to transform the y coordinates by
+        lines: bool
+            (Default: True)
 
 
         Returns
@@ -51,7 +51,7 @@ def plot(x, y, z, ax, **kwargs):
     smooth = kwargs.pop('smooth', False)
 
     linewidths = kwargs.pop('linewidths', 1.0)
-    contour_line_levels = kwargs.pop('contour_line_levels', [1, 2])
+    contour_line_levels = kwargs.pop('contour_line_levels', [1, 2, 3])
 
     fineness = kwargs.pop('fineness', 0.5)
     default_color_levels = numpy.arange(0, contour_line_levels[-1] + 1,
@@ -59,10 +59,7 @@ def plot(x, y, z, ax, **kwargs):
     contour_color_levels = kwargs.pop('contour_color_levels',
                                       default_color_levels)
 
-    x_trans = kwargs.pop('x_trans', lambda x: x)
-    x_trans = numpy.vectorize(x_trans)
-    y_trans = kwargs.pop('y_trans', lambda y: y)
-    y_trans = numpy.vectorize(y_trans)
+    lines = kwargs.pop('lines', True)
 
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
@@ -83,12 +80,9 @@ def plot(x, y, z, ax, **kwargs):
         c.set_edgecolor("face")
 
     # Plot some sigma-based contour lines
-    ax.contour(x, y, z, colors='k', linewidths=linewidths,
-               levels=contour_line_levels)
-
-    # Set limits on axes
-    ax.set_xlim([min(x), max(x)])
-    ax.set_ylim([min(y), max(y)])
+    if lines:
+        ax.contour(x, y, z, colors='k', linewidths=linewidths,
+                   levels=contour_line_levels)
 
     # Return the contours for use as a colourbar later
     return cbar

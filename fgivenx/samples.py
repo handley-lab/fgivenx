@@ -21,7 +21,6 @@ def trim_samples(samples, weights, ntrim=-1):
 
     numpy.random.seed(1)
     n = len(weights)
-    weights /= weights.max()
     choices = numpy.random.rand(n) < weights
 
     new_samples = samples[choices]
@@ -53,6 +52,8 @@ def compute_samples(f, x, samples, **kwargs):
     comm = kwargs.pop('comm', None)
     cache = kwargs.pop('cache', None)
 
+    parallel = ''
+
     if cache is not None:
         cache = Cache(cache + '_fsamples')
         try:
@@ -62,19 +63,19 @@ def compute_samples(f, x, samples, **kwargs):
 
     fsamples = []
     for fi, s in zip(f, samples):
-        if parallel is '':
-            fsamps = [fi(x, theta) for theta in tqdm.tqdm(s)]
-        elif parallel is 'openmp':
-            fsamps = openmp_apply(fi, s, precurry=(x,), nprocs=nprocs)
-        elif parallel is 'mpi':
-            fsamps = mpi_apply(lambda theta: fi(x, theta), s, comm=comm)
-        else:
-            raise ValueError("keyword parallel=%s not recognised,"
-                             "options are 'openmp' or 'mpi'" % parallel)
-        if len(fsamps) > 0:
+        if len(s) > 0:
+            if parallel is '':
+                fsamps = [fi(x, theta) for theta in tqdm.tqdm(s)]
+            elif parallel is 'openmp':
+                fsamps = openmp_apply(fi, s, precurry=(x,), nprocs=nprocs)
+            elif parallel is 'mpi':
+                fsamps = mpi_apply(lambda theta: fi(x, theta), s, comm=comm)
+            else:
+                raise ValueError("keyword parallel=%s not recognised,"
+                                 "options are 'openmp' or 'mpi'" % parallel)
             fsamples.append(numpy.array(fsamps).transpose().copy())
 
-    fsamples = numpy.concatenate(fsamples)
+    fsamples = numpy.concatenate(fsamples,axis=1)
 
     if cache is not None and rank(comm) is 0:
         cache.data = x, samples, fsamples
