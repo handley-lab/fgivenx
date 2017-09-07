@@ -26,8 +26,8 @@ def plot(x, y, z, ax, **kwargs):
         contour_line_levels: List[float]
             (Default: [1,2])
             Contour lines to be plotted.
-        linewidth: float
-            (Default: 0.1)
+        linewidths: float
+            (Default: 0.3)
             Thickness of contour lines
         contour_color_levels: List[float]
             (Default: numpy.arange(0, contour_line_levels[-1] + 1, fineness))
@@ -50,7 +50,7 @@ def plot(x, y, z, ax, **kwargs):
     colors = kwargs.pop('colors', matplotlib.pyplot.cm.Reds_r)
     smooth = kwargs.pop('smooth', False)
 
-    linewidths = kwargs.pop('linewidths', 1.0)
+    linewidths = kwargs.pop('linewidths', 0.3)
     contour_line_levels = kwargs.pop('contour_line_levels', [1, 2, 3])
 
     fineness = kwargs.pop('fineness', 0.5)
@@ -59,6 +59,7 @@ def plot(x, y, z, ax, **kwargs):
     contour_color_levels = kwargs.pop('contour_color_levels',
                                       default_color_levels)
 
+    alpha = kwargs.pop('alpha', 1.0)
     lines = kwargs.pop('lines', True)
 
     if kwargs:
@@ -73,7 +74,7 @@ def plot(x, y, z, ax, **kwargs):
                                           order=0)
 
     # Plot the filled contours onto the axis ax
-    cbar = ax.contourf(x, y, z, cmap=colors, levels=contour_color_levels)
+    cbar = ax.contourf(x, y, z, cmap=colors, levels=contour_color_levels, alpha=alpha)
 
     # Remove those annoying white lines
     for c in cbar.collections:

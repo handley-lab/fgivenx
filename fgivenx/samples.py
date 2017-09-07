@@ -52,8 +52,6 @@ def compute_samples(f, x, samples, **kwargs):
     comm = kwargs.pop('comm', None)
     cache = kwargs.pop('cache', None)
 
-    parallel = ''
-
     if cache is not None:
         cache = Cache(cache + '_fsamples')
         try:
