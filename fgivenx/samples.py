@@ -81,7 +81,7 @@ def compute_samples(f, x, samples, **kwargs):
     return fsamples
 
 
-def samples_from_getdist_chains(params,file_root=None,chains_file=None,paramnames_file=None):
+def samples_from_getdist_chains(params,file_root=None,chains_file=None,paramnames_file=None,latex=False):
     """ Extract samples and weights from getdist chains.
 
     Parameters
@@ -112,10 +112,15 @@ def samples_from_getdist_chains(params,file_root=None,chains_file=None,paramname
     weights = data[:, 0]
 
     # Get the paramnames
-    paramnames = [line.split()[0]  for line in open(paramnames_file,'r')]
+    paramnames = [line.split()[0].replace('*','') for line in open(paramnames_file,'r')]
 
     # Get the relevant samples
     indices = [2+paramnames.index(p) for p in params]
     samples = data[:, indices]
 
-    return samples, weights
+    if latex:
+        latex = [' '.join(line.split()[1:])  for line in open(paramnames_file,'r')]
+        latex = [latex[i-2] for i in indices]
+        return samples, weights, latex
+    else:
+        return samples, weights

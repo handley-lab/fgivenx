@@ -19,7 +19,7 @@ class CacheFile(object):
     
     def __set__(self, obj, value):
         with open(self.filename(obj),"wb") as f:
-            pickle.dump(value, f)
+            pickle.dump(value, f,protocol=pickle.HIGHEST_PROTOCOL)
 
     def __delete__(self, obj):
         try:
