@@ -58,16 +58,22 @@ class Cache(object):
         if len(self.data)-1 != len(args):
             raise ValueError("Wrong number of arguments passed to Cache.check")
 
-        for x, x_check in zip(self.data, args):
-            if isinstance(x, list):
-                if len(x) != len(x_check):
-                    raise CacheError(calling_function + ": values have changed in cache %s, recomputing" % self.file_root)
-                for x_i, x_check_i in zip(x, x_check):
-                    if not numpy.allclose(x_i, x_check_i,equal_nan=True):
-                        raise CacheError(calling_function + ": values have changed in cache %s, recomputing" % self.file_root )
-
-            elif not numpy.allclose(x,x_check,equal_nan=True):
-                raise CacheError(calling_function + ": values have changed in cache %s, recomputing" % self.file_root )
+        try:
+            for x, x_check in zip(self.data, args):
+                if isinstance(x, list):
+                    if len(x) != len(x_check):
+                        raise CacheError
+                    for x_i, x_check_i in zip(x, x_check):
+                        if x_i.shape != x_check_i.shape:
+                            raise CacheError
+                        elif not numpy.allclose(x_i, x_check_i,equal_nan=True):
+                            raise CacheError
+                elif x.shape != x_check.shape:
+                    raise CacheError
+                elif not numpy.allclose(x,x_check,equal_nan=True):
+                    raise CacheError
+        except CacheError:
+            raise CacheError(calling_function + ": values have changed in cache %s, recomputing" % self.file_root )
 
         print(calling_function + ": reading from cache in %s" % self.file_root)
         return self.data[-1]
