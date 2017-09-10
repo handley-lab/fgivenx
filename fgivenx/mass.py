@@ -66,6 +66,7 @@ def PMF(samples, t=None):
             Array to evaluate the PDF at
     """
     # Compute the kernel density estimator from the samples
+    samples = samples[~numpy.isnan(samples)]
     kernel = scipy.stats.gaussian_kde(samples)
 
     # Sort the samples in t, and find their probabilities

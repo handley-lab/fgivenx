@@ -203,7 +203,9 @@ def compute_contours(f, x, samples, **kwargs):
                              nprocs=nprocs, comm=comm, cache=cache)
 
     if y is None:
-        y = numpy.linspace(fsamps.min(axis=None), fsamps.max(axis=None), ny)
+        ymin = fsamps[~numpy.isnan(fsamps)].min(axis=None)
+        ymax = fsamps[~numpy.isnan(fsamps)].max(axis=None)
+        y = numpy.linspace(ymin, ymax)
 
     z = compute_masses(fsamps, y, parallel=parallel,
                        nprocs=nprocs, comm=comm, cache=cache, prior=prior)

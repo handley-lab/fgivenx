@@ -7,6 +7,8 @@ from fgivenx.parallel import openmp_apply, mpi_apply, rank
 def dkl(arrays):
     """ Compute the Kullback-Liebler divergence from samples from prior and posterior. """
     samples, prior_samples = arrays
+    samples = samples[~numpy.isnan(samples)]
+    prior_samples = prior_samples[~numpy.isnan(prior_samples)]
     return (
             gaussian_kde(samples).logpdf(samples) 
             - gaussian_kde(prior_samples).logpdf(samples)
