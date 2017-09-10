@@ -63,10 +63,10 @@ class Cache(object):
                 if len(x) != len(x_check):
                     raise CacheError(calling_function + ": values have changed in cache %s, recomputing" % self.file_root)
                 for x_i, x_check_i in zip(x, x_check):
-                    if not numpy.all_close(x_i, x_check_i,equal_nan=True):
+                    if not numpy.allclose(x_i, x_check_i,equal_nan=True):
                         raise CacheError(calling_function + ": values have changed in cache %s, recomputing" % self.file_root )
 
-            elif not numpy.all_close(x,x_check,equal_nan=True):
+            elif not numpy.allclose(x,x_check,equal_nan=True):
                 raise CacheError(calling_function + ": values have changed in cache %s, recomputing" % self.file_root )
 
         print(calling_function + ": reading from cache in %s" % self.file_root)
