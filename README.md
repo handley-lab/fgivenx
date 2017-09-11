@@ -95,3 +95,8 @@ axes[0,0].get_shared_x_axes().join(axes[0,0], axes[1,0], axes[1,1])
 fig.tight_layout()
 fig.savefig('plot.pdf')
 ```
+![image](https://raw.github.com/williamjameshandley/fgivenx/master/plot.pdf)
+
+
+
+
