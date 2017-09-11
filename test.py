@@ -48,35 +48,38 @@ x, prior_fsamps = fgivenx.compute_samples(f, x, prior_samples, cache=cache+'_pri
 fig, axes = matplotlib.pyplot.subplots(2,2)
 
 # Sample plot
+# -----------
 ax = axes[0,0]
+ax.set_ylabel(r'$c$')
+ax.set_xlabel(r'$m$')
 ax.plot(prior_samples.T[0],prior_samples.T[1],'b.')
 ax.plot(samples.T[0],samples.T[1],'r.')
-ax.set_xlabel('$m$')
-ax.set_ylabel('$c$')
 
 # Line plot
+# ---------
 ax = axes[0,1]
-ax.set_xticklabels([])
 ax.set_ylabel(r'$y = m x + c$')
-
 fgivenx.plot.plot_lines(x, prior_fsamps, ax, color='b')
 fgivenx.plot.plot_lines(x, fsamps, ax, color='r')
+ax.set_xticklabels([])
 
 # Predictive posterior plot
+# -------------------------
 ax = axes[1,1]
+ax.set_ylabel(r'$P(y|x)$')
+ax.set_xlabel(r'$x$')
 cbar = fgivenx.plot.plot(x, y_prior, z_prior, ax, colors=matplotlib.pyplot.cm.Blues_r,linewidths=0)
 cbar = fgivenx.plot.plot(x, y, z, ax)
-ax.set_ylabel(r'$P(y|x)$')
-ax.set_xlabel('$x$')
 
 # DKL plot
+# --------
 ax = axes[1,0]
+ax.set_ylabel(r'$D_\mathrm{KL}$')
+ax.set_xlabel(r'$x$')
 ax.plot(x, dkls)
 ax.set_ylim(bottom=0)
-ax.set_xlabel('$x$')
-ax.set_ylabel('$D_{KL}$')
 
 axes[0,0].get_shared_x_axes().join(axes[0,0], axes[1,0], axes[1,1])
 
 fig.tight_layout()
-fig.savefig('plot.pdf')
+fig.savefig('plot.png')
