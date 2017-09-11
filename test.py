@@ -1,7 +1,7 @@
 import numpy
-import matplotlib.pyplot
+import matplotlib.pyplot as plt
 from fgivenx import compute_samples, compute_contours, compute_kullback_liebler
-import fgivenx.plot
+from fgivenx.plot import plot, plot_lines
 
 
 # Model definitions
@@ -49,48 +49,47 @@ x, y_prior, z_prior = compute_contours(f, x, prior_samples, cache=prior_cache)
 
 # Plotting
 # ========
-fig, axes = matplotlib.pyplot.subplots(2, 2)
+fig, axes = plt.subplots(2, 2)
 prior_color = 'b'
 posterior_color = 'r'
 
 # Sample plot
 # -----------
-ax = axes[0, 0]
-ax.set_ylabel(r'$c$')
-ax.set_xlabel(r'$m$')
-ax.plot(prior_samples.T[0], prior_samples.T[1],
-        color=prior_color, linestyle='.')
-ax.plot(samples.T[0], samples.T[1],
-        color=posterior_color, linestyle='.')
+ax_samples = axes[0, 0]
+ax_samples.set_ylabel(r'$c$')
+ax_samples.set_xlabel(r'$m$')
+ax_samples.plot(prior_samples.T[0], prior_samples.T[1],
+                color=prior_color, marker='.', linestyle='')
+ax_samples.plot(samples.T[0], samples.T[1],
+                color=posterior_color, marker='.', linestyle='')
 
 # Line plot
 # ---------
-ax = axes[0, 1]
-ax.set_ylabel(r'$y = m x + c$')
-fgivenx.plot.plot_lines(x, prior_fsamps, ax, color=prior_color)
-fgivenx.plot.plot_lines(x, fsamps, ax, color=posterior_color)
-ax.set_xticklabels([])
+ax_lines = axes[0, 1]
+ax_lines.set_ylabel(r'$y = m x + c$')
+ax_lines.set_xlabel(r'$x$')
+plot_lines(x, prior_fsamps, ax_lines, color=prior_color)
+plot_lines(x, fsamps, ax_lines, color=posterior_color)
 
 # Predictive posterior plot
 # -------------------------
-ax = axes[1, 1]
-ax.set_ylabel(r'$P(y|x)$')
-ax.set_xlabel(r'$x$')
-cbar = fgivenx.plot.plot(x, y_prior, z_prior, ax,
-                         colors=matplotlib.pyplot.cm.Blues_r,
-                         lines=False)
-cbar = fgivenx.plot.plot(x, y, z, ax,
-                         colors=matplotlib.pyplot.cm.Reds_r)
+ax_fgivenx = axes[1, 1]
+ax_fgivenx.set_ylabel(r'$P(y|x)$')
+ax_fgivenx.set_xlabel(r'$x$')
+cbar = plot(x, y_prior, z_prior, ax_fgivenx,
+            colors=plt.cm.Blues_r, lines=False)
+cbar = plot(x, y, z, ax_fgivenx,
+            colors=plt.cm.Reds_r)
 
 # DKL plot
 # --------
-ax = axes[1, 0]
-ax.set_ylabel(r'$D_\mathrm{KL}$')
-ax.set_xlabel(r'$x$')
-ax.plot(x, dkls)
-ax.set_ylim(bottom=0)
+ax_dkl = axes[1, 0]
+ax_dkl.set_ylabel(r'$D_\mathrm{KL}$')
+ax_dkl.set_xlabel(r'$x$')
+ax_dkl.plot(x, dkls)
+ax_dkl.set_ylim(bottom=0)
 
-axes[0, 0].get_shared_x_axes().join(axes[0, 0], axes[1, 0], axes[1, 1])
+ax_lines.get_shared_x_axes().join(ax_lines, ax_fgivenx, ax_samples)
 
 fig.tight_layout()
 fig.savefig('plot.png')
