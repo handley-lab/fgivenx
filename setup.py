@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 
 from distutils.core import setup
-import pypandoc
+try:
+    import pypandoc
+    long_description = pypandoc.convert_file('README.md', 'rst')
+except (IOError, ImportError):
+    long_description = ''
 
 setup(name='fgivenx',
-      version='1.0.19',
+      version='1.0.20',
       author='Will Handley',
       author_email='wh260@cam.ac.uk',
       url='https://github.com/williamjameshandley/fgivenx',
@@ -24,5 +28,5 @@ setup(name='fgivenx',
       'Topic :: Scientific/Engineering :: Information Analysis',
       ],
       description='Functional Posterior Plotter',
-      long_description=pypandoc.convert_file('README.md','rst')
+      long_description=long_description
       )
