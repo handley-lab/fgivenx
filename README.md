@@ -1,7 +1,7 @@
 Functional Posterior Plotter
 ----------------------------
 
-These packages allows one to compute a predictive posterior of a function,
+These packages allow one to compute a predictive posterior of a function,
 dependent on sampled parameters. We assume one has a Bayesian posterior
 Post(theta|D,M) described by a set of posterior samples {theta_i}~Post. If
 there is a function parameterised by theta f(x;theta), then this script will
@@ -9,7 +9,8 @@ produce a contour plot of the conditional posterior P(f|x,D,M) in the (x,f)
 plane.
 
 The driving routine is `fgivenx.compute_contours`, and example usage can be
-found by running `help(fgivenx)`.
+found by running `help(fgivenx)`. It is compatible with getdist, and has a
+loading function provided by `fgivenx.samples.samples_from_getdist_chains`.
 
 ```python
 import numpy
@@ -98,7 +99,7 @@ axes[0,0].get_shared_x_axes().join(axes[0,0], axes[1,0], axes[1,1])
 fig.tight_layout()
 fig.savefig('plot.png')
 ```
-![image](https://raw.github.com/williamjameshandley/fgivenx/master/plot.png)
+![](https://raw.github.com/williamjameshandley/fgivenx/master/plot.png)
 
 
 
