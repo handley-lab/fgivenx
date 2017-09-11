@@ -70,6 +70,7 @@ def PMF(samples, t=None):
     kernel = scipy.stats.gaussian_kde(samples)
 
     # Sort the samples in t, and find their probabilities
+    samples = kernel.resample(10000)[0]
     samples.sort()
     ps = kernel(samples)
 
@@ -78,6 +79,7 @@ def PMF(samples, t=None):
     # We then store this as a log
     logms = numpy.log(scipy.stats.rankdata(ps) / float(len(samples)))
 
+    samples
     # create an interpolating function of log(M(t))
     logpmf = scipy.interpolate.interp1d(samples, logms,
                                         bounds_error=False,

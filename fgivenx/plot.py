@@ -87,3 +87,10 @@ def plot(x, y, z, ax, **kwargs):
 
     # Return the contours for use as a colourbar later
     return cbar
+
+def plot_lines(x, fsamps, ax, downsample=100, **kwargs):
+    indices = numpy.random.choice(len(fsamps.T), downsample, replace=False)
+    linewidth = kwargs.pop('linewidth',0.1)
+    color = kwargs.pop('color','k')
+    for y in fsamps.T[indices]:
+        ax.plot(x, y, linewidth=linewidth, color=color, **kwargs)

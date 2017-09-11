@@ -81,10 +81,80 @@
 
 """
 import numpy
+import fgivenx.samples
 from fgivenx.mass import compute_masses
-from fgivenx.samples import compute_samples, trim_samples
 from fgivenx.io import Cache
 from fgivenx.dkl import compute_dkl
+
+def compute_samples(f, x, samples, **kwargs):
+    weights = kwargs.pop('weights', None)
+    parallel = kwargs.pop('parallel', '')
+    ntrim = kwargs.pop('ntrim', 100000)
+    nprocs = kwargs.pop('nprocs', None)
+    comm = kwargs.pop('comm', None)
+    cache = kwargs.pop('cache',None)
+    logZs = kwargs.pop('logZs',None) 
+
+    # Argument checking
+    # =================
+    # f
+    if logZs is None:
+        logZs = [0]
+        f = [f]
+        samples = [samples]
+        weights = [weights]
+    elif len(logZs) != len(f):
+            raise ValueError("num logZs (%i) != num sets of functions (%i)"
+                             % (len(logZs), len(f)))
+    elif len(logZs) != len(samples):
+            raise ValueError("num logZs (%i) != num sets of samples (%i)"
+                             % (len(logZs), len(samples)))
+    elif len(logZs) != len(weights):
+            raise ValueError("num logZs (%i) != num sets of weights (%i)"
+                             % (len(logZs), len(weights)))
+
+    if [i for i in f if not callable(i)]:
+        raise ValueError("first argument f must be function (or list of functions) of two variables")
+
+    # samples
+    samples = [numpy.array(s, dtype='double') for s in samples]
+    if [i for i in samples if len(i.shape) is not 2]:
+        raise ValueError("samples should be a 2D array")
+
+    # x
+    if len(x.shape) is not 1:
+        raise ValueError("x should be a 1D array")
+
+    # weights
+    weights = [numpy.array(i, dtype='double') if i is not None 
+               else numpy.ones(len(s), dtype='double')  
+               for i, s in zip(weights, samples)]
+
+    for w, s in zip(weights,samples):
+        if len(w) != len(s):
+            raise ValueError("length of samples (%i) != length of weights (%i)"
+                             % (len(s), len(w)))
+
+    logZs = numpy.array(logZs)
+
+    # Computation
+    # ===========
+    Zs = numpy.exp(logZs-logZs.max())
+    weights = [w/w.sum()*Z for w, Z in zip(weights,Zs)]
+    wmax = max([w.max() for w in weights])
+    weights = [w/wmax for w in weights]
+    ntot = sum([w.sum() for w in weights])
+    if ntrim < ntot:
+        weights = [w*ntrim/ntot for w in weights]
+
+
+    for i, (s, w) in enumerate(zip(samples, weights)):
+        samples[i] = fgivenx.samples.trim_samples(s, w)
+
+    fsamps = fgivenx.samples.compute_samples(f, x, samples, parallel=parallel,
+                             nprocs=nprocs, comm=comm, cache=cache)
+
+    return x, fsamps
 
 
 def compute_contours(f, x, samples, **kwargs):
@@ -137,70 +207,16 @@ def compute_contours(f, x, samples, **kwargs):
     prior = kwargs.pop('prior',False)
     logZs = kwargs.pop('logZs',None) 
 
-    # Argument checking
-    # =================
-    # f
-    if logZs is None:
-        logZs = [0]
-        f = [f]
-        samples = [samples]
-        weights = [weights]
-    elif len(logZs) != len(f):
-            raise ValueError("num logZs (%i) != num sets of functions (%i)"
-                             % (len(logZs), len(f)))
-    elif len(logZs) != len(samples):
-            raise ValueError("num logZs (%i) != num sets of samples (%i)"
-                             % (len(logZs), len(samples)))
-    elif len(logZs) != len(weights):
-            raise ValueError("num logZs (%i) != num sets of weights (%i)"
-                             % (len(logZs), len(weights)))
-
-    if [i for i in f if not callable(i)]:
-        raise ValueError("first argument f must be function (or list of functions) of two variables")
-
-    # samples
-    samples = [numpy.array(s, dtype='double') for s in samples]
-    if [i for i in samples if len(i.shape) is not 2]:
-        raise ValueError("samples should be a 2D array")
-
-    # x
-    if len(x.shape) is not 1:
-        raise ValueError("x should be a 1D array")
-
-    # weights
-    weights = [numpy.array(i, dtype='double') if i is not None 
-               else numpy.ones(len(s), dtype='double')  
-               for i, s in zip(weights, samples)]
-
-    for w, s in zip(weights,samples):
-        if len(w) != len(s):
-            raise ValueError("length of samples (%i) != length of weights (%i)"
-                             % (len(s), len(w)))
-
     # y
     if y is not None:
         y = numpy.array(y, dtype='double')
         if len(x.shape) is not 1:
             raise ValueError("y should be a 1D array")
 
-    logZs = numpy.array(logZs)
+    x, fsamps = compute_samples(f, x, samples, weights=weights, parallel=parallel,
+                                ntrim=ntrim, nprocs=nprocs, comm=comm, cache=cache, 
+                                logZs=logZs) 
 
-    # Computation
-    # ===========
-    Zs = numpy.exp(logZs-logZs.max())
-    weights = [w/w.sum()*Z for w, Z in zip(weights,Zs)]
-    wmax = max([w.max() for w in weights])
-    weights = [w/wmax for w in weights]
-    ntot = sum([w.sum() for w in weights])
-    if ntrim < ntot:
-        weights = [w*ntrim/ntot for w in weights]
-
-
-    for i, (s, w) in enumerate(zip(samples, weights)):
-        samples[i] = trim_samples(s, w)
-
-    fsamps = compute_samples(f, x, samples, parallel=parallel,
-                             nprocs=nprocs, comm=comm, cache=cache)
 
     if y is None:
         ymin = fsamps[~numpy.isnan(fsamps)].min(axis=None)
@@ -235,31 +251,13 @@ def compute_kullback_liebler(f, x, samples, prior_samples, **kwargs):
     DKLs = []
 
     for fi, c, s, ps, w, pw in zip(f, cache, samples, prior_samples, weights, prior_weights):
+        _, fsamps = compute_samples(fi, x, s, parallel=parallel,
+                                    nprocs=nprocs, comm=comm, cache=c,
+                                    weights=w)
 
-        if w is None:
-            w = numpy.ones(len(s))
-        w /= w.max()
-        ntot = w.sum()
-        if ntrim < ntot:
-            w *= ntrim/ntot
-        s = trim_samples(s,w)
-
-        if pw is None:
-            pw = numpy.ones(len(ps))
-        pw /= pw.max()
-        ntot = pw.sum()
-        if ntrim < ntot:
-            pw *= ntrim/ntot
-        ps = trim_samples(ps,pw)
-
-
-        fsamps = compute_samples([fi], x, [s], parallel=parallel,
-                                 nprocs=nprocs, comm=comm, cache=c,
-                                 weights=[w])
-
-        fsamps_prior = compute_samples([fi], x, [ps], parallel=parallel,
-                                       nprocs=nprocs, comm=comm, cache=c + '_prior',
-                                       weights=[pw])
+        _, fsamps_prior = compute_samples(fi, x, ps, parallel=parallel,
+                                          nprocs=nprocs, comm=comm, cache=c + '_prior',
+                                          weights=pw)
 
         dkls = compute_dkl(x, fsamps, fsamps_prior, parallel=parallel, nprocs=nprocs, cache=c) 
         DKLs.append(dkls)

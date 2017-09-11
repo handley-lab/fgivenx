@@ -30,40 +30,44 @@ xmin, xmax = -2, 2
 nx = 100
 x = numpy.linspace(xmin, xmax, nx)
 
-
 # Set the cache
 cache = 'cache/test'
-parallel = 'openmp'
 
 # Compute the dkls
-x, dkls = fgivenx.compute_kullback_liebler(f, x, samples, prior_samples, cache=cache, parallel=parallel, nprocs=8)
+x, dkls = fgivenx.compute_kullback_liebler(f, x, samples, prior_samples, cache=cache)
 
 # Compute the contours
-x, y, z = fgivenx.compute_contours(f, x, samples, cache=cache, parallel=parallel, nprocs=8)
-_, y_prior, z_prior = fgivenx.compute_contours(f, x, prior_samples, cache=cache+'_prior', parallel=parallel, nprocs=8)
+x, y, z = fgivenx.compute_contours(f, x, samples, cache=cache)
+_, y_prior, z_prior = fgivenx.compute_contours(f, x, prior_samples, cache=cache+'_prior')
 
+x, fsamps = fgivenx.compute_samples(f, x, samples, cache=cache)
+x, prior_fsamps = fgivenx.compute_samples(f, x, prior_samples, cache=cache+'_prior')
 
 # Plotting
 # ========
 fig, axes = matplotlib.pyplot.subplots(2,2)
 
 # Sample plot
-ax = axes[0,1]
+ax = axes[0,0]
 ax.plot(prior_samples.T[0],prior_samples.T[1],'b.')
 ax.plot(samples.T[0],samples.T[1],'r.')
 ax.set_xlabel('$m$')
 ax.set_ylabel('$c$')
-ax.xaxis.set_label_position('top')
-ax.xaxis.tick_top()
-ax.yaxis.set_label_position('right')
-ax.yaxis.tick_right()
 
-# Predictive posterior plot
-ax = axes[0,0]
-cbar = fgivenx.plot.plot(x, y_prior, z_prior, ax, colors=matplotlib.pyplot.cm.Blues_r,linewidths=0)
-cbar = fgivenx.plot.plot(x, y, z, ax)
+# Line plot
+ax = axes[0,1]
 ax.set_xticklabels([])
 ax.set_ylabel(r'$y = m x + c$')
+
+fgivenx.plot.plot_lines(x, prior_fsamps, ax, color='b')
+fgivenx.plot.plot_lines(x, fsamps, ax, color='r')
+
+# Predictive posterior plot
+ax = axes[1,1]
+cbar = fgivenx.plot.plot(x, y_prior, z_prior, ax, colors=matplotlib.pyplot.cm.Blues_r,linewidths=0)
+cbar = fgivenx.plot.plot(x, y, z, ax)
+ax.set_ylabel(r'$P(y|x)$')
+ax.set_xlabel('$x$')
 
 # DKL plot
 ax = axes[1,0]
@@ -72,9 +76,7 @@ ax.set_ylim(bottom=0)
 ax.set_xlabel('$x$')
 ax.set_ylabel('$D_{KL}$')
 
-ax.get_shared_x_axes().join(ax, axes[0,0])
-
-fig.delaxes(axes[1,1])
+axes[0,0].get_shared_x_axes().join(axes[0,0], axes[1,0], axes[1,1])
 
 fig.tight_layout()
 fig.savefig('plot.pdf')

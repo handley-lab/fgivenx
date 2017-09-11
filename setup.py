@@ -2,12 +2,16 @@
 
 from distutils.core import setup
 
-def readme():
-    with open('README.md') as f:
-        return f.read()
+#try:
+import pypandoc
+long_description = pypandoc.convert('README.md','rst')
+#except(IOError, ImportError):
+#    long_description = open('README.md').read()
+
+
 
 setup(name='fgivenx',
-      version='1.0.13',
+      version='1.0.15',
       author='Will Handley',
       author_email='wh260@cam.ac.uk',
       url='https://github.com/williamjameshandley/fgivenx',
@@ -27,5 +31,5 @@ setup(name='fgivenx',
       'Topic :: Scientific/Engineering :: Information Analysis',
       ],
       description='Functional Posterior Plotter',
-      long_description=readme(),
+      long_description=long_description
       )
