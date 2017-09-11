@@ -251,13 +251,11 @@ def compute_kullback_liebler(f, x, samples, prior_samples, **kwargs):
     DKLs = []
 
     for fi, c, s, ps, w, pw in zip(f, cache, samples, prior_samples, weights, prior_weights):
-        _, fsamps = compute_samples(fi, x, s, parallel=parallel,
-                                    nprocs=nprocs, comm=comm, cache=c,
-                                    weights=w)
+        _, fsamps = compute_samples(fi, x, s, parallel=parallel, weights=w,
+                                    ntrim=ntrim, nprocs=nprocs, comm=comm, cache=c)
 
-        _, fsamps_prior = compute_samples(fi, x, ps, parallel=parallel,
-                                          nprocs=nprocs, comm=comm, cache=c + '_prior',
-                                          weights=pw)
+        _, fsamps_prior = compute_samples(fi, x, ps, parallel=parallel, weights=pw,
+                                          ntrim=ntrim, nprocs=nprocs, comm=comm, cache=c + '_prior')
 
         dkls = compute_dkl(x, fsamps, fsamps_prior, parallel=parallel, nprocs=nprocs, cache=c) 
         DKLs.append(dkls)
