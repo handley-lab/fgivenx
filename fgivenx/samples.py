@@ -1,6 +1,6 @@
 import numpy
 import tqdm
-from fgivenx.parallel import openmp_apply, mpi_apply, rank
+from fgivenx.parallel import parallel_apply
 from fgivenx.io import CacheError, Cache
 
 
@@ -14,6 +14,10 @@ def trim_samples(samples, weights, ntrim=-1):
 
     weights: numpy.array
         See argument of fgivenx.compute_contours for more detail.
+
+    ntrim: int (optional)
+    Returns
+    -------
 
     """
 
@@ -47,36 +51,28 @@ def compute_samples(f, x, samples, **kwargs):
     An array of samples at each x. shape=(len(x),len(samples),)
     """
 
-    parallel = kwargs.pop('parallel', '')
-    nprocs = kwargs.pop('nprocs', None)
-    comm = kwargs.pop('comm', None)
+    parallel = kwargs.pop('parallel', False)
     cache = kwargs.pop('cache', None)
+    if kwargs:
+        raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
     if cache is not None:
         cache = Cache(cache + '_fsamples')
         try:
             return cache.check(x, samples)  
         except CacheError as e:
-            print(e.args[0])
+            print(e.msg())
 
     fsamples = []
     for fi, s in zip(f, samples):
         if len(s) > 0:
-            if parallel is '':
-                fsamps = [fi(x, theta) for theta in tqdm.tqdm(s)]
-            elif parallel is 'openmp':
-                fsamps = openmp_apply(fi, s, precurry=(x,), nprocs=nprocs)
-            elif parallel is 'mpi':
-                fsamps = mpi_apply(lambda theta: fi(x, theta), s, comm=comm)
-            else:
-                raise ValueError("keyword parallel=%s not recognised,"
-                                 "options are 'openmp' or 'mpi'" % parallel)
-            fsamples.append(numpy.array(fsamps).transpose().copy())
-
+            fsamps = parallel_apply(fi, s, precurry=(x,), parallel=parallel)
+            fsamps = numpy.array(fsamps).transpose().copy()
+            fsamples.append(fsamps)
     fsamples = numpy.concatenate(fsamples,axis=1)
 
-    if cache is not None and rank(comm) is 0:
-        cache.data = x, samples, fsamples
+    if cache is not None:
+        cache.save(x, samples, fsamples)
 
     return fsamples
 
@@ -93,6 +89,9 @@ def samples_from_getdist_chains(params,file_root=None,chains_file=None,paramname
         Root name for getdist chains files. This script requires
         - file_root.txt
         - file_root.paramnames
+
+    Keywords
+    --------
 
     Returns
     -------

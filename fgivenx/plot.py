@@ -20,21 +20,24 @@ def plot(x, y, z, ax, **kwargs):
         colors: matplotlib.colors.LinearSegmentedColormap
             (Default: matplotlib.pyplot.cm.Reds_r)
             Color scheme to plot with. Recommend plotting in reverse
+
         smooth: bool
             (Default: False)
             Whether to smooth the contours.
+
         contour_line_levels: List[float]
-            (Default: [1,2])
-            Contour lines to be plotted.
+            Contour lines to be plotted.  (Default: [1,2])
+
         linewidths: float
-            (Default: 0.3)
-            Thickness of contour lines
+            Thickness of contour lines.  (Default: 0.3)
+
         contour_color_levels: List[float]
-            (Default: numpy.arange(0, contour_line_levels[-1] + 1, fineness))
             Contour color levels.
+            (Default: numpy.arange(0, contour_line_levels[-1] + 1, fineness))
+
         fineness: float
-            (Default: 0.1)
-            Spacing of contour color levels.
+            Spacing of contour color levels.  (Default: 0.1)
+
         lines: bool
             (Default: True)
 
@@ -89,6 +92,14 @@ def plot(x, y, z, ax, **kwargs):
     return cbar
 
 def plot_lines(x, fsamps, ax, downsample=100, **kwargs):
+    """
+    Parameters
+    ----------
+    Keywords
+    --------
+    Returns
+    -------
+    """
     if downsample < len(fsamps.T):
         indices = numpy.random.choice(len(fsamps.T), downsample, replace=False)
     else:

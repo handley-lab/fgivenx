@@ -1,25 +1,12 @@
 import tqdm
 import os
-import numpy
-from joblib import Parallel, delayed
-from mpi4py import MPI
-
-def rank(comm):
-    if MPI.Is_initialized():
-        if comm is None:
-            return MPI.COMM_WORLD.Get_rank()
-        else:
-            return comm.Get_rank()
-    else:
-        return 0
+from joblib import Parallel, delayed, cpu_count
 
 
-
-def openmp_apply(f, array, **kwargs):
+def parallel_apply(f, array, **kwargs):
     """ Apply a function to an array with openmp parallelisation.
 
-    Equivalent to [f(x) for x in array], but parallelised. Will parallelise
-    using the environment variable OMP_NUM_THREADS, unless nprocs is provided.
+    Equivalent to [f(x) for x in array], but parallelised if required.
 
     Parameters
     ----------
@@ -31,107 +18,38 @@ def openmp_apply(f, array, **kwargs):
 
     Keywords
     --------
-    nprocs: int
-        Force to parallelise with nprocs.
+    parallel: int or bool
+        int > 0: number of processes to parallelise over
+        int < 0 or bool=True: use OMP_NUM_THREADS to choose parallelisation
+        bool=False or int=0: do not parallelise
 
     precurry: tuple
-        arguments to pass to f before
+        arguments to pass to f before x
 
     postcurry: tuple
-        arguments to pass to f after
+        arguments to pass to f after x
+
+    Returns
+    -------
     """
 
     precurry = kwargs.pop('precurry', ())
     postcurry = kwargs.pop('postcurry', ())
-    nprocs = kwargs.pop('nprocs', None)
+    parallel = kwargs.pop('parallel', False)
+    if kwargs:
+        raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
-    if nprocs is None:
-        try:
-            nprocs = int(os.environ['OMP_NUM_THREADS'])
-            if nprocs is 1:
-                print("Warning: You have requested to use openmp,"
-                      "but environment variable OMP_NUM_THREADS=1")
-        except KeyError:
-            raise EnvironmentError(
-                    "You have requested to use openmp, but the environment"
-                    "variable OMP_NUM_THREADS is not set")
+    if not parallel:
+        return [f(*(precurry + (x,) + postcurry)) for x in tqdm.tqdm(array)]
+    elif parallel is True:
+        nprocs = cpu_count()
+    elif isinstance(parallel, int):
+        if parallel < 0:
+            nprocs = cpu_count()
+        else:
+            nprocs = parallel
+    else:
+        raise ValueError("parallel keyword must be an integer or bool")
 
-    return Parallel(n_jobs=nprocs)(delayed(f)(*(precurry +(x,)+ postcurry))
+    return Parallel(n_jobs=nprocs)(delayed(f)(*(precurry + (x,) + postcurry))
                                    for x in tqdm.tqdm(array))
-
-
-def mpi_apply(function, array, **kwargs):
-    """ Distribute a function applied to an array across an MPI communicator
-
-    Parameters
-    ----------
-    function:
-        function maps x -> y where x and y are numpy ND arrays, and the
-        dimensionality of x is determined by xdims
-
-    array:
-        ndarray to apply function to
-
-    Keywords
-    --------
-    comm:
-        MPI communicator. If not supplied, one will be created
-    """
-
-    if not MPI.Is_initialized():
-        MPI.Init()
-    comm = kwargs.pop('comm', None)
-
-    if comm is None:
-        comm = MPI.COMM_WORLD
-
-    array_local = mpi_scatter_array(array, comm)
-
-    if rank(comm) is 0:
-        array_local = tqdm.tqdm(array_local)
-
-    answer_local = numpy.array([function(x) for x in array_local])
-
-    return mpi_gather_array(answer_local, comm)
-
-
-def mpi_scatter_array(array, comm):
-    """ Scatters an array across all processes across the first axis"""
-    array = array.astype('d').copy()
-
-    n = len(array)
-    nprocs = comm.Get_size()
-
-    sendcounts = numpy.empty(nprocs, dtype='int')
-    sendcounts.fill(n//nprocs)
-    sendcounts[:n-sum(sendcounts)] += 1
-
-    displacements = sendcounts.cumsum() - sendcounts
-
-    shape = array.shape
-
-    sendcount = sendcounts[rank(comm)]
-    array_local = numpy.zeros((sendcount,) + shape[1:])
-
-    sendcounts *= numpy.prod(shape[1:])
-    displacements *= numpy.prod(shape[1:])
-
-    comm.Scatterv([array, sendcounts, displacements, MPI.DOUBLE],
-                  array_local)
-    return array_local
-
-
-def mpi_gather_array(array_local, comm):
-    """ Gathers an array from all processes"""
-    shape = array_local.shape
-
-    sendcounts = numpy.array(comm.allgather(len(array_local)))
-    displacements = sendcounts.cumsum() - sendcounts
-
-    array = numpy.zeros((sum(sendcounts),) + shape[1:])
-    sendcounts *= numpy.prod(shape[1:])
-    displacements *= numpy.prod(shape[1:])
-
-    comm.Allgatherv(array_local,
-                    [array, sendcounts, displacements, MPI.DOUBLE])
-    return array

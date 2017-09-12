@@ -87,13 +87,21 @@ from fgivenx.io import Cache
 from fgivenx.dkl import compute_dkl
 
 def compute_samples(f, x, samples, **kwargs):
+    """
+    Parameters
+    ----------
+    Keywords
+    --------
+    Returns
+    -------
+    """
     weights = kwargs.pop('weights', None)
-    parallel = kwargs.pop('parallel', '')
-    ntrim = kwargs.pop('ntrim', 100000)
-    nprocs = kwargs.pop('nprocs', None)
-    comm = kwargs.pop('comm', None)
+    parallel = kwargs.pop('parallel', False)
+    ntrim = kwargs.pop('ntrim', None)
     cache = kwargs.pop('cache',None)
     logZs = kwargs.pop('logZs',None) 
+    if kwargs:
+        raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
     # Argument checking
     # =================
@@ -144,15 +152,15 @@ def compute_samples(f, x, samples, **kwargs):
     wmax = max([w.max() for w in weights])
     weights = [w/wmax for w in weights]
     ntot = sum([w.sum() for w in weights])
-    if ntrim < ntot:
+    if ntrim is not None and ntrim < ntot:
         weights = [w*ntrim/ntot for w in weights]
 
 
     for i, (s, w) in enumerate(zip(samples, weights)):
         samples[i] = fgivenx.samples.trim_samples(s, w)
 
-    fsamps = fgivenx.samples.compute_samples(f, x, samples, parallel=parallel,
-                             nprocs=nprocs, comm=comm, cache=cache)
+    fsamps = fgivenx.samples.compute_samples(f, x, samples,
+                                             parallel=parallel, cache=cache)
 
     return x, fsamps
 
@@ -177,11 +185,13 @@ def compute_contours(f, x, samples, **kwargs):
         Sample weights if samples are not equally weighted.
         len(weights) must equal len(samples)
 
-    parallel: str
-        Type of parallelisation to use. Must be either 'openmp' or 'mpi'.
+    parallel: int or bool
+        Amount of parallelisation to use. An integer indicates the number of
+        openmp threads to use. parallel=True indicates to use all available
+        threads.
 
     ntrim: int
-        Number of samples to trim to (useful if your posterior is oversampled)
+        Number of samples to trim to (useful if your posterior is oversampled).
 
     ny: int
         Resolution of y axis
@@ -194,18 +204,20 @@ def compute_contours(f, x, samples, **kwargs):
 
     logZ: array-like
         evidences to weight functions by
+
+    Returns
+    -------
     """
 
     weights = kwargs.pop('weights', None)
-    parallel = kwargs.pop('parallel', '')
+    parallel = kwargs.pop('parallel', False)
     ntrim = kwargs.pop('ntrim', 100000)
     ny = kwargs.pop('ny', 100)
     y = kwargs.pop('y', None)
-    nprocs = kwargs.pop('nprocs', None)
-    comm = kwargs.pop('comm', None)
     cache = kwargs.pop('cache',None)
-    prior = kwargs.pop('prior',False)
     logZs = kwargs.pop('logZs',None) 
+    if kwargs:
+        raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
     # y
     if y is not None:
@@ -214,8 +226,7 @@ def compute_contours(f, x, samples, **kwargs):
             raise ValueError("y should be a 1D array")
 
     x, fsamps = compute_samples(f, x, samples, weights=weights, parallel=parallel,
-                                ntrim=ntrim, nprocs=nprocs, comm=comm, cache=cache, 
-                                logZs=logZs) 
+                                ntrim=ntrim, cache=cache, logZs=logZs) 
 
 
     if y is None:
@@ -223,21 +234,28 @@ def compute_contours(f, x, samples, **kwargs):
         ymax = fsamps[~numpy.isnan(fsamps)].max(axis=None)
         y = numpy.linspace(ymin, ymax)
 
-    z = compute_masses(fsamps, y, parallel=parallel,
-                       nprocs=nprocs, comm=comm, cache=cache, prior=prior)
+    z = compute_masses(fsamps, y, parallel=parallel, cache=cache)
 
     return x, y, z
 
 def compute_kullback_liebler(f, x, samples, prior_samples, **kwargs):
+    """
+    Parameters
+    ----------
+    Keywords
+    --------
+    Returns
+    -------
+    """
 
-    nprocs = kwargs.pop('nprocs', None)
-    parallel = kwargs.pop('parallel', '')
-    comm = kwargs.pop('comm', None)
+    parallel = kwargs.pop('parallel', False)
     cache = kwargs.pop('cache',None)
-    ntrim = kwargs.pop('ntrim', 100000)
+    ntrim = kwargs.pop('ntrim', None)
     weights = kwargs.pop('weights', None)
     prior_weights = kwargs.pop('prior_weights', None)
     logZs = kwargs.pop('logZs', None) 
+    if kwargs:
+        raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
     if logZs is None:
         logZs = [0]
@@ -250,14 +268,16 @@ def compute_kullback_liebler(f, x, samples, prior_samples, **kwargs):
 
     DKLs = []
 
-    for fi, c, s, ps, w, pw in zip(f, cache, samples, prior_samples, weights, prior_weights):
-        _, fsamps = compute_samples(fi, x, s, parallel=parallel, weights=w,
-                                    ntrim=ntrim, nprocs=nprocs, comm=comm, cache=c)
+    for fi, c, s, w, ps, pw in zip(f, cache, samples, weights,
+                                   prior_samples, prior_weights):
 
-        _, fsamps_prior = compute_samples(fi, x, ps, parallel=parallel, weights=pw,
-                                          ntrim=ntrim, nprocs=nprocs, comm=comm, cache=c + '_prior')
+        _, fsamps = compute_samples(fi, x, s, weights=w, ntrim=ntrim,
+                                    parallel=parallel, cache=c)
 
-        dkls = compute_dkl(x, fsamps, fsamps_prior, parallel=parallel, nprocs=nprocs, cache=c) 
+        _, fsamps_prior = compute_samples(fi, x, ps, weights=pw, ntrim=ntrim,
+                                          parallel=parallel, cache=c+'_prior')
+
+        dkls = compute_dkl(x, fsamps, fsamps_prior, parallel=parallel, cache=c) 
         DKLs.append(dkls)
 
     logZs = numpy.array(logZs)

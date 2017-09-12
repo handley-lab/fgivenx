@@ -4,38 +4,27 @@ import errno
 import numpy
 import inspect
 
-class CacheError(IOError):
-    pass
+class CacheError(Exception):
+    """ Base exception to indicate cache errors """
+    def __init__(self, file_root):
+        self._msg = "%s: reading from cache in %s" % (self.calling_function(), file_root)
+    def calling_function(self):
+        return inspect.getouterframes(inspect.currentframe())[3][3]
+    def msg(self):
+        return self._msg
 
-class CacheFile(object):
-    def __get__(self, obj, type=None):
-        try:
-            with open(self.filename(obj),"rb") as f:
-                return pickle.load(f)
-        except IOError:
 
-            calling_function = inspect.getouterframes(inspect.currentframe())[2][3]
-            raise CacheError(calling_function + ": No cache file %s" % obj.file_root)
-    
-    def __set__(self, obj, value):
-        with open(self.filename(obj),"wb") as f:
-            pickle.dump(value, f,protocol=pickle.HIGHEST_PROTOCOL)
+class CacheChanged(CacheError):
+    def __init__(self, file_root):
+        self._msg = "%s: values have changed in cache %s, recomputing" % (self.calling_function(), file_root)
 
-    def __delete__(self, obj):
-        try:
-            os.remove(self.filename(obj))
-        except OSError:
-            pass
 
-    def filename(self, obj):
-        return obj.file_root + '.pkl'
+class CacheMissing(CacheError):
+    def __init__(self, file_root):
+        self._msg = "%s: No cache file %s" % (self.calling_function(), file_root)
 
-    def dirname(self,obj):
-        return os.path.dirname(self.filename(obj))
 
 class Cache(object):
-
-    data = CacheFile()
 
     def __init__(self, file_root):
         if isinstance(file_root, Cache):
@@ -53,13 +42,12 @@ class Cache(object):
 
     def check(self, *args):
 
-        calling_function = inspect.getouterframes(inspect.currentframe())[2][3]
-
-        if len(self.data)-1 != len(args):
+        data = self.load()
+        if len(data)-1 != len(args):
             raise ValueError("Wrong number of arguments passed to Cache.check")
 
         try:
-            for x, x_check in zip(self.data, args):
+            for x, x_check in zip(data, args):
                 if isinstance(x, list):
                     if len(x) != len(x_check):
                         raise CacheError
@@ -73,7 +61,18 @@ class Cache(object):
                 elif not numpy.allclose(x,x_check,equal_nan=True):
                     raise CacheError
         except CacheError:
-            raise CacheError(calling_function + ": values have changed in cache %s, recomputing" % self.file_root )
+            raise CacheChanged(self.file_root)
 
-        print(calling_function + ": reading from cache in %s" % self.file_root)
-        return self.data[-1]
+        print(CacheError(self.file_root).msg())
+        return data[-1]
+
+    def load(self):
+        try:
+            with open(self.file_root + '.pkl', "rb") as f:
+                return pickle.load(f)
+        except IOError:
+            raise CacheMissing(self.file_root)
+    
+    def save(self, *args):
+        with open(self.file_root + '.pkl', "wb") as f:
+            pickle.dump(args, f,protocol=pickle.HIGHEST_PROTOCOL)
