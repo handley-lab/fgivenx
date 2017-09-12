@@ -92,6 +92,9 @@ def compute_samples(f, x, samples, **kwargs):
     ----------
     Keywords
     --------
+    parallel:
+        see docstring for fgivenx.parallel.parallel_apply.
+
     Returns
     -------
     """
@@ -185,10 +188,8 @@ def compute_contours(f, x, samples, **kwargs):
         Sample weights if samples are not equally weighted.
         len(weights) must equal len(samples)
 
-    parallel: int or bool
-        Amount of parallelisation to use. An integer indicates the number of
-        openmp threads to use. parallel=True indicates to use all available
-        threads.
+    parallel:
+        see docstring for fgivenx.parallel.parallel_apply.
 
     ntrim: int
         Number of samples to trim to (useful if your posterior is oversampled).
@@ -245,6 +246,9 @@ def compute_kullback_liebler(f, x, samples, prior_samples, **kwargs):
     ----------
     Keywords
     --------
+    parallel:
+        see docstring for fgivenx.parallel.parallel_apply.
+
     Returns
     -------
     """

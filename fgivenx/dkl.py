@@ -7,6 +7,7 @@ from fgivenx.parallel import parallel_apply
 def dkl(arrays):
     """
     Compute the Kullback-Liebler divergence from prior and posterior samples.
+
     Parameters
     ----------
     Keywords
@@ -27,8 +28,15 @@ def compute_dkl(x, fsamps, prior_fsamps, **kwargs):
     """
     Parameters
     ----------
+
     Keywords
     --------
+    parallel:
+        see docstring for fgivenx.parallel.parallel_apply.
+
+    cache: str
+        cache file.
+
     Returns
     -------
     """

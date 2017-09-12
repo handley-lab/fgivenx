@@ -99,6 +99,9 @@ def compute_masses(fsamps, y, **kwargs):
     ----------
     Keywords
     --------
+    parallel:
+        see docstring for fgivenx.parallel.parallel_apply.
+
     Returns
     -------
     """

@@ -42,8 +42,8 @@ def compute_samples(f, x, samples, **kwargs):
 
     Keywords
     --------
-    parallel: str
-        See arguments of fgivenx.compute_contours
+    parallel:
+        see docstring for fgivenx.parallel.parallel_apply.
 
     Returns
     -------
