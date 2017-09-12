@@ -62,7 +62,6 @@ def plot(x, y, z, ax, **kwargs):
     contour_color_levels = kwargs.pop('contour_color_levels',
                                       default_color_levels)
 
-    alpha = kwargs.pop('alpha', 1.0)
     lines = kwargs.pop('lines', True)
 
     if kwargs:
@@ -77,7 +76,7 @@ def plot(x, y, z, ax, **kwargs):
                                           order=0)
 
     # Plot the filled contours onto the axis ax
-    cbar = ax.contourf(x, y, z, cmap=colors, levels=contour_color_levels, alpha=alpha)
+    cbar = ax.contourf(x, y, z, cmap=colors, levels=contour_color_levels)
 
     # Remove those annoying white lines
     for c in cbar.collections:
@@ -90,6 +89,7 @@ def plot(x, y, z, ax, **kwargs):
 
     # Return the contours for use as a colourbar later
     return cbar
+
 
 def plot_lines(x, fsamps, ax, downsample=100, **kwargs):
     """
@@ -104,7 +104,7 @@ def plot_lines(x, fsamps, ax, downsample=100, **kwargs):
         indices = numpy.random.choice(len(fsamps.T), downsample, replace=False)
     else:
         indices = numpy.arange(len(fsamps.T))
-    linewidth = kwargs.pop('linewidth',0.1)
-    color = kwargs.pop('color','k')
+    linewidth = kwargs.pop('linewidth', 0.1)
+    color = kwargs.pop('color', 'k')
     for y in fsamps.T[indices]:
         ax.plot(x, y, linewidth=linewidth, color=color, **kwargs)

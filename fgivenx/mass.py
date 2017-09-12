@@ -102,7 +102,7 @@ def compute_masses(fsamps, y, **kwargs):
     Returns
     -------
     """
-    parallel = kwargs.pop('parallel', '')
+    parallel = kwargs.pop('parallel', False)
     cache = kwargs.pop('cache', None)
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
@@ -112,7 +112,7 @@ def compute_masses(fsamps, y, **kwargs):
         try:
             return cache.check(fsamps, y)  
         except CacheError as e:
-            print(e.msg())
+            print(e)
 
     masses = parallel_apply(PMF, fsamps, postcurry=(y,), parallel=parallel)
     masses = numpy.array(masses).transpose().copy()

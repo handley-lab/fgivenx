@@ -83,8 +83,8 @@
 import numpy
 import fgivenx.samples
 from fgivenx.mass import compute_masses
-from fgivenx.io import Cache
 from fgivenx.dkl import compute_dkl
+
 
 def compute_samples(f, x, samples, **kwargs):
     """
@@ -98,8 +98,8 @@ def compute_samples(f, x, samples, **kwargs):
     weights = kwargs.pop('weights', None)
     parallel = kwargs.pop('parallel', False)
     ntrim = kwargs.pop('ntrim', None)
-    cache = kwargs.pop('cache',None)
-    logZs = kwargs.pop('logZs',None) 
+    cache = kwargs.pop('cache', None)
+    logZs = kwargs.pop('logZs', None)
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
@@ -122,7 +122,8 @@ def compute_samples(f, x, samples, **kwargs):
                              % (len(logZs), len(weights)))
 
     if [i for i in f if not callable(i)]:
-        raise ValueError("first argument f must be function (or list of functions) of two variables")
+        raise ValueError("first argument f must be function"
+                         "(or list of functions) of two variables")
 
     # samples
     samples = [numpy.array(s, dtype='double') for s in samples]
@@ -134,11 +135,11 @@ def compute_samples(f, x, samples, **kwargs):
         raise ValueError("x should be a 1D array")
 
     # weights
-    weights = [numpy.array(i, dtype='double') if i is not None 
-               else numpy.ones(len(s), dtype='double')  
+    weights = [numpy.array(i, dtype='double') if i is not None
+               else numpy.ones(len(s), dtype='double')
                for i, s in zip(weights, samples)]
 
-    for w, s in zip(weights,samples):
+    for w, s in zip(weights, samples):
         if len(w) != len(s):
             raise ValueError("length of samples (%i) != length of weights (%i)"
                              % (len(s), len(w)))
@@ -148,13 +149,12 @@ def compute_samples(f, x, samples, **kwargs):
     # Computation
     # ===========
     Zs = numpy.exp(logZs-logZs.max())
-    weights = [w/w.sum()*Z for w, Z in zip(weights,Zs)]
+    weights = [w/w.sum()*Z for w, Z in zip(weights, Zs)]
     wmax = max([w.max() for w in weights])
     weights = [w/wmax for w in weights]
     ntot = sum([w.sum() for w in weights])
     if ntrim is not None and ntrim < ntot:
         weights = [w*ntrim/ntot for w in weights]
-
 
     for i, (s, w) in enumerate(zip(samples, weights)):
         samples[i] = fgivenx.samples.trim_samples(s, w)
@@ -214,8 +214,8 @@ def compute_contours(f, x, samples, **kwargs):
     ntrim = kwargs.pop('ntrim', 100000)
     ny = kwargs.pop('ny', 100)
     y = kwargs.pop('y', None)
-    cache = kwargs.pop('cache',None)
-    logZs = kwargs.pop('logZs',None) 
+    cache = kwargs.pop('cache', None)
+    logZs = kwargs.pop('logZs', None)
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
@@ -225,18 +225,19 @@ def compute_contours(f, x, samples, **kwargs):
         if len(x.shape) is not 1:
             raise ValueError("y should be a 1D array")
 
-    x, fsamps = compute_samples(f, x, samples, weights=weights, parallel=parallel,
-                                ntrim=ntrim, cache=cache, logZs=logZs) 
-
+    x, fsamps = compute_samples(f, x, samples, weights=weights,
+                                parallel=parallel, ntrim=ntrim,
+                                cache=cache, logZs=logZs)
 
     if y is None:
         ymin = fsamps[~numpy.isnan(fsamps)].min(axis=None)
         ymax = fsamps[~numpy.isnan(fsamps)].max(axis=None)
-        y = numpy.linspace(ymin, ymax)
+        y = numpy.linspace(ymin, ymax, ny)
 
     z = compute_masses(fsamps, y, parallel=parallel, cache=cache)
 
     return x, y, z
+
 
 def compute_kullback_liebler(f, x, samples, prior_samples, **kwargs):
     """
@@ -249,11 +250,11 @@ def compute_kullback_liebler(f, x, samples, prior_samples, **kwargs):
     """
 
     parallel = kwargs.pop('parallel', False)
-    cache = kwargs.pop('cache',None)
+    cache = kwargs.pop('cache', None)
     ntrim = kwargs.pop('ntrim', None)
     weights = kwargs.pop('weights', None)
     prior_weights = kwargs.pop('prior_weights', None)
-    logZs = kwargs.pop('logZs', None) 
+    logZs = kwargs.pop('logZs', None)
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
@@ -277,7 +278,7 @@ def compute_kullback_liebler(f, x, samples, prior_samples, **kwargs):
         _, fsamps_prior = compute_samples(fi, x, ps, weights=pw, ntrim=ntrim,
                                           parallel=parallel, cache=c+'_prior')
 
-        dkls = compute_dkl(x, fsamps, fsamps_prior, parallel=parallel, cache=c) 
+        dkls = compute_dkl(x, fsamps, fsamps_prior, parallel=parallel, cache=c)
         DKLs.append(dkls)
 
     logZs = numpy.array(logZs)

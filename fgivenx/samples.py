@@ -1,5 +1,4 @@
 import numpy
-import tqdm
 from fgivenx.parallel import parallel_apply
 from fgivenx.io import CacheError, Cache
 
@@ -59,9 +58,9 @@ def compute_samples(f, x, samples, **kwargs):
     if cache is not None:
         cache = Cache(cache + '_fsamples')
         try:
-            return cache.check(x, samples)  
+            return cache.check(x, samples)
         except CacheError as e:
-            print(e.msg())
+            print(e)
 
     fsamples = []
     for fi, s in zip(f, samples):
@@ -69,7 +68,7 @@ def compute_samples(f, x, samples, **kwargs):
             fsamps = parallel_apply(fi, s, precurry=(x,), parallel=parallel)
             fsamps = numpy.array(fsamps).transpose().copy()
             fsamples.append(fsamps)
-    fsamples = numpy.concatenate(fsamples,axis=1)
+    fsamples = numpy.concatenate(fsamples, axis=1)
 
     if cache is not None:
         cache.save(x, samples, fsamples)
@@ -77,7 +76,8 @@ def compute_samples(f, x, samples, **kwargs):
     return fsamples
 
 
-def samples_from_getdist_chains(params,file_root=None,chains_file=None,paramnames_file=None,latex=False):
+def samples_from_getdist_chains(params, file_root=None, chains_file=None,
+                                paramnames_file=None, latex=False):
     """ Extract samples and weights from getdist chains.
 
     Parameters
@@ -105,7 +105,7 @@ def samples_from_getdist_chains(params,file_root=None,chains_file=None,paramname
     # Get the full data
     if file_root is not None:
         chains_file = file_root + '.txt'
-        paramnames_file = file_root + '.paramnames' 
+        paramnames_file = file_root + '.paramnames'
 
     data = numpy.loadtxt(chains_file)
     if len(data) is 0:
@@ -115,14 +115,16 @@ def samples_from_getdist_chains(params,file_root=None,chains_file=None,paramname
     weights = data[:, 0]
 
     # Get the paramnames
-    paramnames = [line.split()[0].replace('*','') for line in open(paramnames_file,'r')]
+    paramnames = [line.split()[0].replace('*', '')
+                  for line in open(paramnames_file, 'r')]
 
     # Get the relevant samples
     indices = [2+paramnames.index(p) for p in params]
     samples = data[:, indices]
 
     if latex:
-        latex = [' '.join(line.split()[1:])  for line in open(paramnames_file,'r')]
+        latex = [' '.join(line.split()[1:])
+                 for line in open(paramnames_file, 'r')]
         latex = [latex[i-2] for i in indices]
         return samples, weights, latex
     else:

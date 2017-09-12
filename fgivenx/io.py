@@ -10,7 +10,7 @@ class CacheError(Exception):
         self._msg = "%s: reading from cache in %s" % (self.calling_function(), file_root)
     def calling_function(self):
         return inspect.getouterframes(inspect.currentframe())[3][3]
-    def msg(self):
+    def __str__(self):
         return self._msg
 
 
@@ -25,13 +25,8 @@ class CacheMissing(CacheError):
 
 
 class Cache(object):
-
     def __init__(self, file_root):
-        if isinstance(file_root, Cache):
-            self.file_root = file_root.file_root
-        else:
-            self.file_root = file_root
-
+        self.file_root = file_root
         dirname = os.path.dirname(self.file_root)
         if not os.path.exists(dirname):
             try:
@@ -41,8 +36,8 @@ class Cache(object):
                     raise
 
     def check(self, *args):
-
         data = self.load()
+
         if len(data)-1 != len(args):
             raise ValueError("Wrong number of arguments passed to Cache.check")
 
@@ -60,10 +55,11 @@ class Cache(object):
                     raise CacheError
                 elif not numpy.allclose(x,x_check,equal_nan=True):
                     raise CacheError
+
         except CacheError:
             raise CacheChanged(self.file_root)
 
-        print(CacheError(self.file_root).msg())
+        print(CacheError(self.file_root))
         return data[-1]
 
     def load(self):
