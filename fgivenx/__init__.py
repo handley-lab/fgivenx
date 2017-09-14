@@ -86,10 +86,12 @@ from fgivenx.mass import compute_masses
 from fgivenx.dkl import compute_dkl
 
 
-def compute_samples(f, x, samples, **kwargs):
+def compute_samples(f, x, samples, logZ=None **kwargs):
     """
     Parameters
     ----------
+    x : array-like
+        x values to evaluate f at.
     Keywords
     --------
     parallel:
@@ -102,27 +104,26 @@ def compute_samples(f, x, samples, **kwargs):
     parallel = kwargs.pop('parallel', False)
     ntrim = kwargs.pop('ntrim', None)
     cache = kwargs.pop('cache', None)
-    logZs = kwargs.pop('logZs', None)
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
     # Argument checking
     # =================
     # f
-    if logZs is None:
-        logZs = [0]
+    if logZ is None:
+        logZ = [0]
         f = [f]
         samples = [samples]
         weights = [weights]
-    elif len(logZs) != len(f):
-            raise ValueError("num logZs (%i) != num sets of functions (%i)"
-                             % (len(logZs), len(f)))
-    elif len(logZs) != len(samples):
-            raise ValueError("num logZs (%i) != num sets of samples (%i)"
-                             % (len(logZs), len(samples)))
-    elif len(logZs) != len(weights):
-            raise ValueError("num logZs (%i) != num sets of weights (%i)"
-                             % (len(logZs), len(weights)))
+    elif len(logZ) != len(f):
+            raise ValueError("num logZ (%i) != num sets of functions (%i)"
+                             % (len(logZ), len(f)))
+    elif len(logZ) != len(samples):
+            raise ValueError("num logZ (%i) != num sets of samples (%i)"
+                             % (len(logZ), len(samples)))
+    elif len(logZ) != len(weights):
+            raise ValueError("num logZ (%i) != num sets of weights (%i)"
+                             % (len(logZ), len(weights)))
 
     if [i for i in f if not callable(i)]:
         raise ValueError("first argument f must be function"
@@ -147,11 +148,11 @@ def compute_samples(f, x, samples, **kwargs):
             raise ValueError("length of samples (%i) != length of weights (%i)"
                              % (len(s), len(w)))
 
-    logZs = numpy.array(logZs)
+    logZ = numpy.array(logZ)
 
     # Computation
     # ===========
-    Zs = numpy.exp(logZs-logZs.max())
+    Zs = numpy.exp(logZ-logZ.max())
     weights = [w/w.sum()*Z for w, Z in zip(weights, Zs)]
     wmax = max([w.max() for w in weights])
     weights = [w/wmax for w in weights]
@@ -168,19 +169,27 @@ def compute_samples(f, x, samples, **kwargs):
     return x, fsamps
 
 
-def compute_contours(f, x, samples, **kwargs):
+def compute_contours(f, x, samples, logZ=None, **kwargs):
     """ Compute the contours ready for matplotlib plotting.
 
     Parameters
     ----------
     f : function or list of functions
         f(x|theta)
+        if logZ is None: function
+        if logZ is array-like: array-like of functions
 
     x : array-like
-        Descriptor of x values to evaluate.
+        Descriptor of x values to evaluate pmf at.
 
-    samples: array-like or list of array-like
-        2D Array of theta samples. shape should be (# of samples, len(theta),)
+    samples: array-like
+        if logZ is None: 2D array-likes
+        if logZ is array-like: array-like of 2D arrays-likes
+
+
+    logZ: array-like
+        evidences to weight functions by
+
 
     Keywords
     --------
@@ -203,9 +212,6 @@ def compute_contours(f, x, samples, **kwargs):
     cache: str
         Location to store cache files.
 
-    logZ: array-like
-        evidences to weight functions by
-
     Returns
     -------
     """
@@ -216,7 +222,6 @@ def compute_contours(f, x, samples, **kwargs):
     ny = kwargs.pop('ny', 100)
     y = kwargs.pop('y', None)
     cache = kwargs.pop('cache', None)
-    logZs = kwargs.pop('logZs', None)
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
@@ -226,9 +231,9 @@ def compute_contours(f, x, samples, **kwargs):
         if len(x.shape) is not 1:
             raise ValueError("y should be a 1D array")
 
-    x, fsamps = compute_samples(f, x, samples, weights=weights,
-                                parallel=parallel, ntrim=ntrim,
-                                cache=cache, logZs=logZs)
+    x, fsamps = compute_samples(f, x, samples, logZ=logZ,
+                                weights=weights, ntrim=ntrim,
+                                parallel=parallel, cache=cache)
 
     if y is None:
         ymin = fsamps[~numpy.isnan(fsamps)].min(axis=None)
@@ -240,10 +245,12 @@ def compute_contours(f, x, samples, **kwargs):
     return x, y, z
 
 
-def compute_kullback_liebler(f, x, samples, prior_samples, **kwargs):
+def compute_kullback_liebler(f, x, samples, prior_samples, logZ=None **kwargs):
     """
     Parameters
     ----------
+    x : array-like
+        x values to evaluate dkl at.
     Keywords
     --------
     parallel:
@@ -258,12 +265,11 @@ def compute_kullback_liebler(f, x, samples, prior_samples, **kwargs):
     ntrim = kwargs.pop('ntrim', None)
     weights = kwargs.pop('weights', None)
     prior_weights = kwargs.pop('prior_weights', None)
-    logZs = kwargs.pop('logZs', None)
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
-    if logZs is None:
-        logZs = [0]
+    if logZ is None:
+        logZ = [0]
         f = [f]
         samples = [samples]
         prior_samples = [prior_samples]
@@ -285,9 +291,9 @@ def compute_kullback_liebler(f, x, samples, prior_samples, **kwargs):
         dkls = compute_dkl(x, fsamps, fsamps_prior, parallel=parallel, cache=c)
         DKLs.append(dkls)
 
-    logZs = numpy.array(logZs)
+    logZ = numpy.array(logZ)
     DKLs = numpy.array(DKLs)
 
-    Zs = numpy.exp(logZs-logZs.max())
+    Zs = numpy.exp(logZ-logZ.max())
     Zs /= Zs.sum()
     return x, numpy.sum(Zs * DKLs.transpose(), axis=1)
