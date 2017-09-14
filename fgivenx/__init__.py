@@ -32,66 +32,85 @@
                 P(y'|x) < P(y|x)
 
     We thus need to compute this function on a rectangular grid of x and y's.
-
-    Example usage
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    import fgivenx
-    import numpy
-    import matplotlib.pyplot
-    import fgivenx.plot
-
-
-    # Define a simple straight line function, parameters theta=(m,c)
-    def f(x, theta):
-        m, c = theta
-        return m * x + c
-
-    # Create some sample gradient and intercepts
-    nsamples = 1000
-    ms = numpy.random.normal(loc=1,size=nsamples)
-    cs = numpy.random.normal(loc=0,size=nsamples)
-    samples = numpy.array([(m,c) for m,c in zip(ms,cs)])
-
-    # Examine the function over a range of x's
-    xmin, xmax = -2, 2
-    nx = 100
-    x = numpy.linspace(xmin, xmax, nx)
-
-    # Compute the contours
-    x, y, z = fgivenx.compute_contours(f, x, samples)
-
-    # Plot
-    fig, ax = matplotlib.pyplot.subplots()
-    cbar = fgivenx.plot.plot(x, y, z, ax)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-    Samples can also be computed from getdist chains using the helper function
-    `fgivenx.samples.samples_from_getdist_chains`:
-
-
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    params = ['m','c']
-    file_root = 'chains/test'
-    samples, weights = fgivenx.samples.samples_from_getdist_chains(params,
-                                                                   file_root)
-    x, y, z = fgivenx.compute_contours(f, x, samples, weights=weights)
-
-
-
 """
 import numpy
 import fgivenx.samples
 from fgivenx.mass import compute_masses
 from fgivenx.dkl import compute_dkl
 
+def check_args(logZ, f, x, samples, weights):
+    # convert to arrays
+    if logZ is None:
+        logZ = [0]
+        f = [f]
+        samples = [samples]
+        weights = [weights]
 
-def compute_samples(f, x, samples, logZ=None **kwargs):
+    # logZ
+    logZ = numpy.array(logZ, dtype='double')
+    if len(logZ.shape) is not 1:
+        raise ValueError("logZ should be a 1D array")
+
+    # x
+    x = numpy.array(x, dtype='double')
+    if len(x.shape) is not 1:
+        raise ValueError("x should be a 1D array")
+
+    # f
+    if len(logZ) != len(f):
+            raise ValueError("len(logZ) = %i != len(f)= %i"
+                             % (len(logZ), len(f)))
+    for func in f:
+        if not callable(func):
+            raise ValueError("first argument f must be function"
+                             "(or list of functions) of two variables")
+
+    # samples
+    if len(logZ) != len(samples):
+            raise ValueError("len(logZ) = %i != len(samples)= %i"
+                             % (len(logZ), len(samples)))
+    samples = [numpy.array(s, dtype='double') for s in samples]
+    for s in samples:
+        if len(s.shape) is not 2:
+            raise ValueError("each set of samples should be a 2D array")
+
+    # weights
+    if len(logZ) != len(weights):
+            raise ValueError("len(logZ) = %i != len(weights)= %i"
+                             % (len(logZ), len(weights)))
+    weights = [numpy.array(w, dtype='double') if w is not None
+               else numpy.ones(len(s), dtype='double')
+               for w, s in zip(weights, samples)]
+
+    for w, s in zip(weights, samples):
+        if len(w.shape) is not 1:
+            raise ValueError("each set of weights should be a 1D array")
+        if len(w) != len(s):
+            raise ValueError("len(w) = %i != len(s) = %i" % (len(s), len(w)))
+
+    return logZ, f, x, samples, weights
+
+
+def normalise_weights(logZ, weights, ntrim):
+    Zs = numpy.exp(logZ-logZ.max())
+    weights = [w/w.sum()*Z for w, Z in zip(weights, Zs)]
+    wmax = max([w.max() for w in weights])
+    weights = [w/wmax for w in weights]
+    ntot = sum([w.sum() for w in weights])
+    if ntrim is not None and ntrim < ntot:
+        weights = [w*ntrim/ntot for w in weights]
+    return logZ, weights
+
+
+def compute_samples(f, x, samples, logZ=None, **kwargs):
     """
+    Apply the function f(x;theta) 
+
     Parameters
     ----------
     x : array-like
         x values to evaluate f at.
+    samples
     Keywords
     --------
     parallel:
@@ -107,64 +126,15 @@ def compute_samples(f, x, samples, logZ=None **kwargs):
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
-    # Argument checking
-    # =================
-    # f
-    if logZ is None:
-        logZ = [0]
-        f = [f]
-        samples = [samples]
-        weights = [weights]
-    elif len(logZ) != len(f):
-            raise ValueError("num logZ (%i) != num sets of functions (%i)"
-                             % (len(logZ), len(f)))
-    elif len(logZ) != len(samples):
-            raise ValueError("num logZ (%i) != num sets of samples (%i)"
-                             % (len(logZ), len(samples)))
-    elif len(logZ) != len(weights):
-            raise ValueError("num logZ (%i) != num sets of weights (%i)"
-                             % (len(logZ), len(weights)))
+    logZ, f, x, samples, weights  = check_args(logZ, f, x, samples, weights)
 
-    if [i for i in f if not callable(i)]:
-        raise ValueError("first argument f must be function"
-                         "(or list of functions) of two variables")
-
-    # samples
-    samples = [numpy.array(s, dtype='double') for s in samples]
-    if [i for i in samples if len(i.shape) is not 2]:
-        raise ValueError("samples should be a 2D array")
-
-    # x
-    if len(x.shape) is not 1:
-        raise ValueError("x should be a 1D array")
-
-    # weights
-    weights = [numpy.array(i, dtype='double') if i is not None
-               else numpy.ones(len(s), dtype='double')
-               for i, s in zip(weights, samples)]
-
-    for w, s in zip(weights, samples):
-        if len(w) != len(s):
-            raise ValueError("length of samples (%i) != length of weights (%i)"
-                             % (len(s), len(w)))
-
-    logZ = numpy.array(logZ)
-
-    # Computation
-    # ===========
-    Zs = numpy.exp(logZ-logZ.max())
-    weights = [w/w.sum()*Z for w, Z in zip(weights, Zs)]
-    wmax = max([w.max() for w in weights])
-    weights = [w/wmax for w in weights]
-    ntot = sum([w.sum() for w in weights])
-    if ntrim is not None and ntrim < ntot:
-        weights = [w*ntrim/ntot for w in weights]
+    logZ, weights = normalise_weights(logZ, weights, ntrim)
 
     for i, (s, w) in enumerate(zip(samples, weights)):
         samples[i] = fgivenx.samples.trim_samples(s, w)
 
-    fsamps = fgivenx.samples.compute_samples(f, x, samples,
-                                             parallel=parallel, cache=cache)
+    fsamps = fgivenx.samples.compute_samples(f, x, samples, parallel=parallel,
+                                             cache=cache)
 
     return x, fsamps
 
@@ -245,7 +215,7 @@ def compute_contours(f, x, samples, logZ=None, **kwargs):
     return x, y, z
 
 
-def compute_kullback_liebler(f, x, samples, prior_samples, logZ=None **kwargs):
+def compute_kullback_liebler(f, x, samples, prior_samples, logZ=None, **kwargs):
     """
     Parameters
     ----------
