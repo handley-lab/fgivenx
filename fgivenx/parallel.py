@@ -23,17 +23,20 @@ def parallel_apply(f, array, **kwargs):
         bool=False or int=0: do not parallelise
 
     precurry: tuple
-        arguments to pass to f before x
+        immutable arguments to pass to f before x,
+        i.e. [f(precurry,x) for x in array]
 
     postcurry: tuple
-        arguments to pass to f after x
+        immutable arguments to pass to f after x
+        i.e. [f(x,postcurry) for x in array]
 
     Returns
     -------
+    [f(precurry,x,postcurry) for x in array] parallelised according to parallel
     """
 
-    precurry = kwargs.pop('precurry', ())
-    postcurry = kwargs.pop('postcurry', ())
+    precurry = tuple(kwargs.pop('precurry', ()))
+    postcurry = tuple(kwargs.pop('postcurry', ()))
     parallel = kwargs.pop('parallel', False)
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)

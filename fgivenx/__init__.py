@@ -26,19 +26,226 @@
     interested in the value of the probability density (1), but in fact
     require the "iso-probablity posterior mass:"
 
-                        /
-    m( y | x ) =        | P(y'|x) dy'
-                        /
-                P(y'|x) < P(y|x)
+                          /
+    pmf( y | x ) =        | P(y'|x) dy'
+                          /
+                  P(y'|x) < P(y|x)
 
     We thus need to compute this function on a rectangular grid of x and y's.
 """
 import numpy
 import fgivenx.samples
-from fgivenx.mass import compute_masses
-from fgivenx.dkl import compute_dkl
+import fgivenx.mass
+import fgivenx.dkl
 
-def check_args(logZ, f, x, samples, weights):
+
+def compute_samples(f, x, samples, logZ=None, **kwargs):
+    """
+    Apply the function(s) f(x;theta) to the arrays defined in x and samples.
+    Has options for weighting, trimming, cacheing and parallelising.
+
+    Additionally, if a list of log-evidences are passed, along with list of
+    functions, samples and optional weights it marginalises over the models
+    according to the evidences.
+
+    Parameters
+    ----------
+    f: function
+        function f(x;theta) with dependent variable x, parameterised by theta.
+
+    x: 1D array-like
+        x values to evaluate f(x;theta) at.
+
+    samples: 2D array-like
+        theta samples to evaluate f(x;theta) at. shape = (nsamples, npars)
+
+    Keywords
+    --------
+    weights: 1D array-like
+        sample weights, if desired. Should have length same as samples.shape[0]
+
+    ntrim: int
+        Approximate number of samples to trim down to, if desired. Useful if
+        the posterior is dramatically oversampled.
+
+    cache: str
+        File root for saving previous calculations for re-use.
+
+    parallel:
+        see docstring for fgivenx.parallel.parallel_apply.
+
+    Returns
+    -------
+    2D numpy array
+        Evaluate the function f at each x value and each theta.
+        Equivalent to [[f(x_i,theta) for theta in samples] for x_i in x]
+
+    """
+    weights = kwargs.pop('weights', None)
+    parallel = kwargs.pop('parallel', False)
+    ntrim = kwargs.pop('ntrim', None)
+    cache = kwargs.pop('cache', None)
+    if kwargs:
+        raise TypeError('Unexpected **kwargs: %r' % kwargs)
+
+    logZ, f, x, samples, weights = _check_args(logZ, f, x, samples, weights)
+
+    logZ, weights = _normalise_weights(logZ, weights, ntrim)
+
+    for i, (s, w) in enumerate(zip(samples, weights)):
+        samples[i] = fgivenx.samples.equally_weight_samples(s, w)
+
+    return fgivenx.samples.compute_samples(f, x, samples,
+                                           parallel=parallel, cache=cache)
+
+
+def compute_pmf(f, x, samples, logZ=None, **kwargs):
+    """
+    Compute the probablity mass function given x at a range of y values
+    for y = f(x|theta)
+
+                  /
+    P( y | x ) =  | P( y = f(x;theta) | x, theta ) dtheta
+                  /
+
+                          /
+    pmf( y | x ) =        | P(y'|x) dy'
+                          /
+                  P(y'|x) < P(y|x)
+
+    Additionally, if a list of log-evidences are passed, along with list of
+    functions, samples and optional weights it marginalises over the models
+    according to the evidences.
+
+    Parameters
+    ----------
+    f, x, samples, weights, ntrim, cache, parallel
+        see arguments for fgivenx.compute_samples
+
+    ny: int
+        Resolution of y axis
+
+    y: array-like
+        Explicit descriptor of y values to evaluate.
+
+    Returns
+    -------
+    1D numpy array:
+        y values pmf is computed at
+    2D numpy array:
+        pmf values at each x and y
+
+    """
+
+    weights = kwargs.pop('weights', None)
+    parallel = kwargs.pop('parallel', False)
+    ntrim = kwargs.pop('ntrim', 100000)
+    ny = kwargs.pop('ny', 100)
+    y = kwargs.pop('y', None)
+    cache = kwargs.pop('cache', None)
+    if kwargs:
+        raise TypeError('Unexpected **kwargs: %r' % kwargs)
+
+    # y
+    if y is not None:
+        y = numpy.array(y, dtype='double')
+        if len(x.shape) is not 1:
+            raise ValueError("y should be a 1D array")
+
+    fsamps = compute_samples(f, x, samples, logZ=logZ,
+                             weights=weights, ntrim=ntrim,
+                             parallel=parallel, cache=cache)
+
+    if y is None:
+        ymin = fsamps[~numpy.isnan(fsamps)].min(axis=None)
+        ymax = fsamps[~numpy.isnan(fsamps)].max(axis=None)
+        y = numpy.linspace(ymin, ymax, ny)
+
+    return y, fgivenx.mass.compute_pmf(fsamps, y,
+                                       parallel=parallel, cache=cache)
+
+
+def compute_dkl(f, x, samples, prior_samples, logZ=None, **kwargs):
+    """
+    Compute the Kullback-Liebler divergence at each value of x for the prior
+    and posterior defined by prior_samples and samples.
+
+    Let the posterior be:
+
+                  /
+    P( y | x ) =  | P( y = f(x;theta) | x, theta ) dtheta
+                  /
+
+    and prior be:
+
+                  /
+    Q( y | x ) =  | Prior( y = f(x;theta) | x, theta ) dtheta
+                  /
+
+    then the Kullback-Liebler divergence at each x is defined by:
+
+              /
+    D_KL(x) = | P( y | x ) log( Q( y | x ) / P( y | x ) ) dy
+              /
+
+    Parameters
+    ----------
+    f, x, samples, weights, ntrim, cache, parallel
+        see arguments for fgivenx.compute_samples
+
+    Keywords
+    --------
+    parallel:
+        see docstring for fgivenx.parallel.parallel_apply.
+
+    Returns
+    -------
+    1D numpy array:
+        dkl values at each value of x.
+    """
+
+    parallel = kwargs.pop('parallel', False)
+    cache = kwargs.pop('cache', None)
+    ntrim = kwargs.pop('ntrim', None)
+    weights = kwargs.pop('weights', None)
+    prior_weights = kwargs.pop('prior_weights', None)
+    if kwargs:
+        raise TypeError('Unexpected **kwargs: %r' % kwargs)
+
+    if logZ is None:
+        logZ = [0]
+        f = [f]
+        samples = [samples]
+        prior_samples = [prior_samples]
+        weights = [weights]
+        prior_weights = [prior_weights]
+        cache = [cache]
+
+    DKLs = []
+
+    for fi, c, s, w, ps, pw in zip(f, cache, samples, weights,
+                                   prior_samples, prior_weights):
+
+        fsamps = compute_samples(fi, x, s, weights=w, ntrim=ntrim,
+                                 parallel=parallel, cache=c)
+
+        fsamps_prior = compute_samples(fi, x, ps, weights=pw, ntrim=ntrim,
+                                       parallel=parallel, cache=c+'_prior')
+
+        dkls = fgivenx.dkl.compute_dkl(fsamps, fsamps_prior,
+                                       parallel=parallel, cache=c)
+        DKLs.append(dkls)
+
+    logZ = numpy.array(logZ)
+    DKLs = numpy.array(DKLs)
+
+    Zs = numpy.exp(logZ-logZ.max())
+    Zs /= Zs.sum()
+    return numpy.sum(Zs * DKLs.transpose(), axis=1)
+
+
+def _check_args(logZ, f, x, samples, weights):
+    """ Check the arguments for compute_samples. """
     # convert to arrays
     if logZ is None:
         logZ = [0]
@@ -91,7 +298,8 @@ def check_args(logZ, f, x, samples, weights):
     return logZ, f, x, samples, weights
 
 
-def normalise_weights(logZ, weights, ntrim):
+def _normalise_weights(logZ, weights, ntrim):
+    """ Correctly normalise the weights for trimming"""
     Zs = numpy.exp(logZ-logZ.max())
     weights = [w/w.sum()*Z for w, Z in zip(weights, Zs)]
     wmax = max([w.max() for w in weights])
@@ -100,170 +308,3 @@ def normalise_weights(logZ, weights, ntrim):
     if ntrim is not None and ntrim < ntot:
         weights = [w*ntrim/ntot for w in weights]
     return logZ, weights
-
-
-def compute_samples(f, x, samples, logZ=None, **kwargs):
-    """
-    Apply the function f(x;theta) 
-
-    Parameters
-    ----------
-    x : array-like
-        x values to evaluate f at.
-    samples
-    Keywords
-    --------
-    parallel:
-        see docstring for fgivenx.parallel.parallel_apply.
-
-    Returns
-    -------
-    """
-    weights = kwargs.pop('weights', None)
-    parallel = kwargs.pop('parallel', False)
-    ntrim = kwargs.pop('ntrim', None)
-    cache = kwargs.pop('cache', None)
-    if kwargs:
-        raise TypeError('Unexpected **kwargs: %r' % kwargs)
-
-    logZ, f, x, samples, weights  = check_args(logZ, f, x, samples, weights)
-
-    logZ, weights = normalise_weights(logZ, weights, ntrim)
-
-    for i, (s, w) in enumerate(zip(samples, weights)):
-        samples[i] = fgivenx.samples.trim_samples(s, w)
-
-    fsamps = fgivenx.samples.compute_samples(f, x, samples, parallel=parallel,
-                                             cache=cache)
-
-    return x, fsamps
-
-
-def compute_contours(f, x, samples, logZ=None, **kwargs):
-    """ Compute the contours ready for matplotlib plotting.
-
-    Parameters
-    ----------
-    f : function or list of functions
-        f(x|theta)
-        if logZ is None: function
-        if logZ is array-like: array-like of functions
-
-    x : array-like
-        Descriptor of x values to evaluate pmf at.
-
-    samples: array-like
-        if logZ is None: 2D array-likes
-        if logZ is array-like: array-like of 2D arrays-likes
-
-
-    logZ: array-like
-        evidences to weight functions by
-
-
-    Keywords
-    --------
-    weights: array-like
-        Sample weights if samples are not equally weighted.
-        len(weights) must equal len(samples)
-
-    parallel:
-        see docstring for fgivenx.parallel.parallel_apply.
-
-    ntrim: int
-        Number of samples to trim to (useful if your posterior is oversampled).
-
-    ny: int
-        Resolution of y axis
-
-    y: array-like
-        Explicit descriptor of y values to evaluate.
-
-    cache: str
-        Location to store cache files.
-
-    Returns
-    -------
-    """
-
-    weights = kwargs.pop('weights', None)
-    parallel = kwargs.pop('parallel', False)
-    ntrim = kwargs.pop('ntrim', 100000)
-    ny = kwargs.pop('ny', 100)
-    y = kwargs.pop('y', None)
-    cache = kwargs.pop('cache', None)
-    if kwargs:
-        raise TypeError('Unexpected **kwargs: %r' % kwargs)
-
-    # y
-    if y is not None:
-        y = numpy.array(y, dtype='double')
-        if len(x.shape) is not 1:
-            raise ValueError("y should be a 1D array")
-
-    x, fsamps = compute_samples(f, x, samples, logZ=logZ,
-                                weights=weights, ntrim=ntrim,
-                                parallel=parallel, cache=cache)
-
-    if y is None:
-        ymin = fsamps[~numpy.isnan(fsamps)].min(axis=None)
-        ymax = fsamps[~numpy.isnan(fsamps)].max(axis=None)
-        y = numpy.linspace(ymin, ymax, ny)
-
-    z = compute_masses(fsamps, y, parallel=parallel, cache=cache)
-
-    return x, y, z
-
-
-def compute_kullback_liebler(f, x, samples, prior_samples, logZ=None, **kwargs):
-    """
-    Parameters
-    ----------
-    x : array-like
-        x values to evaluate dkl at.
-    Keywords
-    --------
-    parallel:
-        see docstring for fgivenx.parallel.parallel_apply.
-
-    Returns
-    -------
-    """
-
-    parallel = kwargs.pop('parallel', False)
-    cache = kwargs.pop('cache', None)
-    ntrim = kwargs.pop('ntrim', None)
-    weights = kwargs.pop('weights', None)
-    prior_weights = kwargs.pop('prior_weights', None)
-    if kwargs:
-        raise TypeError('Unexpected **kwargs: %r' % kwargs)
-
-    if logZ is None:
-        logZ = [0]
-        f = [f]
-        samples = [samples]
-        prior_samples = [prior_samples]
-        weights = [weights]
-        prior_weights = [prior_weights]
-        cache = [cache]
-
-    DKLs = []
-
-    for fi, c, s, w, ps, pw in zip(f, cache, samples, weights,
-                                   prior_samples, prior_weights):
-
-        _, fsamps = compute_samples(fi, x, s, weights=w, ntrim=ntrim,
-                                    parallel=parallel, cache=c)
-
-        _, fsamps_prior = compute_samples(fi, x, ps, weights=pw, ntrim=ntrim,
-                                          parallel=parallel, cache=c+'_prior')
-
-        dkls = compute_dkl(x, fsamps, fsamps_prior, parallel=parallel, cache=c)
-        DKLs.append(dkls)
-
-    logZ = numpy.array(logZ)
-    DKLs = numpy.array(DKLs)
-
-    Zs = numpy.exp(logZ-logZ.max())
-    Zs /= Zs.sum()
-    return x, numpy.sum(Zs * DKLs.transpose(), axis=1)

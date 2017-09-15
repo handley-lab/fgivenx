@@ -4,12 +4,13 @@ import matplotlib.pyplot
 
 
 def plot(x, y, z, ax, **kwargs):
-    """ Plot computed contours.
+    """ Plot iso-probability mass function, converted to sigmas.
 
         Parameters
         ----------
         x, y, z : numpy arrays
             See arguments to matplotlib.pyplot.contour
+
         ax: matplotlib.axes._subplots.AxesSubplot
             Axes to plot the contours onto.
             Typically generated with:
@@ -93,12 +94,26 @@ def plot(x, y, z, ax, **kwargs):
 
 def plot_lines(x, fsamps, ax, downsample=100, **kwargs):
     """
+    Plot function samples as a set of line plots.
+
     Parameters
     ----------
+    x: 1D array-like
+        x values to plot
+
+    fsamps: 2D array-like
+        set of functions to plot at each x. As returned by
+        fgivenx.compute_samples
+
+    ax: matplotlib.pyplot.ax
+        Axis to plot on.
+
     Keywords
     --------
-    Returns
-    -------
+    downsample: int
+        Reduce the number of samples to a viewable quantity. (Default 100)
+
+    any other keywords are passed to matplotlib.pyplot.ax.plot
     """
     if downsample < len(fsamps.T):
         indices = numpy.random.choice(len(fsamps.T), downsample, replace=False)

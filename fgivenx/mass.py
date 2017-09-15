@@ -2,7 +2,6 @@
 import scipy.stats
 import scipy.interpolate
 import numpy
-import tqdm
 from fgivenx.parallel import parallel_apply
 from fgivenx.io import CacheError, Cache
 
@@ -15,10 +14,10 @@ def PMF(samples, t=None):
 
         From P(t) we define:
 
-                  /
-        M(p) =    | P(t) dt
-                  /
-              P(t) < p
+                    /
+        PMF(p) =    | P(t) dt
+                    /
+                P(t) < p
 
         This is the cumulative distribution function expressed as a
         function of the probability
@@ -61,14 +60,20 @@ def PMF(samples, t=None):
         ----------
         samples: array-like
             Array of samples from a probability density P(t).
-        
+
         t: array-like (optional)
             Array to evaluate the PDF at
 
         Returns
         -------
+        if t == None:
+            function for the log of the pmf
+        else:
+            PMF evaluated at each t value
+
     """
     # Compute the kernel density estimator from the samples
+    samples = numpy.array(samples)
     samples = samples[~numpy.isnan(samples)]
     kernel = scipy.stats.gaussian_kde(samples)
 
@@ -88,15 +93,22 @@ def PMF(samples, t=None):
                                         bounds_error=False,
                                         fill_value=-numpy.inf)
     if t is not None:
-        return numpy.exp(logpmf(t))
+        return numpy.exp(logpmf(numpy.array(t)))
     else:
         return logpmf
 
 
-def compute_masses(fsamps, y, **kwargs):
-    """ Compute the masses at each x for a range of y.
+def compute_pmf(fsamps, y, **kwargs):
+    """ Compute the pmf defined by fsamps at each x for each y.
+
     Parameters
     ----------
+    fsamps: 2D array-like
+        array of function samples, as returned by fgivenx.compute_samples
+
+    y: 1D array-like
+        y values to evaluate the PMF at
+
     Keywords
     --------
     parallel:
@@ -113,11 +125,11 @@ def compute_masses(fsamps, y, **kwargs):
     if cache is not None:
         cache = Cache(cache + '_masses')
         try:
-            return cache.check(fsamps, y)  
+            return cache.check(fsamps, y)
         except CacheError as e:
             print(e)
 
-    masses = parallel_apply(PMF, fsamps, postcurry=(y,), parallel=parallel)
+    masses = parallel_apply(PMF, fsamps, postcurry=y, parallel=parallel)
     masses = numpy.array(masses).transpose().copy()
 
     if cache is not None:

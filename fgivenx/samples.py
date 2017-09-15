@@ -3,22 +3,38 @@ from fgivenx.parallel import parallel_apply
 from fgivenx.io import CacheError, Cache
 
 
-def trim_samples(samples, weights, ntrim=-1):
-    """ Make samples equally weighted, and trim if desired.
+def equally_weight_samples(samples, weights):
+    """ Convert samples to be equally weighted.
+
+    Samples are trimmed by discarding samples in accordance with a probability
+    determined by the corresponding weight.
+
+    This function has assumed you have normalised the weights properly.
+    If in doubt, convert weights via:
+    weights /= weights.max() .
 
     Parameters
     ----------
-    samples: numpy.array
-        See argument of fgivenx.compute_contours for more detail.
+    samples: array-like
+        Samples to trim.
 
-    weights: numpy.array
-        See argument of fgivenx.compute_contours for more detail.
+    weights: array-like
+        Weights to trim by.
 
-    ntrim: int (optional)
     Returns
     -------
-
+    1D numpy.array
+    Equally weighted sample array.
     """
+    if len(weights) != len(samples):
+        raise ValueError("len(weights) = %i != len(samples) = %i" %
+                         (len(weights), len(samples)))
+
+    if numpy.logical_or(weights < 0, weights > 1).any():
+        raise ValueError("weights must have probability between 0 and 1")
+
+    weights = numpy.array(weights)
+    samples = numpy.array(samples)
 
     state = numpy.random.get_state()
 
@@ -65,7 +81,7 @@ def compute_samples(f, x, samples, **kwargs):
     fsamples = []
     for fi, s in zip(f, samples):
         if len(s) > 0:
-            fsamps = parallel_apply(fi, s, precurry=(x,), parallel=parallel)
+            fsamps = parallel_apply(fi, s, precurry=x, parallel=parallel)
             fsamps = numpy.array(fsamps).transpose().copy()
             fsamples.append(fsamps)
     fsamples = numpy.concatenate(fsamples, axis=1)
@@ -85,13 +101,23 @@ def samples_from_getdist_chains(params, file_root=None, chains_file=None,
     params: list(str)
         Names of parameters to be supplied to second argument of f(x|theta).
 
-    file_root: str
-        Root name for getdist chains files. This script requires
-        - file_root.txt
-        - file_root.paramnames
-
     Keywords
     --------
+    file_root: str
+        Root name for getdist chains files. This variable automatically
+        defines:
+        - chains_file = file_root.txt
+        - paramnames_file = file_root.paramnames
+        but can be overidden by chains_file or paramnames_file.
+
+    chains_file: str
+        Full filename for getdist chains file.
+
+    paramnames_file: str
+        Full filename for getdist paramnames file.
+
+    latex: bool
+        Also return an array of latex strings for those paramnames.
 
     Returns
     -------
@@ -100,12 +126,24 @@ def samples_from_getdist_chains(params, file_root=None, chains_file=None,
 
     weights: numpy.array
         Array of weights. samples.shape = (len(params),)
+    if latex:
+    latex: list(str)
+        list of latex strigs for each parameter
     """
 
     # Get the full data
     if file_root is not None:
-        chains_file = file_root + '.txt'
-        paramnames_file = file_root + '.paramnames'
+        if chains_file is not None:
+            chains_file = file_root + '.txt'
+        if paramnames_file is not None:
+            paramnames_file = file_root + '.paramnames'
+
+    if paramnames_file is None:
+        raise ValueError("You must define paramnames_file,"
+                         "either by file_root, or paramnames_file")
+    if chains_file is None:
+        raise ValueError("You must define chains_file,"
+                         "either by file_root, or chains_file")
 
     data = numpy.loadtxt(chains_file)
     if len(data) is 0:
