@@ -16,7 +16,7 @@ setup(name='fgivenx',
       install_requires=['numpy','matplotlib','scipy','joblib','tqdm'],
       license='MIT',
       classifiers=[
-      'Development Status :: 3 - Alpha',
+      'Development Status :: 4 - Beta',
       'Intended Audience :: Developers',
       'Natural Language :: English',
       'License :: OSI Approved :: MIT License',

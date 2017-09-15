@@ -18,7 +18,7 @@ Example Usage
 ```python
 import numpy
 import matplotlib.pyplot as plt
-from fgivenx import compute_samples, compute_contours, compute_kullback_liebler
+from fgivenx import compute_samples, compute_pmf, compute_dkl
 from fgivenx.plot import plot, plot_lines
 
 
@@ -33,7 +33,7 @@ def f(x, theta):
 numpy.random.seed(1)
 
 # Posterior samples
-nsamples = 1000
+nsamples = 500
 ms = numpy.random.normal(loc=-5, scale=1, size=nsamples)
 cs = numpy.random.normal(loc=2, scale=1, size=nsamples)
 samples = numpy.array([(m, c) for m, c in zip(ms, cs)]).copy()
@@ -55,15 +55,15 @@ cache = 'cache/test'
 prior_cache = cache + '_prior'
 
 # Compute function samples
-x, fsamps = compute_samples(f, x, samples, cache=cache)
-x, prior_fsamps = compute_samples(f, x, prior_samples, cache=prior_cache)
+fsamps = compute_samples(f, x, samples, cache=cache)
+prior_fsamps = compute_samples(f, x, prior_samples, cache=prior_cache)
 
 # Compute dkls
-x, dkls = compute_kullback_liebler(f, x, samples, prior_samples, cache=cache)
+dkls = compute_dkl(f, x, samples, prior_samples, cache=cache)
 
 # Compute probability mass function.
-x, y, z = compute_contours(f, x, samples, cache=cache)
-x, y_prior, z_prior = compute_contours(f, x, prior_samples, cache=prior_cache)
+y, pmf = compute_pmf(f, x, samples, cache=cache)
+y_prior, pmf_prior = compute_pmf(f, x, prior_samples, cache=prior_cache)
 
 # Plotting
 # ========
@@ -94,9 +94,9 @@ plot_lines(x, fsamps, ax_lines, color=posterior_color)
 ax_fgivenx = axes[1, 1]
 ax_fgivenx.set_ylabel(r'$P(y|x)$')
 ax_fgivenx.set_xlabel(r'$x$')
-cbar = plot(x, y_prior, z_prior, ax_fgivenx,
+cbar = plot(x, y_prior, pmf_prior, ax_fgivenx,
             colors=plt.cm.Blues_r, lines=False)
-cbar = plot(x, y, z, ax_fgivenx,
+cbar = plot(x, y, pmf, ax_fgivenx,
             colors=plt.cm.Reds_r)
 
 # DKL plot
