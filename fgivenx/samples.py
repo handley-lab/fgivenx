@@ -1,6 +1,6 @@
 import numpy
 from fgivenx.parallel import parallel_apply
-from fgivenx.io import CacheError, Cache
+from fgivenx.io import CacheException, Cache
 
 
 def equally_weight_samples(samples, weights):
@@ -75,7 +75,7 @@ def compute_samples(f, x, samples, **kwargs):
         cache = Cache(cache + '_fsamples')
         try:
             return cache.check(x, samples)
-        except CacheError as e:
+        except CacheException as e:
             print(e)
 
     fsamples = []

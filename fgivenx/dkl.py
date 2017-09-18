@@ -1,6 +1,6 @@
 import numpy
 from scipy.stats import gaussian_kde
-from fgivenx.io import CacheError, Cache
+from fgivenx.io import CacheException, Cache
 from fgivenx.parallel import parallel_apply
 
 
@@ -62,7 +62,7 @@ def compute_dkl(fsamps, prior_fsamps, **kwargs):
         cache = Cache(cache + '_dkl')
         try:
             return cache.check(fsamps, prior_fsamps)
-        except CacheError as e:
+        except CacheException as e:
             print(e)
 
     zip_fsamps = list(zip(fsamps, prior_fsamps))

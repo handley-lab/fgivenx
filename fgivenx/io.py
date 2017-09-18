@@ -5,11 +5,8 @@ import numpy
 import inspect
 
 
-class CacheError(Exception):
+class CacheException(Exception):
     """ Base exception to indicate cache errors """
-    def __init__(self, file_root):
-        self._msg = "%s: reading from cache in %s" % (
-                     self.calling_function(), file_root)
 
     def calling_function(self):
         """ Get the name of the function calling this cache. """
@@ -20,14 +17,20 @@ class CacheError(Exception):
         return self._msg
 
 
-class CacheChanged(CacheError):
+class CacheOK(CacheException):
+    def __init__(self, file_root):
+        self._msg = "%s: reading from cache in %s" % (
+                     self.calling_function(), file_root)
+
+
+class CacheChanged(CacheException):
     """ Exception to indicate the cache has changed. """
     def __init__(self, file_root):
         self._msg = "%s: values have changed in cache %s, recomputing" % (
                      self.calling_function(), file_root)
 
 
-class CacheMissing(CacheError):
+class CacheMissing(CacheException):
     """ Exception to indicate the cache does not exist. """
     def __init__(self, file_root):
         self._msg = "%s: No cache file %s" % (
@@ -56,7 +59,7 @@ class Cache(object):
         """ Check that the cache has changed.
 
         If cache is unchanged, return the last answer, otherwise indicate
-        recomputation required by throwing a CacheError exception.
+        recomputation required by throwing a CacheException exception.
         """
         data = self.load()
 
@@ -67,22 +70,22 @@ class Cache(object):
             for x, x_check in zip(data, args):
                 if isinstance(x, list):
                     if len(x) != len(x_check):
-                        raise CacheError
+                        raise CacheException
                     for x_i, x_check_i in zip(x, x_check):
                         if x_i.shape != x_check_i.shape:
-                            raise CacheError
+                            raise CacheException
                         elif not numpy.allclose(x_i, x_check_i,
                                                 equal_nan=True):
-                            raise CacheError
+                            raise CacheException
                 elif x.shape != x_check.shape:
-                    raise CacheError
+                    raise CacheException
                 elif not numpy.allclose(x, x_check, equal_nan=True):
-                    raise CacheError
+                    raise CacheException
 
-        except CacheError:
+        except CacheException:
             raise CacheChanged(self.file_root)
 
-        print(CacheError(self.file_root))
+        print(CacheOK(self.file_root))
         return data[-1]
 
     def load(self):

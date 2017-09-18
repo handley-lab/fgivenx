@@ -3,7 +3,7 @@ import scipy.stats
 import scipy.interpolate
 import numpy
 from fgivenx.parallel import parallel_apply
-from fgivenx.io import CacheError, Cache
+from fgivenx.io import CacheException, Cache
 
 
 def PMF(samples, t=None):
@@ -126,7 +126,7 @@ def compute_pmf(fsamps, y, **kwargs):
         cache = Cache(cache + '_masses')
         try:
             return cache.check(fsamps, y)
-        except CacheError as e:
+        except CacheException as e:
             print(e)
 
     masses = parallel_apply(PMF, fsamps, postcurry=(y,), parallel=parallel)
