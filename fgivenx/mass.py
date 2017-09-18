@@ -129,7 +129,7 @@ def compute_pmf(fsamps, y, **kwargs):
         except CacheError as e:
             print(e)
 
-    masses = parallel_apply(PMF, fsamps, postcurry=y, parallel=parallel)
+    masses = parallel_apply(PMF, fsamps, postcurry=(y,), parallel=parallel)
     masses = numpy.array(masses).transpose().copy()
 
     if cache is not None:

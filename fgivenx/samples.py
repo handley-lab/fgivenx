@@ -81,7 +81,7 @@ def compute_samples(f, x, samples, **kwargs):
     fsamples = []
     for fi, s in zip(f, samples):
         if len(s) > 0:
-            fsamps = parallel_apply(fi, s, precurry=x, parallel=parallel)
+            fsamps = parallel_apply(fi, s, precurry=(x,), parallel=parallel)
             fsamps = numpy.array(fsamps).transpose().copy()
             fsamples.append(fsamps)
     fsamples = numpy.concatenate(fsamples, axis=1)
