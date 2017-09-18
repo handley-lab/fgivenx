@@ -8,7 +8,7 @@ except (IOError, ImportError):
     long_description = ''
 
 setup(name='fgivenx',
-      version='1.1.1',
+      version='1.1.3',
       author='Will Handley',
       author_email='wh260@cam.ac.uk',
       url='https://github.com/williamjameshandley/fgivenx',
