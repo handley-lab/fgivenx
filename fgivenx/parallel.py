@@ -42,7 +42,8 @@ def parallel_apply(f, array, **kwargs):
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
     if not parallel:
-        return [f(*(precurry + (x,) + postcurry)) for x in tqdm.tqdm(array)]
+        return [f(*(precurry + (x,) + postcurry)) for x in
+                tqdm.tqdm_notebook(array, leave=False)]
     elif parallel is True:
         nprocs = cpu_count()
     elif isinstance(parallel, int):
@@ -54,4 +55,5 @@ def parallel_apply(f, array, **kwargs):
         raise ValueError("parallel keyword must be an integer or bool")
 
     return Parallel(n_jobs=nprocs)(delayed(f)(*(precurry + (x,) + postcurry))
-                                   for x in tqdm.tqdm(array))
+                                   for x in tqdm.tqdm_notebook(array,
+                                                               leave=False))
