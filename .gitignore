@@ -5,3 +5,6 @@ MANIFEST
 tags
 build
 dist
+*.egg-info
+.eggs
+plot.png

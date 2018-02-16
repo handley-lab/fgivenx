@@ -1,4 +1,5 @@
 import scipy
+import scipy.ndimage
 import numpy
 import matplotlib.pyplot
 

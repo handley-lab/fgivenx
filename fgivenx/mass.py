@@ -75,23 +75,40 @@ def PMF(samples, t=None):
     # Compute the kernel density estimator from the samples
     samples = numpy.array(samples)
     samples = samples[~numpy.isnan(samples)]
-    kernel = scipy.stats.gaussian_kde(samples)
+    try:
+        kernel = scipy.stats.gaussian_kde(samples)
 
-    # Sort the samples in t, and find their probabilities
-    samples = kernel.resample(10000)[0]
-    samples.sort()
-    ps = kernel(samples)
+        # Sort the samples in t, and find their probabilities
+        samples = kernel.resample(10000)[0]
+        samples.sort()
+        ps = kernel(samples)
 
-    # Compute the cumulative distribution function M(t) by
-    # sorting the ps, and finding the position in that sort
-    # We then store this as a log
-    logms = numpy.log(scipy.stats.rankdata(ps) / float(len(samples)))
+        # Compute the cumulative distribution function M(t) by
+        # sorting the ps, and finding the position in that sort
+        # We then store this as a log
+        logms = numpy.log(scipy.stats.rankdata(ps) / float(len(samples)))
 
-    samples
-    # create an interpolating function of log(M(t))
-    logpmf = scipy.interpolate.interp1d(samples, logms,
-                                        bounds_error=False,
-                                        fill_value=-numpy.inf)
+        # create an interpolating function of log(M(t))
+        logpmf = scipy.interpolate.interp1d(samples, logms,
+                                            bounds_error=False,
+                                            fill_value=-numpy.inf)
+    except numpy.linalg.LinAlgError:
+        # If the samples all have approximately the same value (for example
+        # this can occur if the function you are plotting converges) then
+        # scipy.stats.gaussian_kde(samples) may throw a LinAlgError when the
+        # standard deviation of the samples goes to zero (to within numerical
+        # accuracy).
+        # In this case return an interpolating function that is 1 exactly on
+        # the samples and zero elsewhere.
+        # NB pmf=1 implies logpmf=0.
+        if numpy.std(samples, ddof=1) == 0:
+            logpmf = scipy.interpolate.interp1d(samples,
+                                                numpy.zeros(samples.shape),
+                                                bounds_error=False,
+                                                fill_value=-numpy.inf)
+        else:
+            raise numpy.linalg.LinAlgError("numpy.linalg.LinAlgError not " +
+                                           "handeled as samples std != 0")
     if t is not None:
         return numpy.exp(logpmf(numpy.array(t)))
     else:
