@@ -23,8 +23,8 @@ def parallel_apply(f, array, **kwargs):
         bool=False or int=0: do not parallelise
 
     tqdm_leave: bool
-        tqdm progress bars' 'leave' setting - set to False to have progress bars
-        disappear when finished.
+        tqdm progress bars' 'leave' setting - set to False to have progress
+        bars disappear when finished.
 
     precurry: tuple
         immutable arguments to pass to f before x,
@@ -67,4 +67,4 @@ def parallel_apply(f, array, **kwargs):
         raise ValueError("parallel keyword must be an integer or bool")
 
     return Parallel(n_jobs=nprocs)(delayed(f)(*(precurry + (x,) + postcurry))
-                                   for x in progress(array, tqdm_leave=False))
+                                   for x in progress(array, leave=tqdm_leave))
