@@ -43,6 +43,11 @@ def plot(x, y, z, ax, **kwargs):
         lines: bool
             (Default: True)
 
+        rasterize_contours: bool
+            (Default: False)
+            Rasterize the contours while keeping the lines, text etc in vector
+            format. Useful for reducing file size bloat and making printing
+            easier when you have dense contours.
 
         Returns
         -------
@@ -64,6 +69,8 @@ def plot(x, y, z, ax, **kwargs):
     contour_color_levels = kwargs.pop('contour_color_levels',
                                       default_color_levels)
 
+    rasterize_contours = kwargs.pop('rasterize_contours', False)
+
     lines = kwargs.pop('lines', True)
 
     if kwargs:
@@ -80,6 +87,11 @@ def plot(x, y, z, ax, **kwargs):
     # Plot the filled contours onto the axis ax
     cbar = ax.contourf(x, y, z, cmap=colors, levels=contour_color_levels)
 
+    # Rasterize contours (the rest of the figure stays in vector format)
+    if rasterize_contours:
+        for c in cbar.collections:
+            c.set_rasterized(True)
+    
     # Remove those annoying white lines
     for c in cbar.collections:
         c.set_edgecolor("face")
