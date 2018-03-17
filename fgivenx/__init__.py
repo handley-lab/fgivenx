@@ -74,6 +74,9 @@ def compute_samples(f, x, samples, logZ=None, **kwargs):
     parallel:
         see docstring for fgivenx.parallel.parallel_apply.
 
+    tqdm_leave: bool
+        see docstring for fgivenx.parallel.parallel_apply.
+
     Returns
     -------
     2D numpy array
@@ -85,6 +88,7 @@ def compute_samples(f, x, samples, logZ=None, **kwargs):
     parallel = kwargs.pop('parallel', False)
     ntrim = kwargs.pop('ntrim', None)
     cache = kwargs.pop('cache', None)
+    tqdm_leave = kwargs.pop('tqdm_leave', True)
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
@@ -96,7 +100,8 @@ def compute_samples(f, x, samples, logZ=None, **kwargs):
         samples[i] = fgivenx.samples.equally_weight_samples(s, w)
 
     return fgivenx.samples.compute_samples(f, x, samples,
-                                           parallel=parallel, cache=cache)
+                                           parallel=parallel, cache=cache,
+                                           tqdm_leave=tqdm_leave)
 
 
 def compute_pmf(f, x, samples, logZ=None, **kwargs):
@@ -128,6 +133,11 @@ def compute_pmf(f, x, samples, logZ=None, **kwargs):
     y: array-like
         Explicit descriptor of y values to evaluate.
 
+    Keywords
+    --------
+    tqdm_leave: bool
+        see docstring for fgivenx.parallel.parallel_apply.
+
     Returns
     -------
     1D numpy array:
@@ -143,6 +153,7 @@ def compute_pmf(f, x, samples, logZ=None, **kwargs):
     ny = kwargs.pop('ny', 100)
     y = kwargs.pop('y', None)
     cache = kwargs.pop('cache', None)
+    tqdm_leave = kwargs.pop('tqdm_leave', True)
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
@@ -154,15 +165,16 @@ def compute_pmf(f, x, samples, logZ=None, **kwargs):
 
     fsamps = compute_samples(f, x, samples, logZ=logZ,
                              weights=weights, ntrim=ntrim,
-                             parallel=parallel, cache=cache)
+                             parallel=parallel, cache=cache,
+                             tqdm_leave=tqdm_leave)
 
     if y is None:
         ymin = fsamps[~numpy.isnan(fsamps)].min(axis=None)
         ymax = fsamps[~numpy.isnan(fsamps)].max(axis=None)
         y = numpy.linspace(ymin, ymax, ny)
 
-    return y, fgivenx.mass.compute_pmf(fsamps, y,
-                                       parallel=parallel, cache=cache)
+    return y, fgivenx.mass.compute_pmf(fsamps, y, parallel=parallel,
+                                       cache=cache, tqdm_leave=tqdm_leave)
 
 
 def compute_dkl(f, x, samples, prior_samples, logZ=None, **kwargs):

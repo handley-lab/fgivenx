@@ -61,6 +61,10 @@ def compute_samples(f, x, samples, **kwargs):
     parallel:
         see docstring for fgivenx.parallel.parallel_apply.
 
+    tqdm_leave: bool
+        see docstring for fgivenx.parallel.parallel_apply.
+
+
     Returns
     -------
     An array of samples at each x. shape=(len(x),len(samples),)
@@ -68,6 +72,7 @@ def compute_samples(f, x, samples, **kwargs):
 
     parallel = kwargs.pop('parallel', False)
     cache = kwargs.pop('cache', None)
+    tqdm_leave = kwargs.pop('tqdm_leave', True)
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
@@ -81,7 +86,8 @@ def compute_samples(f, x, samples, **kwargs):
     fsamples = []
     for fi, s in zip(f, samples):
         if len(s) > 0:
-            fsamps = parallel_apply(fi, s, precurry=(x,), parallel=parallel)
+            fsamps = parallel_apply(fi, s, precurry=(x,), parallel=parallel,
+                                    tqdm_leave=tqdm_leave)
             fsamps = numpy.array(fsamps).transpose().copy()
             fsamples.append(fsamps)
     fsamples = numpy.concatenate(fsamples, axis=1)

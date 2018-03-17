@@ -131,11 +131,15 @@ def compute_pmf(fsamps, y, **kwargs):
     parallel:
         see docstring for fgivenx.parallel.parallel_apply.
 
+    tqdm_leave:
+        see docstring for fgivenx.parallel.parallel_apply.
+
     Returns
     -------
     """
     parallel = kwargs.pop('parallel', False)
     cache = kwargs.pop('cache', None)
+    tqdm_leave = kwargs.pop('tqdm_leave', True)
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
@@ -146,7 +150,8 @@ def compute_pmf(fsamps, y, **kwargs):
         except CacheException as e:
             print(e)
 
-    masses = parallel_apply(PMF, fsamps, postcurry=(y,), parallel=parallel)
+    masses = parallel_apply(PMF, fsamps, postcurry=(y,), parallel=parallel,
+                            tqdm_leave=tqdm_leave)
     masses = numpy.array(masses).transpose().copy()
 
     if cache is not None:
