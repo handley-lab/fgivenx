@@ -128,10 +128,10 @@ def compute_pmf(fsamps, y, **kwargs):
 
     Keywords
     --------
-    parallel:
+    parallel: bool
         see docstring for fgivenx.parallel.parallel_apply.
 
-    tqdm_leave:
+    tqdm_kwargs: dict
         see docstring for fgivenx.parallel.parallel_apply.
 
     Returns
@@ -139,7 +139,7 @@ def compute_pmf(fsamps, y, **kwargs):
     """
     parallel = kwargs.pop('parallel', False)
     cache = kwargs.pop('cache', None)
-    tqdm_leave = kwargs.pop('tqdm_leave', True)
+    tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
@@ -151,7 +151,7 @@ def compute_pmf(fsamps, y, **kwargs):
             print(e)
 
     masses = parallel_apply(PMF, fsamps, postcurry=(y,), parallel=parallel,
-                            tqdm_leave=tqdm_leave)
+                            tqdm_kwargs=tqdm_kwargs)
     masses = numpy.array(masses).transpose().copy()
 
     if cache is not None:

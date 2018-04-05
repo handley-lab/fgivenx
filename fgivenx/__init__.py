@@ -74,7 +74,7 @@ def compute_samples(f, x, samples, logZ=None, **kwargs):
     parallel:
         see docstring for fgivenx.parallel.parallel_apply.
 
-    tqdm_leave: bool
+    tqdm_kwargs: dict
         see docstring for fgivenx.parallel.parallel_apply.
 
     Returns
@@ -88,7 +88,7 @@ def compute_samples(f, x, samples, logZ=None, **kwargs):
     parallel = kwargs.pop('parallel', False)
     ntrim = kwargs.pop('ntrim', None)
     cache = kwargs.pop('cache', None)
-    tqdm_leave = kwargs.pop('tqdm_leave', True)
+    tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
@@ -101,7 +101,7 @@ def compute_samples(f, x, samples, logZ=None, **kwargs):
 
     return fgivenx.samples.compute_samples(f, x, samples,
                                            parallel=parallel, cache=cache,
-                                           tqdm_leave=tqdm_leave)
+                                           tqdm_kwargs=tqdm_kwargs)
 
 
 def compute_pmf(f, x, samples, logZ=None, **kwargs):
@@ -135,7 +135,7 @@ def compute_pmf(f, x, samples, logZ=None, **kwargs):
 
     Keywords
     --------
-    tqdm_leave: bool
+    tqdm_kwargs: dict
         see docstring for fgivenx.parallel.parallel_apply.
 
     Returns
@@ -153,7 +153,7 @@ def compute_pmf(f, x, samples, logZ=None, **kwargs):
     ny = kwargs.pop('ny', 100)
     y = kwargs.pop('y', None)
     cache = kwargs.pop('cache', None)
-    tqdm_leave = kwargs.pop('tqdm_leave', True)
+    tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
@@ -166,7 +166,7 @@ def compute_pmf(f, x, samples, logZ=None, **kwargs):
     fsamps = compute_samples(f, x, samples, logZ=logZ,
                              weights=weights, ntrim=ntrim,
                              parallel=parallel, cache=cache,
-                             tqdm_leave=tqdm_leave)
+                             tqdm_kwargs=tqdm_kwargs)
 
     if y is None:
         ymin = fsamps[~numpy.isnan(fsamps)].min(axis=None)
@@ -174,7 +174,7 @@ def compute_pmf(f, x, samples, logZ=None, **kwargs):
         y = numpy.linspace(ymin, ymax, ny)
 
     return y, fgivenx.mass.compute_pmf(fsamps, y, parallel=parallel,
-                                       cache=cache, tqdm_leave=tqdm_leave)
+                                       cache=cache, tqdm_kwargs=tqdm_kwargs)
 
 
 def compute_dkl(f, x, samples, prior_samples, logZ=None, **kwargs):

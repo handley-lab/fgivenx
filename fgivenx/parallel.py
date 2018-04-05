@@ -22,9 +22,8 @@ def parallel_apply(f, array, **kwargs):
         int < 0 or bool=True: use OMP_NUM_THREADS to choose parallelisation
         bool=False or int=0: do not parallelise
 
-    tqdm_leave: bool
-        tqdm progress bars' 'leave' setting - set to False to have progress
-        bars disappear when finished.
+    tqdm_kwargs: dict
+        additional kwargs for tqdm progress bars.
 
     precurry: tuple
         immutable arguments to pass to f before x,
@@ -42,7 +41,7 @@ def parallel_apply(f, array, **kwargs):
     precurry = tuple(kwargs.pop('precurry', ()))
     postcurry = tuple(kwargs.pop('postcurry', ()))
     parallel = kwargs.pop('parallel', False)
-    tqdm_leave = kwargs.pop('tqdm_leave', True)
+    tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
     # If running in a jupyter notebook then use tqdm_notebook. Otherwise use
@@ -55,7 +54,7 @@ def parallel_apply(f, array, **kwargs):
         progress = tqdm.tqdm
     if not parallel:
         return [f(*(precurry + (x,) + postcurry)) for x in
-                progress(array, leave=tqdm_leave)]
+                progress(array, **tqdm_kwargs)]
     elif parallel is True:
         nprocs = cpu_count()
     elif isinstance(parallel, int):
@@ -67,4 +66,4 @@ def parallel_apply(f, array, **kwargs):
         raise ValueError("parallel keyword must be an integer or bool")
 
     return Parallel(n_jobs=nprocs)(delayed(f)(*(precurry + (x,) + postcurry))
-                                   for x in progress(array, leave=tqdm_leave))
+                                   for x in progress(array, **tqdm_kwargs))
