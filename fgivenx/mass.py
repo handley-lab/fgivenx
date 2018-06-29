@@ -95,20 +95,22 @@ def PMF(samples, y):
 
                 # compute the probability at this y value
                 p = kernel(yi)
+                if p <= min(ps_):
+                    m = 0.
+                else:
+                    # Find out which samples have greater probability than P(y)
+                    bools = ps_>p
 
-                # Find out which samples have greater probability than P(y)
-                bools = ps_>p
+                    # Compute indices where to start and stop the integration
+                    stops = numpy.where(numpy.logical_and(~bools[:-1], bools[1:]))[0]
+                    starts = numpy.where(numpy.logical_and(bools[:-1], ~bools[1:]))[0]
 
-                # Compute indices where to start and stop the integration
-                stops = numpy.where(numpy.logical_and(~bools[:-1], bools[1:]))[0]
-                starts = numpy.where(numpy.logical_and(bools[:-1], ~bools[1:]))[0]
+                    # Compute locations
+                    starts =  [mn] + [scipy.optimize.brentq(lambda u: kernel(u)-p,samples_[i], samples_[i+1]) for i in starts]
+                    stops = [scipy.optimize.brentq(lambda u: kernel(u)-p,samples_[i], samples_[i+1]) for i in stops] + [mx]
 
-                # Compute locations
-                starts =  [mn] + [scipy.optimize.brentq(lambda u: kernel(u)-p,samples_[i], samples_[i+1]) for i in starts]
-                stops = [scipy.optimize.brentq(lambda u: kernel(u)-p,samples_[i], samples_[i+1]) for i in stops] + [mx]
-
-                # 
-                m = sum(kernel.integrate_box_1d(a, b) for a, b in zip(starts, stops))
+                    # Sum up the masses
+                    m = sum(kernel.integrate_box_1d(a, b) for a, b in zip(starts, stops))
             ms.append(m)
         return numpy.array(ms)
 

@@ -23,9 +23,9 @@ def plot(x, y, z, ax, **kwargs):
             (Default: matplotlib.pyplot.cm.Reds_r)
             Color scheme to plot with. Recommend plotting in reverse
 
-        smooth: bool
-            (Default: False)
-            Whether to smooth the contours.
+        smooth: float
+            (Default: no smoothing)
+            Percentage by which to smooth the contours.
 
         contour_line_levels: List[float]
             Contour lines to be plotted.  (Default: [1,2])
@@ -79,9 +79,9 @@ def plot(x, y, z, ax, **kwargs):
     # Convert to sigmas
     z = numpy.sqrt(2) * scipy.special.erfinv(1 - z)
 
-    # Gaussian filter if desired the sigmas by a factor of 1%
+    # Gaussian filter if desired the sigmas by a factor of smooth%
     if smooth:
-        z = scipy.ndimage.gaussian_filter(z, sigma=numpy.array(z.shape)/100.0,
+        z = scipy.ndimage.gaussian_filter(z, sigma=smooth*numpy.array(z.shape)/100.0,
                                           order=0)
 
     # Plot the filled contours onto the axis ax
