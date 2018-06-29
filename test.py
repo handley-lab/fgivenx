@@ -15,7 +15,7 @@ def f(x, theta):
 numpy.random.seed(1)
 
 # Posterior samples
-nsamples = 500
+nsamples = 1000
 ms = numpy.random.normal(loc=-5, scale=1, size=nsamples)
 cs = numpy.random.normal(loc=2, scale=1, size=nsamples)
 samples = numpy.array([(m, c) for m, c in zip(ms, cs)]).copy()
@@ -41,11 +41,11 @@ fsamps = compute_samples(f, x, samples, cache=cache)
 prior_fsamps = compute_samples(f, x, prior_samples, cache=prior_cache)
 
 # Compute dkls
-dkls = compute_dkl(f, x, samples, prior_samples, cache=cache)
+dkls = compute_dkl(f, x, samples, prior_samples, cache=cache, parallel=True)
 
 # Compute probability mass function.
-y, pmf = compute_pmf(f, x, samples, cache=cache)
-y_prior, pmf_prior = compute_pmf(f, x, prior_samples, cache=prior_cache)
+y, pmf = compute_pmf(f, x, samples, cache=cache, parallel=True)
+y_prior, pmf_prior = compute_pmf(f, x, prior_samples, cache=prior_cache, parallel=True)
 
 # Plotting
 # ========

@@ -6,13 +6,13 @@ from fgivenx.parallel import parallel_apply
 from fgivenx.io import CacheException, Cache
 
 
-def PMF(samples, t=None):
+def PMF(samples, y):
     """ Compute the probability mass function.
 
-        The set of samples defines a probability density P(t),
+        The set of samples defines a probability density P(y),
         which is computed using a kernel density estimator.
 
-        From P(t) we define:
+        From P(y) we define:
 
                     /
         PMF(p) =    | P(t) dt
@@ -22,12 +22,12 @@ def PMF(samples, t=None):
         This is the cumulative distribution function expressed as a
         function of the probability
 
-        We aim to compute M(t), which indicates the amount of
+        We aim to compute M(y), which indicates the amount of
         probability contained outside the iso-probability contour
-        passing through t.
+        passing through y.
 
 
-         ^ P(t)                   ...
+         ^ P(y)                   ...
          |                     | .   .
          |                     |       .
         p|- - - - - - - - - - .+- - - - . - - - - - - - - - - -
@@ -42,10 +42,10 @@ def PMF(samples, t=None):
          |              ..#####|        #####..
          |          ....#######|        #######....
          |         .###########|        ###########.
-         +---------------------+-------------------------------> t
+         +---------------------+-------------------------------> y
                               t
 
-         ^ M(p)                        ^ M(t)
+         ^ M(p)                        ^ M(y)
          |                             |
         1|                +++         1|         +
          |               +             |        + +
@@ -53,67 +53,67 @@ def PMF(samples, t=None):
          |     ++                      |     ++     ++
          |   ++                        |   ++         ++
          |+++                          |+++             +++
-         +---------------------> p     +---------------------> t
+         +---------------------> p     +---------------------> y
         0                   1
 
         Parameters
         ----------
         samples: array-like
-            Array of samples from a probability density P(t).
+            Array of samples from a probability density P(y).
 
-        t: array-like (optional)
+        y: array-like (optional)
             Array to evaluate the PDF at
 
         Returns
         -------
-        if t == None:
-            function for the log of the pmf
-        else:
-            PMF evaluated at each t value
+        PMF evaluated at each y value
 
     """
-    # Compute the kernel density estimator from the samples
+    # Remove any nans from the samples
     samples = numpy.array(samples)
     samples = samples[~numpy.isnan(samples)]
     try:
+        # Compute the kernel density estimate
         kernel = scipy.stats.gaussian_kde(samples)
 
-        # Sort the samples in t, and find their probabilities
-        samples = kernel.resample(10000)[0]
-        samples.sort()
-        ps = kernel(samples)
+        # Add two more samples definitely outside the range and sort them
+        mn = 1.5*min(samples) - 0.5*max(samples)
+        mx = 1.5*max(samples) - 0.5*min(samples)
+        samples_ = numpy.array([mn, mx] + list(samples))
+        samples_.sort()
 
-        # Compute the cumulative distribution function M(t) by
-        # sorting the ps, and finding the position in that sort
-        # We then store this as a log
-        logms = numpy.log(scipy.stats.rankdata(ps) / float(len(samples)))
+        # Compute the probabilities at each of the extended samples
+        ps_ = kernel(samples_)
 
-        # create an interpolating function of log(M(t))
-        logpmf = scipy.interpolate.interp1d(samples, logms,
-                                            bounds_error=False,
-                                            fill_value=-numpy.inf)
+        # Compute the masses
+        ms = []
+        for yi in y:
+            # Zero mass if it's outside the range
+            if yi < mn or yi > mx:
+                m = 0.
+            else:
+
+                # compute the probability at this y value
+                p = kernel(yi)
+
+                # Find out which samples have greater probability than P(y)
+                bools = ps_>p
+
+                # Compute indices where to start and stop the integration
+                stops = numpy.where(numpy.logical_and(~bools[:-1], bools[1:]))[0]
+                starts = numpy.where(numpy.logical_and(bools[:-1], ~bools[1:]))[0]
+
+                # Compute locations
+                starts =  [mn] + [scipy.optimize.brentq(lambda u: kernel(u)-p,samples_[i], samples_[i+1]) for i in starts]
+                stops = [scipy.optimize.brentq(lambda u: kernel(u)-p,samples_[i], samples_[i+1]) for i in stops] + [mx]
+
+                # 
+                m = sum(kernel.integrate_box_1d(a, b) for a, b in zip(starts, stops))
+            ms.append(m)
+        return numpy.array(ms)
+
     except numpy.linalg.LinAlgError:
-        # If the samples all have approximately the same value (for example
-        # this can occur if the function you are plotting converges) then
-        # scipy.stats.gaussian_kde(samples) may throw a LinAlgError when the
-        # standard deviation of the samples goes to zero (to within numerical
-        # accuracy).
-        # In this case return an interpolating function that is 1 exactly on
-        # the samples and zero elsewhere.
-        # NB pmf=1 implies logpmf=0.
-        if numpy.std(samples, ddof=1) == 0:
-            logpmf = scipy.interpolate.interp1d(samples,
-                                                numpy.zeros(samples.shape),
-                                                bounds_error=False,
-                                                fill_value=-numpy.inf)
-        else:
-            raise numpy.linalg.LinAlgError("numpy.linalg.LinAlgError not " +
-                                           "handeled as samples std != 0")
-    if t is not None:
-        return numpy.exp(logpmf(numpy.array(t)))
-    else:
-        return logpmf
-
+        return numpy.zeros_like(y)
 
 def compute_pmf(fsamps, y, **kwargs):
     """ Compute the pmf defined by fsamps at each x for each y.
