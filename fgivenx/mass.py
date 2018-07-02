@@ -87,7 +87,7 @@ def PMF(samples, y):
 
         # Compute the masses
         ms = []
-        for i, yi in enumerate(y):
+        for yi in y:
             # Zero mass if it's outside the range
             if yi < mn or yi > mx:
                 m = 0.
@@ -106,8 +106,8 @@ def PMF(samples, y):
                     starts = numpy.where(numpy.logical_and(bools[:-1], ~bools[1:]))[0]
 
                     # Compute locations
-                    starts =  [mn] + [scipy.optimize.brentq(lambda u: kernel(u)-p,samples_[j], samples_[j+1]) if j != i or j+1 != i else yi for j in starts]
-                    stops = [scipy.optimize.brentq(lambda u: kernel(u)-p,samples_[j], samples_[j+1]) if j != i or j+1 != i else yi for j in stops] + [mx]
+                    starts =  [mn] + [samples_[i] if numpy.isclose(kernel(samples_[i]),p) else samples_[i+1] if numpy.isclose(kernel(samples_[i+1]),p) else scipy.optimize.brentq(lambda u: kernel(u)-p,samples_[i], samples_[i+1]) for i in starts]
+                    stops = [samples_[i] if numpy.isclose(kernel(samples_[i]),p) else samples_[i+1] if numpy.isclose(kernel(samples_[i+1]),p) else scipy.optimize.brentq(lambda u: kernel(u)-p,samples_[i], samples_[i+1]) for i in stops] + [mx]
 
                     # Sum up the masses
                     m = sum(kernel.integrate_box_1d(a, b) for a, b in zip(starts, stops))
