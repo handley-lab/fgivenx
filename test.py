@@ -16,7 +16,7 @@ numpy.random.seed(1)
 
 # Posterior samples
 nsamples = 1000
-ms = numpy.random.normal(loc=-5, scale=3, size=nsamples)
+ms = numpy.random.normal(loc=-5, scale=1, size=nsamples)
 cs = numpy.random.normal(loc=2, scale=1, size=nsamples)
 samples = numpy.array([(m, c) for m, c in zip(ms, cs)]).copy()
 
