@@ -33,8 +33,8 @@ def f(x, theta):
 numpy.random.seed(1)
 
 # Posterior samples
-nsamples = 500
-ms = numpy.random.normal(loc=-5, scale=1, size=nsamples)
+nsamples = 1000
+ms = numpy.random.normal(loc=-5, scale=3, size=nsamples)
 cs = numpy.random.normal(loc=2, scale=1, size=nsamples)
 samples = numpy.array([(m, c) for m, c in zip(ms, cs)]).copy()
 
@@ -59,11 +59,11 @@ fsamps = compute_samples(f, x, samples, cache=cache)
 prior_fsamps = compute_samples(f, x, prior_samples, cache=prior_cache)
 
 # Compute dkls
-dkls = compute_dkl(f, x, samples, prior_samples, cache=cache)
+dkls = compute_dkl(f, x, samples, prior_samples, cache=cache, parallel=True)
 
 # Compute probability mass function.
-y, pmf = compute_pmf(f, x, samples, cache=cache)
-y_prior, pmf_prior = compute_pmf(f, x, prior_samples, cache=prior_cache)
+y, pmf = compute_pmf(f, x, samples, cache=cache, parallel=True)
+y_prior, pmf_prior = compute_pmf(f, x, prior_samples, cache=prior_cache, parallel=True)
 
 # Plotting
 # ========
@@ -76,10 +76,8 @@ posterior_color = 'r'
 ax_samples = axes[0, 0]
 ax_samples.set_ylabel(r'$c$')
 ax_samples.set_xlabel(r'$m$')
-ax_samples.plot(prior_samples.T[0], prior_samples.T[1],
-                color=prior_color, marker='.', linestyle='')
-ax_samples.plot(samples.T[0], samples.T[1],
-                color=posterior_color, marker='.', linestyle='')
+ax_samples.plot(prior_samples.T[0], prior_samples.T[1], color=prior_color, marker='.', linestyle='')
+ax_samples.plot(samples.T[0], samples.T[1], color=posterior_color, marker='.', linestyle='')
 
 # Line plot
 # ---------
@@ -94,10 +92,8 @@ plot_lines(x, fsamps, ax_lines, color=posterior_color)
 ax_fgivenx = axes[1, 1]
 ax_fgivenx.set_ylabel(r'$P(y|x)$')
 ax_fgivenx.set_xlabel(r'$x$')
-cbar = plot(x, y_prior, pmf_prior, ax_fgivenx,
-            colors=plt.cm.Blues_r, lines=False)
-cbar = plot(x, y, pmf, ax_fgivenx,
-            colors=plt.cm.Reds_r)
+cbar = plot(x, y_prior, pmf_prior, ax_fgivenx, colors=plt.cm.Blues_r, lines=False)
+cbar = plot(x, y, pmf, ax_fgivenx, colors=plt.cm.Reds_r)
 
 # DKL plot
 # --------

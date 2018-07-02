@@ -77,8 +77,8 @@ def PMF(samples, y):
         kernel = scipy.stats.gaussian_kde(samples)
 
         # Add two more samples definitely outside the range and sort them
-        mn = 1.5*min(samples) - 0.5*max(samples)
-        mx = 1.5*max(samples) - 0.5*min(samples)
+        mn = min(samples) - 10*numpy.sqrt(kernel.covariance[0,0])
+        mx = max(samples) + 10*numpy.sqrt(kernel.covariance[0,0]) 
         samples_ = numpy.array([mn, mx] + list(samples))
         samples_.sort()
 
