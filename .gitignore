@@ -8,3 +8,4 @@ dist
 *.egg-info
 .eggs
 plot.png
+.pytest_cache
