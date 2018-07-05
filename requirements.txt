@@ -1,0 +1,7 @@
+pytest
+matplotlib
+scipy
+tqdm
+numpy
+joblib
+pypandoc
