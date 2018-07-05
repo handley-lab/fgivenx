@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/100947684.svg)](https://zenodo.org/badge/latestdoi/100947684)
+
 Functional Posterior Plotter
 ============================
 
