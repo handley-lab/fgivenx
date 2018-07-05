@@ -108,7 +108,7 @@ ax_lines.get_shared_x_axes().join(ax_lines, ax_fgivenx, ax_samples)
 fig.tight_layout()
 fig.savefig('plot.pdf')
 ```
-![](https://raw.github.com/williamjameshandley/fgivenx/master/plot.pdf)
+![](https://raw.github.com/williamjameshandley/fgivenx/master/plot.png)
 
 
 
