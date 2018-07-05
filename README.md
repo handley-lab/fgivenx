@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/williamjameshandley/fgivenx.svg?branch=testing_setup)](https://travis-ci.org/williamjameshandley/fgivenx)
+[![codecov](https://codecov.io/gh/williamjameshandley/fgivenx/branch/testing_setup/graph/badge.svg)](https://codecov.io/gh/williamjameshandley/fgivenx)
+[![PyPI version](https://badge.fury.io/py/fgivenx.svg)](https://badge.fury.io/py/fgivenx)
 
 Functional Posterior Plotter
 ============================

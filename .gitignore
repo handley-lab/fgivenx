@@ -9,3 +9,4 @@ dist
 .eggs
 plot.png
 .pytest_cache
+.coverage
