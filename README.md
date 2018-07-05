@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/williamjameshandley/fgivenx.svg?branch=testing_setup)](https://travis-ci.org/williamjameshandley/fgivenx)
+
 Functional Posterior Plotter
 ============================
 
