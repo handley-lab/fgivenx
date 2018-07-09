@@ -10,3 +10,4 @@ dist
 plot.png
 .pytest_cache
 .coverage
+*,cover

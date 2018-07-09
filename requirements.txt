@@ -6,3 +6,4 @@ numpy
 joblib
 pypandoc
 pytest-cov
+shutil

@@ -49,11 +49,7 @@ class Cache(object):
         self.file_root = file_root
         dirname = os.path.dirname(self.file_root)
         if not os.path.exists(dirname):
-            try:
-                os.makedirs(dirname)
-            except OSError as exc:
-                if exc.errno != errno.EEXIST:
-                    raise
+            os.makedirs(dirname)
 
     def check(self, *args):
         """ Check that the cache has changed.
