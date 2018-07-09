@@ -1,9 +1,9 @@
-pytest
 matplotlib
-scipy
 tqdm
+pytest
+scipy
 numpy
 joblib
 pypandoc
+codecov
 pytest-cov
-shutil
