@@ -23,7 +23,7 @@ def test_PMF():
     N = 100000
     kernel = scipy.stats.gaussian_kde(samples)
     s = kernel.resample(N)[0]
-    m_ = [sum(kernel(s)<=kernel(y_i))/N for y_i in y]
+    m_ = [sum(kernel(s)<=kernel(y_i))/float(N) for y_i in y]
     assert_allclose(m, m_, atol=3*N**-0.5)
 
     # Compute PMF via quadrature
