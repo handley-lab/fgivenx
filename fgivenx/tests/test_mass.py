@@ -7,7 +7,22 @@ from shutil import rmtree
 from numpy.testing import assert_allclose
 import scipy.stats
 import scipy.integrate
+import scipy.special
 from fgivenx.mass import PMF
+
+def gaussian_pmf(y, mu=0, sigma=1):
+    return scipy.special.erfc(numpy.abs(y-mu)/numpy.sqrt(2)/sigma)
+
+
+def test_gaussian():
+    numpy.random.seed(0)
+    nsamp = 10000
+    samples = numpy.random.randn(nsamp)
+    y = numpy.random.uniform(-3,3,10)
+    m = PMF(samples, y)
+    m_ = gaussian_pmf(y)
+    assert_allclose(m, m_,rtol=1e-1)
+
 
 def test_PMF():
     # Compute samples
@@ -29,5 +44,5 @@ def test_PMF():
     # Compute PMF via quadrature
     m_ = [scipy.integrate.quad(lambda x: kernel(x)*(kernel(x)<=kernel(y_i)), -numpy.inf, numpy.inf,limit=500)[0] for y_i in y]
     assert_allclose(m, m_, atol=1e-4)
-    
 
+    
