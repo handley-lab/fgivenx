@@ -8,7 +8,7 @@ from numpy.testing import assert_allclose
 import scipy.stats
 import scipy.integrate
 import scipy.special
-from fgivenx.mass import PMF
+from fgivenx.mass import PMF, compute_pmf
 
 def gaussian_pmf(y, mu=0, sigma=1):
     return scipy.special.erfc(numpy.abs(y-mu)/numpy.sqrt(2)/sigma)
@@ -16,12 +16,12 @@ def gaussian_pmf(y, mu=0, sigma=1):
 
 def test_gaussian():
     numpy.random.seed(0)
-    nsamp = 10000
+    nsamp = 5000
     samples = numpy.random.randn(nsamp)
     y = numpy.random.uniform(-3,3,10)
     m = PMF(samples, y)
     m_ = gaussian_pmf(y)
-    assert_allclose(m, m_,rtol=1e-1)
+    assert_allclose(m, m_,rtol=3e-1)
 
 
 def test_PMF():
@@ -45,4 +45,40 @@ def test_PMF():
     m_ = [scipy.integrate.quad(lambda x: kernel(x)*(kernel(x)<=kernel(y_i)), -numpy.inf, numpy.inf,limit=500)[0] for y_i in y]
     assert_allclose(m, m_, atol=1e-4)
 
+    assert_allclose([0,0],PMF(samples,[-1e3,1e3]))
+
+    samples = [0,0]
+    m = PMF(samples, y)
+    assert_allclose(m,numpy.zeros_like(y))
+
     
+def test_compute_pmf():
+
+    with pytest.raises(TypeError):
+        compute_pmf(None,None,blah=None)
+
+    cache = '.test_cache/test'
+    numpy.random.seed(0)
+    nsamp = 5000
+    a,b,e,f = 0,1,0,1
+    m = numpy.random.normal(a,b,nsamp)
+    c = numpy.random.normal(e,f,nsamp)
+    nx = 100
+    x = numpy.linspace(-1,1,nx)
+    fsamps = (numpy.outer(x, m) + c)
+    ny = 100
+    y = numpy.linspace(-3,3,ny)
+
+    assert(not os.path.isfile(cache + '_masses.pkl'))
+    m = compute_pmf(fsamps, y,cache=cache)
+    assert(os.path.isfile(cache + '_masses.pkl'))
+
+    m_ = [gaussian_pmf(y,a*xi+e,numpy.sqrt(b**2*xi**2+f**2)) for xi in x]
+    assert_allclose(m.transpose(), m_, atol=3e-1)
+
+    m = compute_pmf(fsamps, y,cache=cache)
+    assert_allclose(m.transpose(), m_, atol=3e-1)
+
+    rmtree('.test_cache')
+
+
