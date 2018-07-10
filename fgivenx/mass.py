@@ -79,11 +79,10 @@ def PMF(samples, y):
         # Add two more samples definitely outside the range and sort them
         mn = min(samples) - 10*numpy.sqrt(kernel.covariance[0,0])
         mx = max(samples) + 10*numpy.sqrt(kernel.covariance[0,0]) 
-        samples_ = numpy.array([mn, mx] + list(samples))
-        samples_.sort()
+        y_ = numpy.linspace(mn, mx, len(y)*10)
 
         # Compute the probabilities at each of the extended samples
-        ps_ = kernel(samples_)
+        ps_ = kernel(y_)
 
         # Compute the masses
         ms = []
@@ -106,8 +105,8 @@ def PMF(samples, y):
                     starts = numpy.where(numpy.logical_and(bools[:-1], ~bools[1:]))[0]
 
                     # Compute locations
-                    starts =  [mn] + [samples_[i] if numpy.isclose(kernel(samples_[i]),p) else samples_[i+1] if numpy.isclose(kernel(samples_[i+1]),p) else scipy.optimize.brentq(lambda u: kernel(u)-p,samples_[i], samples_[i+1]) for i in starts]
-                    stops = [samples_[i] if numpy.isclose(kernel(samples_[i]),p) else samples_[i+1] if numpy.isclose(kernel(samples_[i+1]),p) else scipy.optimize.brentq(lambda u: kernel(u)-p,samples_[i], samples_[i+1]) for i in stops] + [mx]
+                    starts =  [mn] + [y_[i] if numpy.isclose(kernel(y_[i]),p) else y_[i+1] if numpy.isclose(kernel(y_[i+1]),p) else scipy.optimize.brentq(lambda u: kernel(u)-p,y_[i], y_[i+1]) for i in starts]
+                    stops = [y_[i] if numpy.isclose(kernel(y_[i]),p) else y_[i+1] if numpy.isclose(kernel(y_[i+1]),p) else scipy.optimize.brentq(lambda u: kernel(u)-p,y_[i], y_[i+1]) for i in stops] + [mx]
 
                     # Sum up the masses
                     m = sum(kernel.integrate_box_1d(a, b) for a, b in zip(starts, stops))
