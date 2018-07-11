@@ -79,38 +79,32 @@ def PMF(samples, y):
         # Add two more samples definitely outside the range and sort them
         mn = min(samples) - 10*numpy.sqrt(kernel.covariance[0,0])
         mx = max(samples) + 10*numpy.sqrt(kernel.covariance[0,0]) 
-        samples_ = numpy.array([mn, mx] + list(samples))
-        samples_.sort()
+        y_ = numpy.linspace(mn, mx, len(y)*10)
 
         # Compute the probabilities at each of the extended samples
-        ps_ = kernel(samples_)
+        ps_ = kernel(y_)
 
         # Compute the masses
         ms = []
         for yi in y:
-            # Zero mass if it's outside the range
-            if yi < mn or yi > mx:
+            # compute the probability at this y value
+            p = kernel(yi)
+            if p <= min(ps_) or yi < mn or yi > mx:
                 m = 0.
             else:
+                # Find out which samples have greater probability than P(y)
+                bools = ps_>p
 
-                # compute the probability at this y value
-                p = kernel(yi)
-                if p <= min(ps_):
-                    m = 0.
-                else:
-                    # Find out which samples have greater probability than P(y)
-                    bools = ps_>p
+                # Compute indices where to start and stop the integration
+                stops = numpy.where(numpy.logical_and(~bools[:-1], bools[1:]))[0]
+                starts = numpy.where(numpy.logical_and(bools[:-1], ~bools[1:]))[0]
 
-                    # Compute indices where to start and stop the integration
-                    stops = numpy.where(numpy.logical_and(~bools[:-1], bools[1:]))[0]
-                    starts = numpy.where(numpy.logical_and(bools[:-1], ~bools[1:]))[0]
+                # Compute locations
+                starts =  [mn] + [y_[i] if numpy.isclose(kernel(y_[i]),p) else y_[i+1] if numpy.isclose(kernel(y_[i+1]),p) else scipy.optimize.brentq(lambda u: kernel(u)-p,y_[i], y_[i+1]) for i in starts]
+                stops = [y_[i] if numpy.isclose(kernel(y_[i]),p) else y_[i+1] if numpy.isclose(kernel(y_[i+1]),p) else scipy.optimize.brentq(lambda u: kernel(u)-p,y_[i], y_[i+1]) for i in stops] + [mx]
 
-                    # Compute locations
-                    starts =  [mn] + [samples_[i] if numpy.isclose(kernel(samples_[i]),p) else samples_[i+1] if numpy.isclose(kernel(samples_[i+1]),p) else scipy.optimize.brentq(lambda u: kernel(u)-p,samples_[i], samples_[i+1]) for i in starts]
-                    stops = [samples_[i] if numpy.isclose(kernel(samples_[i]),p) else samples_[i+1] if numpy.isclose(kernel(samples_[i+1]),p) else scipy.optimize.brentq(lambda u: kernel(u)-p,samples_[i], samples_[i+1]) for i in stops] + [mx]
-
-                    # Sum up the masses
-                    m = sum(kernel.integrate_box_1d(a, b) for a, b in zip(starts, stops))
+                # Sum up the masses
+                m = sum(kernel.integrate_box_1d(a, b) for a, b in zip(starts, stops))
             ms.append(m)
         return numpy.array(ms)
 
