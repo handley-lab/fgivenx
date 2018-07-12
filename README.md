@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/williamjameshandley/fgivenx.svg?branch=master)](https://travis-ci.org/williamjameshandley/fgivenx)
 [![codecov](https://codecov.io/gh/williamjameshandley/fgivenx/branch/master/graph/badge.svg)](https://codecov.io/gh/williamjameshandley/fgivenx)
 [![PyPI version](https://badge.fury.io/py/fgivenx.svg)](https://badge.fury.io/py/fgivenx)
-[![DOI](https://zenodo.org/badge/100947684.svg)](https://zenodo.org/badge/latestdoi/100947684)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1310715.svg)](https://doi.org/10.5281/zenodo.1310715)
 
 Functional Posterior Plotter
 ============================
