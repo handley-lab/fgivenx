@@ -89,7 +89,7 @@ def PMF(samples, y):
         for yi in y:
             # compute the probability at this y value
             p = kernel(yi)
-            if p <= min(ps_) or yi < mn or yi > mx:
+            if p <= max(ps_)*1e-5:
                 m = 0.
             else:
                 # Find out which samples have greater probability than P(y)
@@ -100,8 +100,8 @@ def PMF(samples, y):
                 starts = numpy.where(numpy.logical_and(bools[:-1], ~bools[1:]))[0]
 
                 # Compute locations
-                starts =  [mn] + [y_[i] if numpy.isclose(kernel(y_[i]),p) else y_[i+1] if numpy.isclose(kernel(y_[i+1]),p) else scipy.optimize.brentq(lambda u: kernel(u)-p,y_[i], y_[i+1]) for i in starts]
-                stops = [y_[i] if numpy.isclose(kernel(y_[i]),p) else y_[i+1] if numpy.isclose(kernel(y_[i+1]),p) else scipy.optimize.brentq(lambda u: kernel(u)-p,y_[i], y_[i+1]) for i in stops] + [mx]
+                starts = [-numpy.inf] + [scipy.optimize.brentq(lambda u: kernel(u)-p,y_[i], y_[i+1]) for i in starts]
+                stops = [scipy.optimize.brentq(lambda u: kernel(u)-p,y_[i], y_[i+1]) for i in stops] + [numpy.inf]
 
                 # Sum up the masses
                 m = sum(kernel.integrate_box_1d(a, b) for a, b in zip(starts, stops))
