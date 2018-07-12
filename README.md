@@ -1,7 +1,11 @@
+[![Build Status](https://travis-ci.org/williamjameshandley/fgivenx.svg?branch=master)](https://travis-ci.org/williamjameshandley/fgivenx)
+[![codecov](https://codecov.io/gh/williamjameshandley/fgivenx/branch/master/graph/badge.svg)](https://codecov.io/gh/williamjameshandley/fgivenx)
+[![PyPI version](https://badge.fury.io/py/fgivenx.svg)](https://badge.fury.io/py/fgivenx)
 [![DOI](https://zenodo.org/badge/100947684.svg)](https://zenodo.org/badge/latestdoi/100947684)
 
 Functional Posterior Plotter
 ============================
+![](https://raw.github.com/williamjameshandley/fgivenx/master/plot.png)
 
 These packages allow one to compute a predictive posterior of a function,
 dependent on sampled parameters. We assume one has a Bayesian posterior
@@ -110,8 +114,3 @@ ax_lines.get_shared_x_axes().join(ax_lines, ax_fgivenx, ax_samples)
 fig.tight_layout()
 fig.savefig('plot.pdf')
 ```
-![](https://raw.github.com/williamjameshandley/fgivenx/master/plot.png)
-
-
-
-
