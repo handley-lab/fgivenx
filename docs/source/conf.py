@@ -28,6 +28,9 @@ version = ''
 # The full version, including alpha/beta/rc tags
 release = '2.0'
 
+import sys
+import os
+sys.path.append(os.path.abspath('../../'))
 
 # -- General configuration ---------------------------------------------------
 
@@ -48,6 +51,7 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
+    'numpydoc',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

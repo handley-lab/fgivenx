@@ -1,37 +1,35 @@
-""" fgivenx module.
+r""" fgivenx module.
 
     This module provides utilities for computing the grid for contours of a
     function reconstruction plot.
 
-    Assume one has
-     * posterior probability distribution P(theta) described by samples
-     * independent variable x
-     * dependent variable y
-     * functional form y = f(x;theta) parameterised by theta
+    Required ingredients:
+     * posterior probability distribution :math:`P(\theta)` described by samples 
+     * independent variable :math:`x`
+     * dependent variable :math:`y`
+     * functional form :math:`y = f(x;\theta)` parameterised by :math:`\theta`
 
     Assuming that you have obtained samples of theta from an MCMC
     process, we aim to compute the density:
 
-                  /
-    P( y | x ) =  | P( y = f(x;theta) | x, theta ) dtheta ,  (1)
-                  /
+    .. math::
 
-                  /
-               =  | dirac_delta( y - f(x;theta) ) P(theta) dtheta ,  (2)
-                  /
+        P(y|x) &= \int P(y=f(x;\theta)|x,\theta)d\theta \\
+                &= \int \delta(y-f(x;\theta) P(\theta) d\theta
 
-    which gives our degree of knowledge for each y value given an x value.
+    which gives our degree of knowledge for each :math:`y` value given an
+    :math:`x` value.
 
     In fact, for a more representative plot, we are not actually
-    interested in the value of the probability density (1), but in fact
+    interested in the value of the probability density above, but in fact
     require the "iso-probablity posterior mass:"
 
-                          /
-    pmf( y | x ) =        | P(y'|x) dy'
-                          /
-                  P(y'|x) < P(y|x)
+    .. math::
 
-    We thus need to compute this function on a rectangular grid of x and y's.
+        \mathrm{pmf}(y|x) = \int_{P(y'|x) < P(y|x)} P(y'|x) dy'
+
+    We thus need to compute this function on a rectangular grid of :math:`x`
+    and :math:`y`.
 """
 import numpy
 import fgivenx.samples
