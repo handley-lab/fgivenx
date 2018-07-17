@@ -54,6 +54,12 @@ extensions = [
     'numpydoc',
 ]
 
+intersphinx_mapping = {
+        'numpy': ('https://docs.scipy.org/doc/numpy/', None),
+        'scipy': ('https://docs.scipy.org/doc/scipy/reference/', None),
+        'matplotlib': ('http://matplotlib.org/', None),
+        }
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 

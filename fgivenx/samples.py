@@ -54,15 +54,10 @@ def compute_samples(f, x, samples, **kwargs):
 
     Parameters
     ----------
-    See arguments of fgivenx.compute_contours
+    See arguments of :func:`fgivenx.compute_contours`
 
-    Keywords
-    --------
-    parallel:
-        see docstring for fgivenx.parallel.parallel_apply.
-
-    tqdm_kwargs: dict
-        see docstring for fgivenx.parallel.parallel_apply.
+    parallel, tqdm_kwargs: optional
+        see docstring for :func:`fgivenx.parallel.parallel_apply`
 
 
     Returns

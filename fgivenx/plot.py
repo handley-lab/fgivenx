@@ -10,22 +10,23 @@ def plot(x, y, z, ax, **kwargs):
         Parameters
         ----------
         x, y, z : numpy arrays
-            See arguments to matplotlib.pyplot.contour
+            See arguments to :func:`matplotlib.pyplot.contour`
 
-        ax: matplotlib.axes._subplots.AxesSubplot
-            Axes to plot the contours onto.
-            Typically generated with:
-                fig, ax = matplotlib.pyplot.subplots()
+        ax: axes object 
+            :class:`matplotlib.axes._subplots.AxesSubplot` to plot the contours
+            onto. Typically generated with:
+            >>> fig, ax = matplotlib.pyplot.subplots()
 
         Keywords
         --------
-        colors: matplotlib.colors.LinearSegmentedColormap
-            (Default: matplotlib.pyplot.cm.Reds_r)
+        colors: color scheme
+            :class:`matplotlib.colors.LinearSegmentedColormap` 
             Color scheme to plot with. Recommend plotting in reverse
+            (Default: :class:`matplotlib.pyplot.cm.Reds_r`)
 
         smooth: float
-            (Default: no smoothing)
             Percentage by which to smooth the contours.
+            (Default: no smoothing)
 
         contour_line_levels: List[float]
             Contour lines to be plotted.  (Default: [1,2])
@@ -44,14 +45,15 @@ def plot(x, y, z, ax, **kwargs):
             (Default: True)
 
         rasterize_contours: bool
-            (Default: False)
             Rasterize the contours while keeping the lines, text etc in vector
             format. Useful for reducing file size bloat and making printing
             easier when you have dense contours.
+            (Default: False)
 
         Returns
         -------
-        cbar: matplotlib.contour.QuadContourSet
+        cbar: color bar
+            :class:`matplotlib.contour.QuadContourSet`
             Colors to create a global colour bar
 
         Functionality mostly determined by modifications to ax
@@ -118,15 +120,15 @@ def plot_lines(x, fsamps, ax, downsample=100, **kwargs):
         set of functions to plot at each x. As returned by
         fgivenx.compute_samples
 
-    ax: matplotlib.pyplot.ax
-        Axis to plot on.
+    ax: axes object
+        :class:`matplotlib.pyplot.ax` to plot on.
 
     Keywords
     --------
     downsample: int
         Reduce the number of samples to a viewable quantity. (Default 100)
 
-    any other keywords are passed to matplotlib.pyplot.ax.plot
+    any other keywords are passed to :meth:`matplotlib.pyplot.ax.plot`
     """
     if downsample < len(fsamps.T):
         indices = numpy.random.choice(len(fsamps.T), downsample, replace=False)
