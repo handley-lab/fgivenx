@@ -13,38 +13,36 @@ def plot(x, y, z, ax, **kwargs):
             See arguments to :func:`matplotlib.pyplot.contour`
 
         ax: axes object 
-            :class:`matplotlib.axes._subplots.AxesSubplot` to plot the contours
+            :class:`matplotlib.axes._subplots.AxesSubplot` to plot the contours on
             onto. Typically generated with:
             >>> fig, ax = matplotlib.pyplot.subplots()
 
-        Keywords
-        --------
-        colors: color scheme
+        colors: color scheme, optional
             :class:`matplotlib.colors.LinearSegmentedColormap` 
             Color scheme to plot with. Recommend plotting in reverse
             (Default: :class:`matplotlib.pyplot.cm.Reds_r`)
 
-        smooth: float
+        smooth: float, optional
             Percentage by which to smooth the contours.
             (Default: no smoothing)
 
-        contour_line_levels: List[float]
+        contour_line_levels: List[float], optional
             Contour lines to be plotted.  (Default: [1,2])
 
-        linewidths: float
+        linewidths: float, optional
             Thickness of contour lines.  (Default: 0.3)
 
-        contour_color_levels: List[float]
+        contour_color_levels: List[float], optional
             Contour color levels.
             (Default: numpy.arange(0, contour_line_levels[-1] + 1, fineness))
 
-        fineness: float
+        fineness: float, optional
             Spacing of contour color levels.  (Default: 0.1)
 
-        lines: bool
+        lines: bool, optional
             (Default: True)
 
-        rasterize_contours: bool
+        rasterize_contours: bool, optional
             Rasterize the contours while keeping the lines, text etc in vector
             format. Useful for reducing file size bloat and making printing
             easier when you have dense contours.
@@ -123,9 +121,7 @@ def plot_lines(x, fsamps, ax, downsample=100, **kwargs):
     ax: axes object
         :class:`matplotlib.pyplot.ax` to plot on.
 
-    Keywords
-    --------
-    downsample: int
+    downsample: int, optional
         Reduce the number of samples to a viewable quantity. (Default 100)
 
     any other keywords are passed to :meth:`matplotlib.pyplot.ax.plot`
