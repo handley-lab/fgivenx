@@ -14,15 +14,15 @@ r""" fgivenx module.
 
     .. math::
 
-        P(y|x) &= \int P(y=f(x;\theta)|x,\theta)d\theta \\
-                &= \int \delta(y-f(x;\theta) P(\theta) d\theta
+        P(y|x) &= \int P(y=f(x;\theta)|x,\theta) P(\theta) d\theta \\
+                &= \int \delta(y-f(x;\theta)) P(\theta) d\theta
 
     which gives our degree of knowledge for each :math:`y` value given an
     :math:`x` value.
 
     In fact, for a more representative plot, we are not actually
     interested in the value of the probability density above, but in fact
-    require the "iso-probablity posterior mass:"
+    require the "iso-probablity posterior mass"
 
     .. math::
 
@@ -38,9 +38,9 @@ import fgivenx.dkl
 
 
 def compute_samples(f, x, samples, logZ=None, **kwargs):
-    """
-    Apply the function(s) f(x;theta) to the arrays defined in x and samples.
-    Has options for weighting, trimming, cacheing and parallelising.
+    r"""
+    Apply the function(s) :math:`f(x;\theta)` to the arrays defined in x and
+    samples.  Has options for weighting, trimming, cacheing and parallelising.
 
     Additionally, if a list of log-evidences are passed, along with list of
     functions, samples and optional weights it marginalises over the models
@@ -49,31 +49,31 @@ def compute_samples(f, x, samples, logZ=None, **kwargs):
     Parameters
     ----------
     f: function
-        function f(x;theta) with dependent variable x, parameterised by theta.
+        function :math:`f(x;\theta)` with dependent variable :math:`x`,
+        parameterised by :math:`\theta`.
 
     x: 1D array-like
-        x values to evaluate f(x;theta) at.
+        x values to evaluate :math:`f(x;\theta)` at.
 
     samples: 2D array-like
-        theta samples to evaluate f(x;theta) at. shape = (nsamples, npars)
+        theta samples to evaluate :math:`f(x;\theta)` at. 
+        shape = (nsamples, npars)
 
-    Keywords
-    --------
-    weights: 1D array-like
+    weights: 1D array-like, optional
         sample weights, if desired. Should have length same as samples.shape[0]
+        default `numpy.ones_like(samples)`
 
-    ntrim: int
+    ntrim: int, optional
         Approximate number of samples to trim down to, if desired. Useful if
-        the posterior is dramatically oversampled.
+        the posterior is dramatically oversampled
+        default None
 
-    cache: str
-        File root for saving previous calculations for re-use.
+    cache: str, optional
+        File root for saving previous calculations for re-use
+        default None
 
-    parallel:
-        see docstring for fgivenx.parallel.parallel_apply.
-
-    tqdm_kwargs: dict
-        see docstring for fgivenx.parallel.parallel_apply.
+    parallel, tqdm_args:
+        see docstring for :func:`fgivenx.parallel.parallel_apply`
 
     Returns
     -------
@@ -103,18 +103,14 @@ def compute_samples(f, x, samples, logZ=None, **kwargs):
 
 
 def compute_pmf(f, x, samples, logZ=None, **kwargs):
-    """
-    Compute the probablity mass function given x at a range of y values
-    for y = f(x|theta)
+    r"""
+    Compute the probability mass function given x at a range of y values
+    for :math:`y = f(x|\theta)`
 
-                  /
-    P( y | x ) =  | P( y = f(x;theta) | x, theta ) dtheta
-                  /
-
-                          /
-    pmf( y | x ) =        | P(y'|x) dy'
-                          /
-                  P(y'|x) < P(y|x)
+    .. math:
+    
+        P(y|x) &= \int P(y=f(x;\theta)|x,\theta) P(\theta) d\theta \\
+        \mathrm{pmf}(y|x) &= \int_{P(y'|x) < P(y|x)} P(y'|x) dy'
 
     Additionally, if a list of log-evidences are passed, along with list of
     functions, samples and optional weights it marginalises over the models
@@ -122,8 +118,8 @@ def compute_pmf(f, x, samples, logZ=None, **kwargs):
 
     Parameters
     ----------
-    f, x, samples, weights, ntrim, cache, parallel
-        see arguments for fgivenx.compute_samples
+    f, x, samples, weights, ntrim, cache
+        see arguments for :func:`fgivenx.compute_samples`
 
     ny: int
         Resolution of y axis
@@ -131,10 +127,8 @@ def compute_pmf(f, x, samples, logZ=None, **kwargs):
     y: array-like
         Explicit descriptor of y values to evaluate.
 
-    Keywords
-    --------
-    tqdm_kwargs: dict
-        see docstring for fgivenx.parallel.parallel_apply.
+    tqdm_kwargs, parallel:
+        see docstring for :func:`fgivenx.parallel.parallel_apply`
 
     Returns
     -------
@@ -176,37 +170,27 @@ def compute_pmf(f, x, samples, logZ=None, **kwargs):
 
 
 def compute_dkl(f, x, samples, prior_samples, logZ=None, **kwargs):
-    """
+    r"""
     Compute the Kullback-Liebler divergence at each value of x for the prior
     and posterior defined by prior_samples and samples.
 
-    Let the posterior be:
+    Let the posterior and prior be
 
-                  /
-    P( y | x ) =  | P( y = f(x;theta) | x, theta ) dtheta
-                  /
+    .. math:
 
-    and prior be:
+        P(y|x) &= \int P(y=f(x;\theta)|x,theta)P(\theta) d\theta \\
+        Q(y|x) &= \int \mathrm{Prior}(y=f(x;\theta)|x,theta)P(\theta) d\theta
 
-                  /
-    Q( y | x ) =  | Prior( y = f(x;theta) | x, theta ) dtheta
-                  /
+    then the Kullback-Liebler divergence at each x is defined by
 
-    then the Kullback-Liebler divergence at each x is defined by:
+    .. math:
 
-              /
-    D_KL(x) = | P( y | x ) log( Q( y | x ) / P( y | x ) ) dy
-              /
+        D_\mathrm{KL}(x) = \int P(y|x) \log\left[\frac{Q(y|x)}{P(y|x)}\right] dy
 
     Parameters
     ----------
     f, x, samples, weights, ntrim, cache, parallel
-        see arguments for fgivenx.compute_samples
-
-    Keywords
-    --------
-    parallel:
-        see docstring for fgivenx.parallel.parallel_apply.
+        see arguments for :func:`fgivenx.compute_samples`
 
     Returns
     -------
