@@ -1,0 +1,15 @@
+name: fgivenx-read-the-docs-environment
+
+dependencies:
+    - python=3.6
+    - python=2.7
+    - matplotlib
+    - tqdm
+    - pytest
+    - scipy
+    - numpy
+    - joblib
+    - pypandoc
+    - numpydoc
+    - codecov
+    - pytest-cov
