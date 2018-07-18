@@ -99,5 +99,5 @@ def test_full():
     ax_dkl.set_ylim(bottom=0)
 
     ax_lines.get_shared_x_axes().join(ax_lines, ax_fgivenx, ax_samples)
-
+    fig.set_size_inches(8,6)
     fig.tight_layout()

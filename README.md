@@ -6,7 +6,7 @@
 
 Functional Posterior Plotter
 ============================
-![](https://raw.github.com/williamjameshandley/fgivenx/master/plot.png)
+![](https://raw.github.com/williamjameshandley/fgivenx/master/fgivenx/tests/baseline_images/test_z/plot.png)
 
 These packages allow one to compute a predictive posterior of a function,
 dependent on sampled parameters. We assume one has a Bayesian posterior

@@ -46,9 +46,7 @@ def parallel_apply(f, array, **kwargs):
     try:
         # If running in a jupyter notebook then use tqdm_notebook. Otherwise use
         # regular tqdm progress bar
-        ip = get_ipython()
-        assert ip.has_trait('kernel')
-        progress = tqdm.tqdm_notebook
+        if get_ipython().has_trait('kernel'): progress = tqdm.tqdm_notebook
     except (NameError, AssertionError):
         progress = tqdm.tqdm
     if not parallel:
