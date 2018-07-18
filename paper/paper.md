@@ -1,5 +1,5 @@
 ---
-title: 'fgivenx: a package for functional posterior plotting'
+title: 'fgivenx: a python package for functional posterior plotting'
 tags:
   - Python
   - Statistics
@@ -34,7 +34,7 @@ light years. The fact that the observable universe is roughly three times
 larger in light years in comparison with its age is explained by the expansion
 of space over cosmic history.](parameters.png) 
 
-Plots such as the above can be created using two-dimensional kernel density
+Plots like the above can be created using two-dimensional kernel density
 estimation using packages such as
 [scipy](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gaussian_kde.html),
 [getdist](http://getdist.readthedocs.io/en/latest/intro.html) and
@@ -42,12 +42,12 @@ estimation using packages such as
 as inputs to such programs are typically created by a Markov-Chain-Monte-Carlo
 analysis.
 
-As well as uncertain parameters, scientists can also be concerned with
-uncertain functional relationships. Take as a universally relatable case the
-equation of a straight line ``y = m*x + c``. If one measured the gradient ``m``
-and intercept ``c`` with some uncertainty, then our ability to predict ``y``
-from ``x`` using the straight line relationship would also be uncertain, and
-plotted like:
+As well as uncertain parameters, scientists may also be interested in
+quantifying uncertainty in functional relationships. Take as a universally
+relatable case the equation of a straight line ``y = m*x + c``. If one measured
+the gradient ``m`` and intercept ``c`` with some uncertainty, then our ability
+to predict ``y`` from ``x`` using the straight line relationship would also be
+uncertain, and plotted thus:
 
 ![An example of plots fgivenx is capable of producing](figure.png) 
 
@@ -59,15 +59,15 @@ perturbations, by [@Hee2015] in examining the dark energy equation of state
 estimation and by [@Higson2018] for providing diagnostic tests for nested
 sampling.                
 
-``fgivenx`` is a package for functional posterior plotting, currently used in
-astronomy, but will be of use to any scientists performing a Bayesian analysis
-which have predictive posteriors that are functions. The source code for
-``fgivenx`` is available on
+``fgivenx`` is a python package for functional posterior plotting, currently
+used in astronomy, but will be of use to any scientists performing any Bayesian
+analysis which have predictive posteriors that are functions. The source code
+for ``fgivenx`` is available on
 [github](https://github.com/williamjameshandley/fgivenx) and has been archived to
 Zenodo with the linked DOI: [@zenodo] 
 
 # Acknowledgements
 
-We acknowledge contributions from Ed Higson
+We acknowledge contributions and bug-testing from Ed Higson
 
 # References
