@@ -174,11 +174,11 @@ def compute_dkl(f, x, samples, prior_samples, logZ=None, **kwargs):
 
     Let the posterior be:
 
-    :math:`P(y|x) = \int P(y=f(x;\theta)|x,theta)P(\theta) d\theta`
+    :math:`P(y|x) = \int P(y=f(x;\theta)|x,\theta)P(\theta) d\theta`
 
     and the prior be:
 
-    :math:`Q(y|x) = \int P(y=f(x;\theta)|x,theta)Q(\theta) d\theta`
+    :math:`Q(y|x) = \int P(y=f(x;\theta)|x,\theta)Q(\theta) d\theta`
 
     then the Kullback-Leibler divergence at each x is defined by
 

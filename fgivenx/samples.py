@@ -90,9 +90,9 @@ def samples_from_getdist_chains(params, file_root=None, chains_file=None,
 
     # Get the full data
     if file_root is not None:
-        if chains_file is not None:
+        if chains_file is None:
             chains_file = file_root + '.txt'
-        if paramnames_file is not None:
+        if paramnames_file is None:
             paramnames_file = file_root + '.paramnames'
 
     if paramnames_file is None:
