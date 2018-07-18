@@ -33,7 +33,8 @@ def parallel_apply(f, array, **kwargs):
 
     Returns
     -------
-    [f(precurry,x,postcurry) for x in array] parallelised according to parallel
+    list:
+        `[f(precurry,x,postcurry) for x in array]` parallelised according to parallel
     """
 
     precurry = tuple(kwargs.pop('precurry', ()))

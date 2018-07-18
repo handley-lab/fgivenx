@@ -36,10 +36,10 @@ def compute_dkl(fsamps, prior_fsamps, **kwargs):
     Parameters
     ----------
     fsamps: 2D numpy.array
-        Posterior function samples, as computed by fgivenx.compute_samples
+        Posterior function samples, as computed by :func:`fgivenx.compute_samples`
 
     prior_fsamps: 2D numpy.array
-        Prior function samples, as computed by fgivenx.compute_samples
+        Prior function samples, as computed by :func:`fgivenx.compute_samples`
 
     parallel, tqdm_kwargs: optional
         see docstring for :func:`fgivenx.parallel.parallel_apply`.
@@ -49,8 +49,8 @@ def compute_dkl(fsamps, prior_fsamps, **kwargs):
 
     Returns
     -------
-
-    Kullback-Liebler divergences
+    1D numpy.array:
+        Kullback-Liebler divergences at each value of x. `shape=(len(fsamps))`
     """
 
     parallel = kwargs.pop('parallel', False)

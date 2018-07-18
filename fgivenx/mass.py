@@ -12,19 +12,16 @@ def PMF(samples, y):
         The set of samples defines a probability density P(y),
         which is computed using a kernel density estimator.
 
-        From P(y) we define:
+        From :math:`P(y)` we define:
 
-                    /
-        PMF(p) =    | P(t) dt
-                    /
-                P(t) < p
+        :math:`\mathrm{pmf}(p) = \int_{P(y)<p} P(y) dy`
 
         This is the cumulative distribution function expressed as a
         function of the probability
 
-        We aim to compute M(y), which indicates the amount of
+        We aim to compute :math:`M(y)`, which indicates the amount of
         probability contained outside the iso-probability contour
-        passing through y::
+        passing through :math:`y`::
 
 
              ^ P(y)                   ...
@@ -54,7 +51,7 @@ def PMF(samples, y):
              |   ++                        |   ++         ++
              |+++                          |+++             +++
              +---------------------> p     +---------------------> y
-            0                   1
+            0
 
         Parameters
         ----------
@@ -66,7 +63,8 @@ def PMF(samples, y):
 
         Returns
         -------
-        PMF evaluated at each y value
+        1D numpy.array:
+            PMF evaluated at each y value
 
     """
     # Remove any nans from the samples
@@ -117,7 +115,8 @@ def compute_pmf(fsamps, y, **kwargs):
     Parameters
     ----------
     fsamps: 2D array-like
-        array of function samples, as returned by fgivenx.compute_samples
+        array of function samples, as returned by
+        :func:`fgivenx.compute_samples`
 
     y: 1D array-like
         y values to evaluate the PMF at
@@ -127,6 +126,9 @@ def compute_pmf(fsamps, y, **kwargs):
 
     Returns
     -------
+    2D numpy.array
+        probability mass function at each x for each y
+        `shape=(len(fsamps),len(y)`
     """
     parallel = kwargs.pop('parallel', False)
     cache = kwargs.pop('cache', None)

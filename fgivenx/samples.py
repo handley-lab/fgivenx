@@ -10,8 +10,7 @@ def equally_weight_samples(samples, weights):
     determined by the corresponding weight.
 
     This function has assumed you have normalised the weights properly.
-    If in doubt, convert weights via:
-    weights /= weights.max() .
+    If in doubt, convert weights via: `weights /= weights.max()`
 
     Parameters
     ----------
@@ -23,8 +22,8 @@ def equally_weight_samples(samples, weights):
 
     Returns
     -------
-    1D numpy.array
-    Equally weighted sample array.
+    1D numpy.array:
+        Equally weighted sample array. `shape=(len(samples))`
     """
     if len(weights) != len(samples):
         raise ValueError("len(weights) = %i != len(samples) = %i" %
@@ -62,7 +61,8 @@ def compute_samples(f, x, samples, **kwargs):
 
     Returns
     -------
-    An array of samples at each x. shape=(len(x),len(samples),)
+    2D numpy.array:
+        samples at each x. `shape=(len(x),len(samples),)`
     """
 
     parallel = kwargs.pop('parallel', False)
@@ -121,13 +121,14 @@ def samples_from_getdist_chains(params, file_root=None, chains_file=None,
     Returns
     -------
     samples: numpy.array
-        2D Array of samples. samples.shape=(# of samples, len(params),)
+        2D Array of samples. `shape=(len(samples), len(params))`
 
     weights: numpy.array
-        Array of weights. samples.shape = (len(params),)
-    if latex:
-    latex: list(str)
-        list of latex strigs for each parameter
+        Array of weights. `shape = (len(params),)`
+
+    latex: list(str), optional
+        list of latex strings for each parameter
+        (if latex is provided as an argument)
     """
 
     # Get the full data

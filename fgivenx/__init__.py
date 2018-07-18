@@ -1,6 +1,4 @@
-r""" fgivenx module.
-
-    This module provides utilities for computing the grid for contours of a
+r"""This module provides utilities for computing the grid for contours of a
     function reconstruction plot.
 
     Required ingredients:
@@ -30,6 +28,8 @@ r""" fgivenx module.
 
     We thus need to compute this function on a rectangular grid of :math:`x`
     and :math:`y`.
+
+    :func:`scipy.integrate.odeint`
 """
 import numpy
 import fgivenx.samples
@@ -77,9 +77,9 @@ def compute_samples(f, x, samples, logZ=None, **kwargs):
 
     Returns
     -------
-    2D numpy array
+    2D numpy.array
         Evaluate the function f at each x value and each theta.
-        Equivalent to [[f(x_i,theta) for theta in samples] for x_i in x]
+        Equivalent to `[[f(x_i,theta) for theta in samples] for x_i in x]`
 
     """
     weights = kwargs.pop('weights', None)
@@ -132,10 +132,10 @@ def compute_pmf(f, x, samples, logZ=None, **kwargs):
 
     Returns
     -------
-    1D numpy array:
-        y values pmf is computed at
-    2D numpy array:
-        pmf values at each x and y
+    1D numpy.array:
+        y values pmf is computed at `shape=(len(y))` or `ny`
+    2D numpy.array:
+        pmf values at each x and y  `shape=(len(x),len(y))`
 
     """
 

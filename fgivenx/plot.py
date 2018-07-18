@@ -34,7 +34,7 @@ def plot(x, y, z, ax, **kwargs):
 
         contour_color_levels: List[float], optional
             Contour color levels.
-            (Default: numpy.arange(0, contour_line_levels[-1] + 1, fineness))
+            (Default: `numpy.arange(0, contour_line_levels[-1] + 1, fineness)`)
 
         fineness: float, optional
             Spacing of contour color levels.  (Default: 0.1)
@@ -53,8 +53,6 @@ def plot(x, y, z, ax, **kwargs):
         cbar: color bar
             :class:`matplotlib.contour.QuadContourSet`
             Colors to create a global colour bar
-
-        Functionality mostly determined by modifications to ax
     """
     # Get inputs
     colors = kwargs.pop('colors', matplotlib.pyplot.cm.Reds_r)
@@ -116,7 +114,7 @@ def plot_lines(x, fsamps, ax, downsample=100, **kwargs):
 
     fsamps: 2D array-like
         set of functions to plot at each x. As returned by
-        fgivenx.compute_samples
+        :func:`fgivenx.compute_samples`
 
     ax: axes object
         :class:`matplotlib.pyplot.ax` to plot on.
