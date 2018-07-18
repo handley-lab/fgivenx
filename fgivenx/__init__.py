@@ -33,7 +33,7 @@ import numpy
 import fgivenx.samples
 import fgivenx.mass
 import fgivenx.dkl
-from fgivenx._utils import _check_args, _normalise_weights
+from fgivenx._utils import _check_args, _normalise_weights, _equally_weight_samples
 
 
 def compute_samples(f, x, samples, logZ=None, **kwargs):
@@ -94,7 +94,7 @@ def compute_samples(f, x, samples, logZ=None, **kwargs):
     logZ, weights = _normalise_weights(logZ, weights, ntrim)
 
     for i, (s, w) in enumerate(zip(samples, weights)):
-        samples[i] = fgivenx.samples.equally_weight_samples(s, w)
+        samples[i] = _equally_weight_samples(s, w)
 
     return fgivenx.samples.compute_samples(f, x, samples,
                                            parallel=parallel, cache=cache,

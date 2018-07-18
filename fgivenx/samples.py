@@ -1,51 +1,8 @@
 import numpy
 from fgivenx.parallel import parallel_apply
 from fgivenx.io import CacheException, Cache
+from fgivenx._utils import _equally_weight_samples
 
-
-def equally_weight_samples(samples, weights):
-    """ Convert samples to be equally weighted.
-
-    Samples are trimmed by discarding samples in accordance with a probability
-    determined by the corresponding weight.
-
-    This function has assumed you have normalised the weights properly.
-    If in doubt, convert weights via: `weights /= weights.max()`
-
-    Parameters
-    ----------
-    samples: array-like
-        Samples to trim.
-
-    weights: array-like
-        Weights to trim by.
-
-    Returns
-    -------
-    1D numpy.array:
-        Equally weighted sample array. `shape=(len(samples))`
-    """
-    if len(weights) != len(samples):
-        raise ValueError("len(weights) = %i != len(samples) = %i" %
-                         (len(weights), len(samples)))
-
-    if numpy.logical_or(weights < 0, weights > 1).any():
-        raise ValueError("weights must have probability between 0 and 1")
-
-    weights = numpy.array(weights)
-    samples = numpy.array(samples)
-
-    state = numpy.random.get_state()
-
-    numpy.random.seed(1)
-    n = len(weights)
-    choices = numpy.random.rand(n) < weights
-
-    new_samples = samples[choices]
-
-    numpy.random.set_state(state)
-
-    return new_samples.copy()
 
 
 def compute_samples(f, x, samples, **kwargs):
