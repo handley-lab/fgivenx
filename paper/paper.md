@@ -24,42 +24,47 @@ bibliography: paper.bib
 
 # Summary
 
-The forces on stars, galaxies, and dark matter under external gravitational
-fields lead to the dynamical evolution of structures in the universe. The orbits
-of these bodies are therefore key to understanding the formation, history, and
-future state of galaxies. The field of "galactic dynamics," which aims to model
-the gravitating components of galaxies to study their structure and evolution,
-is now well-established, commonly taught, and frequently used in astronomy.
-Aside from toy problems and demonstrations, the majority of problems require
-efficient numerical tools, many of which require the same base code (e.g., for
-performing numerical orbit integration).
+Scientists are often concerned with numerical values of parameters in
+scientific models. Our knowledge of such things can be quantified and presented
+as a probability distribution:
 
-``Gala`` is an Astropy-affiliated Python package for galactic dynamics. Python
-enables wrapping low-level languages (e.g., C) for speed without losing
-flexibility or ease-of-use in the user-interface. The API for ``Gala`` was
-designed to provide a class-based and user-friendly interface to fast (C or
-Cython-optimized) implementations of common operations such as gravitational
-potential and force evaluation, orbit integration, dynamical transformations,
-and chaos indicators for nonlinear dynamics. ``Gala`` also relies heavily on and
-interfaces well with the implementations of physical units and astronomical
-coordinate systems in the ``Astropy`` package [@astropy] (``astropy.units`` and
-``astropy.coordinates``).
+![The age and size of the universe, as measured using Planck 2018 data.
+(non-Astro)Physicists may have noted that 14 Gigaparsecs is roughly 46 billion
+light years. The fact that the observable universe is roughly three times
+larger in light years in comparison with its age is explained by the expansion
+of space over cosmic history.](parameters.png) 
 
-``Gala`` was designed to be used by both astronomical researchers and by
-students in courses on gravitational dynamics or astronomy. It has already been
-used in a number of scientific publications [@Pearson:2017] and has also been
-used in graduate courses on Galactic dynamics to, e.g., provide interactive
-visualizations of textbook material [@Binney:2008]. The combination of speed,
-design, and support for Astropy functionality in ``Gala`` will enable exciting
-scientific explorations of forthcoming data releases from the *Gaia* mission
-[@gaia] by students and experts alike. The source code for ``Gala`` has been
-archived to Zenodo with the linked DOI: [@zenodo]
+Plots such as the above can be created using two-dimensional kernel density
+estimation using packages such as
+[scipy](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gaussian_kde.html),
+[getdist](http://getdist.readthedocs.io/en/latest/intro.html) and
+[corner](https://corner.readthedocs.io/en/latest/), where the samples provided
+as inputs to such programs are typically created by a Markov-Chain-Monte-Carlo
+analysis.
 
-Citations to entries in paper.bib should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format.
+As well as uncertain parameters, scientists can also be concerned with
+uncertain functional relationships. Take as a universally relatable case the
+equation of a straight line ``y = m*x + c``. If one measured the gradient ``m``
+and intercept ``c`` with some uncertainty, then our ability to predict ``y``
+from ``x`` using the straight line relationship would also be uncertain, and
+plotted like:
 
-Figures can be included like this: ![Example figure.](figure.png)
+![An example of plots fgivenx is capable of producing](figure.png) 
+
+The above example is a little over-simplified, but the code has been used in
+the latest two Planck inflation papers [-@inflation2015][-@inflation2018] to
+quantify our knowledge of the primordial power spectrum of curvature
+perturbations, by [@Hee2015] in examining the dark energy equation of state
+(and later by [@Hee2016]), by [@Higson2017] for measuring errors in parameter
+estimation and by [@Higson2018] for providing diagnostic tests for nested
+sampling.                
+
+``fgivenx`` is a package for functional posterior plotting, currently used in
+astronomy, but will be of use to any scientists performing a Bayesian analysis
+which have predictive posteriors that are functions. The source code for
+``fgivenx`` is available on
+[github](https://github.com/williamjameshandley/fgivenx) and has been archived to
+Zenodo with the linked DOI: [@zenodo] 
 
 # Acknowledgements
 
