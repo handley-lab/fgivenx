@@ -46,19 +46,23 @@ def test_samples_from_getdist_chains():
 
     # Set up getdist chains
     file_root = './chains/test' 
-    nsamples = 1000
     labels = [r'\alpha',r'\beta',r'\gamma']
     names = ['a', 'b', 'g']
+    chains_file = file_root + '.txt'
+    paramnames_file = file_root + '.paramnames'
+    nsamples = 1000
+    params = ['a', 'g']
+    i = [names.index(p) for p in params]
     samples_ = numpy.random.rand(nsamples,len(names))
     weights_ = numpy.random.rand(nsamples)
     samples = getdist.mcsamples.MCSamples(samples=samples_,labels=labels,names=names,weights=weights_)
     samples.saveAsText(file_root,make_dirs=True)
 
-    # now test function
-    params = ['a','g']
+    samples, weights = samples_from_getdist_chains(params, file_root=file_root)
+    assert_allclose(samples,samples_[:,i])
+    assert_allclose(weights,weights_)
 
-    chains_file = file_root + '.txt'
-    paramnames_file = file_root + '.paramnames'
+    # now test function
     with pytest.raises(ValueError):
         samples_from_getdist_chains(params)
     with pytest.raises(ValueError):
@@ -66,21 +70,20 @@ def test_samples_from_getdist_chains():
     with pytest.raises(ValueError):
         samples_from_getdist_chains(params, paramnames_file=paramnames_file)
 
-    i = [names.index(p) for p in params]
-
     samples, weights = samples_from_getdist_chains(params, 
                                                    chains_file=chains_file, 
                                                    paramnames_file=paramnames_file)
     assert_allclose(samples,samples_[:,i])
     assert_allclose(weights,weights_)
 
-    samples, weights = samples_from_getdist_chains(params, file_root=file_root) 
-    assert_allclose(samples,samples_[:,i])
-    assert_allclose(weights,weights_)
-
     samples, weights, latex = samples_from_getdist_chains(params, file_root=file_root, latex=True) 
     assert_allclose(weights,weights_)
     assert_array_equal(latex, numpy.array(labels)[i])
+
+    with open(chains_file, "w"):
+        pass
+    samples, weights = samples_from_getdist_chains(params, file_root=file_root)
+
 
     rmtree('chains')
 
