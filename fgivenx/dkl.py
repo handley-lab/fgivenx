@@ -6,18 +6,18 @@ from fgivenx.parallel import parallel_apply
 
 def DKL(arrays):
     """
-    Compute the Kullback-Liebler divergence from one distribution Q to another
+    Compute the Kullback-Leibler divergence from one distribution Q to another
     P, where Q and P are represented by a set of samples.
 
     Parameters
     ----------
-    arrays: tuple(1D numpy.array,1D numpy.array )
+    arrays: tuple(1D numpy.array,1D numpy.array)
         samples defining distributions P & Q respectively
 
     Returns
     -------
     float:
-        Kullback Liebler divergence.
+        Kullback Leibler divergence.
     """
     samples, prior_samples = arrays
     samples = samples[~numpy.isnan(samples)]
@@ -30,7 +30,7 @@ def DKL(arrays):
 
 def compute_dkl(fsamps, prior_fsamps, **kwargs):
     """
-    Compute the kullback liebler divergence for function samples for posterior
+    Compute the Kullback Leibler divergence for function samples for posterior
     and prior pre-calculated at a range of x values.
 
     Parameters
@@ -50,7 +50,7 @@ def compute_dkl(fsamps, prior_fsamps, **kwargs):
     Returns
     -------
     1D numpy.array:
-        Kullback-Liebler divergences at each value of x. `shape=(len(fsamps))`
+        Kullback-Leibler divergences at each value of x. `shape=(len(fsamps))`
     """
 
     parallel = kwargs.pop('parallel', False)

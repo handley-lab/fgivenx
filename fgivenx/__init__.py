@@ -169,7 +169,7 @@ def compute_pmf(f, x, samples, logZ=None, **kwargs):
 
 def compute_dkl(f, x, samples, prior_samples, logZ=None, **kwargs):
     r"""
-    Compute the Kullback-Liebler divergence at each value of x for the prior
+    Compute the Kullback-Leibler divergence at each value of x for the prior
     and posterior defined by prior_samples and samples.
 
     Let the posterior be:
@@ -180,7 +180,7 @@ def compute_dkl(f, x, samples, prior_samples, logZ=None, **kwargs):
 
     :math:`Q(y|x) = \int P(y=f(x;\theta)|x,theta)Q(\theta) d\theta`
 
-    then the Kullback-Liebler divergence at each x is defined by
+    then the Kullback-Leibler divergence at each x is defined by
 
     :math:`D_\mathrm{KL}(x) = \int P(y|x) \log\left[\frac{Q(y|x)}{P(y|x)}\right] dy`
 

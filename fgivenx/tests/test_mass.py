@@ -55,7 +55,7 @@ def test_PMF():
 def test_compute_pmf():
 
     with pytest.raises(TypeError):
-        compute_pmf(None,None,blah=None)
+        compute_pmf(None,None,wrong_argument=None)
 
     cache = '.test_cache/test'
     numpy.random.seed(0)
@@ -70,13 +70,13 @@ def test_compute_pmf():
     y = numpy.linspace(-3,3,ny)
 
     assert(not os.path.isfile(cache + '_masses.pkl'))
-    m = compute_pmf(fsamps, y,cache=cache)
+    m = compute_pmf(fsamps, y, cache=cache)
     assert(os.path.isfile(cache + '_masses.pkl'))
 
     m_ = [gaussian_pmf(y,a*xi+e,numpy.sqrt(b**2*xi**2+f**2)) for xi in x]
     assert_allclose(m.transpose(), m_, atol=3e-1)
 
-    m = compute_pmf(fsamps, y,cache=cache)
+    m = compute_pmf(fsamps, y, cache=cache)
     assert_allclose(m.transpose(), m_, atol=3e-1)
 
     rmtree('.test_cache')
