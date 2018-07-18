@@ -1,14 +1,9 @@
 import numpy
 import pytest
-import os
-import fgivenx.io
-import pytest
-from shutil import rmtree
-from numpy.testing import assert_allclose, assert_array_equal, assert_almost_equal
-import scipy.stats
-import scipy.integrate
-import scipy.special
-from fgivenx._utils import _check_args, _normalise_weights, _equally_weight_samples
+from numpy.testing import assert_allclose, assert_almost_equal
+from fgivenx._utils import _check_args, _normalise_weights, \
+                           _equally_weight_samples
+
 
 def test__check_args():
     numpy.random.seed(0)
@@ -16,24 +11,24 @@ def test__check_args():
     logZ = numpy.random.rand(nfuncs)
     f = [lambda x: x**i for i in range(nfuncs)]
     nx = 100
-    x = numpy.linspace(0,1,nx)
+    x = numpy.linspace(0, 1, nx)
     nsamps = 200
     nparams = 5
-    samples = numpy.random.rand(nfuncs,nsamps,nparams)
-    weights = numpy.random.rand(nfuncs,nsamps)
+    samples = numpy.random.rand(nfuncs, nsamps, nparams)
+    weights = numpy.random.rand(nfuncs, nsamps)
 
     # check these valid versions pass
     _check_args(logZ, f, x, samples, weights)
     _check_args(None, f[0], x, samples[0], weights[0])
 
     with pytest.raises(ValueError):
-        _check_args(numpy.ones((2,2)), f, x, samples, weights)
-    
-    with pytest.raises(ValueError):
-        _check_args(logZ, f, numpy.ones((2,2)), samples, weights)
+        _check_args(numpy.ones((2, 2)), f, x, samples, weights)
 
     with pytest.raises(ValueError):
-        _check_args(logZ, f, numpy.ones((2,2)), samples, weights)
+        _check_args(logZ, f, numpy.ones((2, 2)), samples, weights)
+
+    with pytest.raises(ValueError):
+        _check_args(logZ, f, numpy.ones((2, 2)), samples, weights)
 
     with pytest.raises(ValueError):
         _check_args(logZ, f[1:], x, samples, weights)
@@ -45,7 +40,7 @@ def test__check_args():
         _check_args(logZ, f, x, samples[1:], weights)
 
     with pytest.raises(ValueError):
-        _check_args(logZ, f, x, numpy.random.rand(nfuncs,nparams), weights)
+        _check_args(logZ, f, x, numpy.random.rand(nfuncs, nparams), weights)
 
     with pytest.raises(ValueError):
         _check_args(logZ, f, x, samples, weights[1:])
@@ -54,10 +49,12 @@ def test__check_args():
         _check_args(logZ, f, x, samples, numpy.random.rand(nfuncs))
 
     with pytest.raises(ValueError):
-        _check_args(logZ, f, x, samples, numpy.random.rand(nfuncs,nsamps+1))
+        _check_args(logZ, f, x, samples, numpy.random.rand(nfuncs, nsamps+1))
 
-def assert_in_ratio(a,b):
-    assert_almost_equal(numpy.array(a)*max(b),max(a)*numpy.array(b))
+
+def assert_in_ratio(a, b):
+    assert_almost_equal(numpy.array(a)*max(b), max(a)*numpy.array(b))
+
 
 def test__normalise_weights():
     numpy.random.seed(0)
@@ -68,16 +65,16 @@ def test__normalise_weights():
     weights = numpy.random.rand(nfuncs, nsamps)
 
     logZ, weights = _normalise_weights(logZ, weights)
-    
-    assert_almost_equal(numpy.max(weights),1)
-    assert_almost_equal(numpy.max(logZ),0)
-    assert_in_ratio([sum(w) for w in weights],numpy.exp(logZ))
 
+    assert_almost_equal(numpy.max(weights), 1)
+    assert_almost_equal(numpy.max(logZ), 0)
+    assert_in_ratio([sum(w) for w in weights], numpy.exp(logZ))
 
     logZ, weights = _normalise_weights(logZ, weights, ntrim)
 
-    assert_in_ratio([sum(w) for w in weights],numpy.exp(logZ))
-    assert_almost_equal(numpy.sum(weights),ntrim)
+    assert_in_ratio([sum(w) for w in weights], numpy.exp(logZ))
+    assert_almost_equal(numpy.sum(weights), ntrim)
+
 
 def test__equally_weight_samples():
     numpy.random.seed(0)
@@ -102,4 +99,4 @@ def test__equally_weight_samples():
 
     assert_allclose(samples_1, samples_2)
     assert(rand_1 != rand_2)
-    assert_almost_equal(len(samples_1)/sum(weights),1,1)
+    assert_almost_equal(len(samples_1)/sum(weights), 1, 1)

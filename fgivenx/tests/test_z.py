@@ -4,6 +4,7 @@ from fgivenx import compute_samples, compute_pmf, compute_dkl
 from fgivenx.plot import plot, plot_lines
 import pytest
 
+
 def test_full():
     # Model definitions
     # =================
@@ -11,7 +12,6 @@ def test_full():
     def f(x, theta):
         m, c = theta
         return m * x + c
-
 
     numpy.random.seed(1)
 
@@ -45,16 +45,18 @@ def test_full():
 
     # Compute dkls
     with pytest.raises(TypeError):
-        fsamps = compute_dkl(f, x, samples, prior_samples, unknown_arg=None) 
-    dkls = compute_dkl(f, x, samples, prior_samples, cache=cache, parallel=True)
+        fsamps = compute_dkl(f, x, samples, prior_samples, unknown_arg=None)
+    dkls = compute_dkl(f, x, samples, prior_samples,
+                       cache=cache, parallel=True)
 
     # Compute probability mass function.
     with pytest.raises(TypeError):
-        fsamps = compute_pmf(f, x, samples, unknown_arg=None) 
+        fsamps = compute_pmf(f, x, samples, unknown_arg=None)
     with pytest.raises(ValueError):
-        fsamps = compute_pmf(f, x, samples, y=numpy.random.rand(2,2)) 
+        fsamps = compute_pmf(f, x, samples, y=numpy.random.rand(2, 2))
     y, pmf = compute_pmf(f, x, samples, cache=cache, parallel=True)
-    y_prior, pmf_prior = compute_pmf(f, x, prior_samples, cache=prior_cache, parallel=True)
+    y_prior, pmf_prior = compute_pmf(f, x, prior_samples,
+                                     cache=prior_cache, parallel=True)
 
     # Plotting
     # ========
@@ -67,8 +69,10 @@ def test_full():
     ax_samples = axes[0, 0]
     ax_samples.set_ylabel(r'$c$')
     ax_samples.set_xlabel(r'$m$')
-    ax_samples.plot(prior_samples.T[0], prior_samples.T[1], color=prior_color, marker='.', linestyle='')
-    ax_samples.plot(samples.T[0], samples.T[1], color=posterior_color, marker='.', linestyle='')
+    ax_samples.plot(prior_samples.T[0], prior_samples.T[1],
+                    color=prior_color, marker='.', linestyle='')
+    ax_samples.plot(samples.T[0], samples.T[1],
+                    color=posterior_color, marker='.', linestyle='')
 
     # Line plot
     # ---------
@@ -83,8 +87,8 @@ def test_full():
     ax_fgivenx = axes[1, 1]
     ax_fgivenx.set_ylabel(r'$P(y|x)$')
     ax_fgivenx.set_xlabel(r'$x$')
-    cbar = plot(x, y_prior, pmf_prior, ax_fgivenx, colors=plt.cm.Blues_r, lines=False)
-    cbar = plot(x, y, pmf, ax_fgivenx, colors=plt.cm.Reds_r)
+    plot(x, y_prior, pmf_prior, ax_fgivenx, colors=plt.cm.Blues_r, lines=False)
+    plot(x, y, pmf, ax_fgivenx, colors=plt.cm.Reds_r)
 
     # DKL plot
     # --------
@@ -95,5 +99,5 @@ def test_full():
     ax_dkl.set_ylim(bottom=0)
 
     ax_lines.get_shared_x_axes().join(ax_lines, ax_fgivenx, ax_samples)
-    fig.set_size_inches(8,6)
+    fig.set_size_inches(8, 6)
     fig.tight_layout()

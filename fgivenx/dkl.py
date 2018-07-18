@@ -36,7 +36,8 @@ def compute_dkl(fsamps, prior_fsamps, **kwargs):
     Parameters
     ----------
     fsamps: 2D numpy.array
-        Posterior function samples, as computed by :func:`fgivenx.compute_samples`
+        Posterior function samples, as computed by
+        :func:`fgivenx.compute_samples`
 
     prior_fsamps: 2D numpy.array
         Prior function samples, as computed by :func:`fgivenx.compute_samples`

@@ -1,6 +1,5 @@
 import os
 import pickle
-import errno
 import numpy
 import inspect
 
@@ -60,10 +59,11 @@ class Cache(object):
         *args:
             All but the last argument are inputs to the cached function. The
             last is the actual value of the function.
-            
 
+        Returns
+        -------
         If cache is unchanged, return the last answer, otherwise indicate
-        recomputation required by throwing a CacheException exception.
+        recomputation required by throwing a :class:`CacheException`.
         """
         data = self.load()
 
@@ -101,8 +101,8 @@ class Cache(object):
             raise CacheMissing(self.file_root)
 
     def save(self, *args):
-        """ Save cache to file using pickle. 
-        
+        """ Save cache to file using pickle.
+
         Parameters
         ----------
         *args:

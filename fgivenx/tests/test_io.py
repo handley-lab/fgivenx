@@ -2,9 +2,9 @@ import numpy
 import pytest
 import os
 import fgivenx.io
-import pytest
 from shutil import rmtree
 from numpy.testing import assert_allclose
+
 
 def test_Cache():
     """ Fully test the cache """
@@ -12,9 +12,9 @@ def test_Cache():
     # Stuff for testing the functionality
     numpy.random.seed(0)
     dirname = '.test_cache'
-    root = os.path.join(dirname,'test_root')
-    data0 = numpy.random.rand(5,4,3)
-    data1 = numpy.random.rand(4,3)
+    root = os.path.join(dirname, 'test_root')
+    data0 = numpy.random.rand(5, 4, 3)
+    data1 = numpy.random.rand(4, 3)
     data2 = data0 * data1
 
     # Creates a directory
@@ -32,9 +32,9 @@ def test_Cache():
 
     # check loading
     data0_, data1_, data2_ = cache.load()
-    assert_allclose(data0_,data0)
-    assert_allclose(data1_,data1)
-    assert_allclose(data2_,data2)
+    assert_allclose(data0_, data0)
+    assert_allclose(data1_, data1)
+    assert_allclose(data2_, data2)
 
     # check check
     with pytest.raises(ValueError):
@@ -44,7 +44,7 @@ def test_Cache():
         cache.check(data1, data0)
 
     with pytest.raises(fgivenx.io.CacheChanged):
-        cache.check(numpy.random.rand(5,4,3),numpy.random.rand(4,3))
+        cache.check(numpy.random.rand(5, 4, 3), numpy.random.rand(4, 3))
 
     assert_allclose(data2, cache.check(data0, data1))
 

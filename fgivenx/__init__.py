@@ -2,7 +2,7 @@ r"""This module provides utilities for computing the grid for contours of a
     function reconstruction plot.
 
     Required ingredients:
-     * posterior probability distribution :math:`P(\theta)` described by samples 
+     * sampled posterior probability distribution :math:`P(\theta)`
      * independent variable :math:`x`
      * dependent variable :math:`y`
      * functional form :math:`y = f(x;\theta)` parameterised by :math:`\theta`
@@ -33,7 +33,8 @@ import numpy
 import fgivenx.samples
 import fgivenx.mass
 import fgivenx.dkl
-from fgivenx._utils import _check_args, _normalise_weights, _equally_weight_samples
+from fgivenx._utils import _check_args, _normalise_weights,\
+                           _equally_weight_samples
 
 
 def compute_samples(f, x, samples, logZ=None, **kwargs):
@@ -55,7 +56,7 @@ def compute_samples(f, x, samples, logZ=None, **kwargs):
         x values to evaluate :math:`f(x;\theta)` at.
 
     samples: 2D array-like
-        theta samples to evaluate :math:`f(x;\theta)` at. 
+        theta samples to evaluate :math:`f(x;\theta)` at.
         shape = (nsamples, npars)
 
     weights: 1D array-like, optional
@@ -182,7 +183,7 @@ def compute_dkl(f, x, samples, prior_samples, logZ=None, **kwargs):
 
     then the Kullback-Leibler divergence at each x is defined by
 
-    :math:`D_\mathrm{KL}(x) = \int P(y|x) \log\left[\frac{Q(y|x)}{P(y|x)}\right] dy`
+    :math:`D_\mathrm{KL}(x)=\int P(y|x)\ln\left[\frac{Q(y|x)}{P(y|x)}\right]dy`
 
     Parameters
     ----------

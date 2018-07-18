@@ -75,8 +75,8 @@ def PMF(samples, y):
         kernel = scipy.stats.gaussian_kde(samples)
 
         # Add two more samples definitely outside the range and sort them
-        mn = min(samples) - 10*numpy.sqrt(kernel.covariance[0,0])
-        mx = max(samples) + 10*numpy.sqrt(kernel.covariance[0,0]) 
+        mn = min(samples) - 10*numpy.sqrt(kernel.covariance[0, 0])
+        mx = max(samples) + 10*numpy.sqrt(kernel.covariance[0, 0])
         y_ = numpy.linspace(mn, mx, len(y)*10)
 
         # Compute the probabilities at each of the extended samples
@@ -91,23 +91,31 @@ def PMF(samples, y):
                 m = 0.
             else:
                 # Find out which samples have greater probability than P(y)
-                bools = ps_>p
+                bools = ps_ > p
 
                 # Compute indices where to start and stop the integration
-                stops = numpy.where(numpy.logical_and(~bools[:-1], bools[1:]))[0]
-                starts = numpy.where(numpy.logical_and(bools[:-1], ~bools[1:]))[0]
+                stops = numpy.where(numpy.logical_and(~bools[:-1], bools[1:]))
+                starts = numpy.where(numpy.logical_and(bools[:-1], ~bools[1:]))
 
                 # Compute locations
-                starts = [-numpy.inf] + [scipy.optimize.brentq(lambda u: kernel(u)-p,y_[i], y_[i+1]) for i in starts]
-                stops = [scipy.optimize.brentq(lambda u: kernel(u)-p,y_[i], y_[i+1]) for i in stops] + [numpy.inf]
+                starts = [scipy.optimize.brentq(lambda u: kernel(u)-p,
+                                                y_[i], y_[i+1])
+                          for i in starts[0]]
+                starts = [-numpy.inf] + starts
+                stops = [scipy.optimize.brentq(lambda u: kernel(u)-p,
+                                               y_[i], y_[i+1])
+                         for i in stops[0]]
+                stops = stops + [numpy.inf]
 
                 # Sum up the masses
-                m = sum(kernel.integrate_box_1d(a, b) for a, b in zip(starts, stops))
+                m = sum(kernel.integrate_box_1d(a, b)
+                        for a, b in zip(starts, stops))
             ms.append(m)
         return numpy.array(ms)
 
     except numpy.linalg.LinAlgError:
         return numpy.zeros_like(y)
+
 
 def compute_pmf(fsamps, y, **kwargs):
     """ Compute the pmf defined by fsamps at each x for each y.

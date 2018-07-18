@@ -34,7 +34,8 @@ def parallel_apply(f, array, **kwargs):
     Returns
     -------
     list:
-        `[f(precurry,x,postcurry) for x in array]` parallelised according to parallel
+        `[f(precurry,x,postcurry) for x in array]`
+        parallelised according to parallel
     """
 
     precurry = tuple(kwargs.pop('precurry', ()))
@@ -44,10 +45,10 @@ def parallel_apply(f, array, **kwargs):
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
     try:
-        # If running in a jupyter notebook then use tqdm_notebook. Otherwise use
-        # regular tqdm progress bar
+        # If running in a jupyter notebook then use tqdm_notebook.
         if get_ipython().has_trait('kernel'): progress = tqdm.tqdm_notebook
     except (NameError, AssertionError):
+        # Otherwise use regular tqdm progress bar
         progress = tqdm.tqdm
     if not parallel:
         return [f(*(precurry + (x,) + postcurry)) for x in

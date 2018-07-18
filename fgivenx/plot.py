@@ -12,13 +12,13 @@ def plot(x, y, z, ax, **kwargs):
         x, y, z : numpy arrays
             See arguments to :func:`matplotlib.pyplot.contour`
 
-        ax: axes object 
-            :class:`matplotlib.axes._subplots.AxesSubplot` to plot the contours on
+        ax: axes object
+            :class:`matplotlib.axes._subplots.AxesSubplot` to plot the contours
             onto. Typically generated with:
             >>> fig, ax = matplotlib.pyplot.subplots()
 
         colors: color scheme, optional
-            :class:`matplotlib.colors.LinearSegmentedColormap` 
+            :class:`matplotlib.colors.LinearSegmentedColormap`
             Color scheme to plot with. Recommend plotting in reverse
             (Default: :class:`matplotlib.pyplot.cm.Reds_r`)
 
@@ -79,8 +79,8 @@ def plot(x, y, z, ax, **kwargs):
 
     # Gaussian filter if desired the sigmas by a factor of smooth%
     if smooth:
-        z = scipy.ndimage.gaussian_filter(z, sigma=smooth*numpy.array(z.shape)/100.0,
-                                          order=0)
+        sigma = smooth*numpy.array(z.shape)/100.0
+        z = scipy.ndimage.gaussian_filter(z, sigma=sigma, order=0)
 
     # Plot the filled contours onto the axis ax
     cbar = ax.contourf(x, y, z, cmap=colors, levels=contour_color_levels)
@@ -89,7 +89,7 @@ def plot(x, y, z, ax, **kwargs):
     if rasterize_contours:
         for c in cbar.collections:
             c.set_rasterized(True)
-    
+
     # Remove those annoying white lines
     for c in cbar.collections:
         c.set_edgecolor("face")

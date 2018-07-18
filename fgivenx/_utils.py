@@ -1,8 +1,9 @@
 import numpy
 
+
 def _check_args(logZ, f, x, samples, weights):
-    """ Sanity-check the arguments for compute_samples. 
-    
+    """ Sanity-check the arguments for compute_samples.
+
     Parameters
     ----------
     f, x, samples, weights:
@@ -74,7 +75,7 @@ def _normalise_weights(logZ, weights, ntrim=None):
 
     weights: array-like of numpy.array
         list of not necessarily equal length list of weights
-    
+
     Returns
     -------
     logZ: numpy.array
@@ -82,8 +83,6 @@ def _normalise_weights(logZ, weights, ntrim=None):
 
     weights: list of 1D numpy.array
         normalised weights
-        
-    
     """
     logZ -= logZ.max()
     Zs = numpy.exp(logZ)
@@ -139,4 +138,3 @@ def _equally_weight_samples(samples, weights):
     numpy.random.set_state(state)
 
     return new_samples.copy()
-

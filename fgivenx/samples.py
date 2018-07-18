@@ -1,8 +1,6 @@
 import numpy
 from fgivenx.parallel import parallel_apply
 from fgivenx.io import CacheException, Cache
-from fgivenx._utils import _equally_weight_samples
-
 
 
 def compute_samples(f, x, samples, **kwargs):

@@ -1,1 +1,1 @@
-""" fgivenx testing module """
+""" Testing module """
