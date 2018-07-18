@@ -67,7 +67,7 @@ def test__normalise_weights():
     logZ = numpy.random.rand(nfuncs)
     weights = numpy.random.rand(nfuncs, nsamps)
 
-    logZ, weights = _normalise_weights(logZ, weights, None)
+    logZ, weights = _normalise_weights(logZ, weights)
     
     assert_almost_equal(numpy.max(weights),1)
     assert_almost_equal(numpy.max(logZ),0)

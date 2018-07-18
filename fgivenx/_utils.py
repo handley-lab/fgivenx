@@ -1,7 +1,13 @@
 import numpy
 
 def _check_args(logZ, f, x, samples, weights):
-    """ Check the arguments for compute_samples. """
+    """ Sanity-check the arguments for compute_samples. 
+    
+    Parameters
+    ----------
+    f, x, samples, weights:
+        see arguments for :func:`fgivenx.compute_samples`
+    """
     # convert to arrays
     if logZ is None:
         logZ = [0]
@@ -54,10 +60,33 @@ def _check_args(logZ, f, x, samples, weights):
     return logZ, f, x, samples, weights
 
 
-def _normalise_weights(logZ, weights, ntrim):
-    """ Correctly normalise the weights for trimming"""
-    Zs = numpy.exp(logZ-logZ.max())
-    logZ = numpy.log(Zs)
+def _normalise_weights(logZ, weights, ntrim=None):
+    """ Correctly normalise the weights for trimming
+
+    This takes a list of log-evidences, and re-normalises the weights so that
+    the largest weight across all samples is 1, and the total weight in each
+    set of samples is proportional to the evidence.
+
+    Parameters
+    ----------
+    logZ: array-like
+        log-evidences to weight each set of weights by
+
+    weights: array-like of numpy.array
+        list of not necessarily equal length list of weights
+    
+    Returns
+    -------
+    logZ: numpy.array
+        evidences, renormalised so that max(logZ) = 0
+
+    weights: list of 1D numpy.array
+        normalised weights
+        
+    
+    """
+    logZ -= logZ.max()
+    Zs = numpy.exp(logZ)
     weights = [w/w.sum()*Z for w, Z in zip(weights, Zs)]
     wmax = max([w.max() for w in weights])
     weights = [w/wmax for w in weights]

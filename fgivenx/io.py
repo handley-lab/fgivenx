@@ -18,6 +18,7 @@ class CacheException(Exception):
 
 
 class CacheOK(CacheException):
+    """ Exception to indicate the cache can be used. """
     def __init__(self, file_root):
         self._msg = "%s: reading from cache in %s" % (
                      self.calling_function(), file_root)
@@ -53,6 +54,13 @@ class Cache(object):
 
     def check(self, *args):
         """ Check that the cache has changed.
+
+        Parameters
+        ----------
+        *args:
+            All but the last argument are inputs to the cached function. The
+            last is the actual value of the function.
+            
 
         If cache is unchanged, return the last answer, otherwise indicate
         recomputation required by throwing a CacheException exception.
@@ -93,6 +101,13 @@ class Cache(object):
             raise CacheMissing(self.file_root)
 
     def save(self, *args):
-        """ Save cache to file using pickle. """
+        """ Save cache to file using pickle. 
+        
+        Parameters
+        ----------
+        *args:
+            All but the last argument are inputs to the cached function. The
+            last is the actual value of the function.
+        """
         with open(self.file_root + '.pkl', "wb") as f:
             pickle.dump(args, f, protocol=pickle.HIGHEST_PROTOCOL)
