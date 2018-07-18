@@ -64,11 +64,5 @@ def parallel_apply(f, array, **kwargs):
     else:
         raise ValueError("parallel keyword must be an integer or bool")
 
-    try:
-        return Parallel(n_jobs=nprocs)(delayed(f)(*(precurry + (x,) + postcurry))
-                                       for x in progress(array, **tqdm_kwargs))
-    except AttributeError:
-        raise AttributeError(
-                "Sadly, you cannot pickle local functions."
-                "Either turn of parallelisation, or move your function"
-                "to global scope")
+    return Parallel(n_jobs=nprocs)(delayed(f)(*(precurry + (x,) + postcurry))
+                                   for x in progress(array, **tqdm_kwargs))
