@@ -3,11 +3,7 @@ import matplotlib.pyplot as plt
 from fgivenx import compute_samples, compute_pmf, compute_dkl
 from fgivenx.plot import plot, plot_lines
 import pytest
-from matplotlib.testing.decorators import image_comparison
 
-
-
-@image_comparison(baseline_images=['plot'], extensions=['png'])
 def test_full():
     # Model definitions
     # =================
