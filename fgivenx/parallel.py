@@ -43,9 +43,9 @@ def parallel_apply(f, array, **kwargs):
     tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
-    # If running in a jupyter notebook then use tqdm_notebook. Otherwise use
-    # regular tqdm progress bar
     try:
+        # If running in a jupyter notebook then use tqdm_notebook. Otherwise use
+        # regular tqdm progress bar
         ip = get_ipython()
         assert ip.has_trait('kernel')
         progress = tqdm.tqdm_notebook
@@ -64,5 +64,11 @@ def parallel_apply(f, array, **kwargs):
     else:
         raise ValueError("parallel keyword must be an integer or bool")
 
-    return Parallel(n_jobs=nprocs)(delayed(f)(*(precurry + (x,) + postcurry))
-                                   for x in progress(array, **tqdm_kwargs))
+    try:
+        return Parallel(n_jobs=nprocs)(delayed(f)(*(precurry + (x,) + postcurry))
+                                       for x in progress(array, **tqdm_kwargs))
+    except AttributeError:
+        raise AttributeError(
+                "Sadly, you cannot pickle local functions."
+                "Either turn of parallelisation, or move your function"
+                "to global scope")

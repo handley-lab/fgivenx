@@ -1,5 +1,4 @@
 import numpy
-import pytest
 import os
 import pytest
 from shutil import rmtree
