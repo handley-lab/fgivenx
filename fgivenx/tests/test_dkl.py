@@ -10,6 +10,7 @@ def gaussian_dkl(mu, sig, mu_, sig_):
 
 
 def test_DKL():
+    numpy.random.seed(0)
     mu_, sig_ = 0, 1
     mu, sig = 0.2, 0.1
     size = 1000

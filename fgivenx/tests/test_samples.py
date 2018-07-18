@@ -53,6 +53,7 @@ def test_samples_from_getdist_chains():
     nsamples = 1000
     params = ['a', 'g']
     i = [names.index(p) for p in params]
+    numpy.random.seed(0)
     samples_ = numpy.random.rand(nsamples,len(names))
     weights_ = numpy.random.rand(nsamples)
     samples = getdist.mcsamples.MCSamples(samples=samples_,labels=labels,names=names,weights=weights_)
