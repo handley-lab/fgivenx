@@ -57,6 +57,7 @@ def _check_args(logZ, f, x, samples, weights):
 def _normalise_weights(logZ, weights, ntrim):
     """ Correctly normalise the weights for trimming"""
     Zs = numpy.exp(logZ-logZ.max())
+    logZ = numpy.log(Zs)
     weights = [w/w.sum()*Z for w, Z in zip(weights, Zs)]
     wmax = max([w.max() for w in weights])
     weights = [w/wmax for w in weights]
