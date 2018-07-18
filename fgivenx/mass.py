@@ -122,13 +122,8 @@ def compute_pmf(fsamps, y, **kwargs):
     y: 1D array-like
         y values to evaluate the PMF at
 
-    Keywords
-    --------
-    parallel: bool
-        see docstring for fgivenx.parallel.parallel_apply.
-
-    tqdm_kwargs: dict
-        see docstring for fgivenx.parallel.parallel_apply.
+    parallel, tqdm_kwargs: optional
+        see docstring for :func:`fgivenx.parallel.parallel_apply`.
 
     Returns
     -------

@@ -102,22 +102,20 @@ def samples_from_getdist_chains(params, file_root=None, chains_file=None,
     params: list(str)
         Names of parameters to be supplied to second argument of f(x|theta).
 
-    Keywords
-    --------
-    file_root: str
+    file_root: str, optional
         Root name for getdist chains files. This variable automatically
         defines:
         - chains_file = file_root.txt
         - paramnames_file = file_root.paramnames
         but can be overidden by chains_file or paramnames_file.
 
-    chains_file: str
+    chains_file: str, optional
         Full filename for getdist chains file.
 
-    paramnames_file: str
+    paramnames_file: str, optional
         Full filename for getdist paramnames file.
 
-    latex: bool
+    latex: bool, optional
         Also return an array of latex strings for those paramnames.
 
     Returns

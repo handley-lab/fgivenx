@@ -41,16 +41,16 @@ def compute_dkl(fsamps, prior_fsamps, **kwargs):
     prior_fsamps: 2D numpy.array
         Prior function samples, as computed by fgivenx.compute_samples
 
-    Keywords
-    --------
-    parallel:
-        see docstring for fgivenx.parallel.parallel_apply.
+    parallel, tqdm_kwargs: optional
+        see docstring for :func:`fgivenx.parallel.parallel_apply`.
 
-    cache: str
+    cache: str, optional
         File root for saving previous calculations for re-use.
 
     Returns
     -------
+
+    Kullback-Liebler divergences
     """
 
     parallel = kwargs.pop('parallel', False)
