@@ -5,8 +5,7 @@
 [![status](http://joss.theoj.org/papers/cf6f8ac309d6a18b6d6cf08b64aa3f62/status.svg)](http://joss.theoj.org/papers/cf6f8ac309d6a18b6d6cf08b64aa3f62)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1310715.svg)](https://doi.org/10.5281/zenodo.1310715)
 
-Functional Posterior Plotter
-============================
+# Functional Posterior Plotter
 ![](https://raw.github.com/williamjameshandley/fgivenx/master/plot.png)
 
 These packages allow one to compute a predictive posterior of a function,
@@ -20,8 +19,54 @@ The driving routine is `fgivenx.compute_contours`, and example usage can be
 found by running `help(fgivenx)`. It is compatible with getdist, and has a
 loading function provided by `fgivenx.samples.samples_from_getdist_chains`.
 
-Example Usage
--------------
+
+## Installation
+
+Users can install using pip:
+```bash
+pip install fgivenx
+```
+using the setup.py:
+```bash
+git clone https://github.com/williamjameshandley/fgivenx
+cd fgivenx
+python setup.py install --user
+```
+or for those on [Arch linux](https://www.archlinux.org/) it is available on the
+[AUR](https://aur.archlinux.org/packages/python-fgivenx/)
+
+
+## Documentation
+
+Documentation is hosted at [ReadTheDocs](http://fgivenx.readthedocs.io/).
+
+To build your own local copy of the documentation you'll need to install
+[sphinx](http://www.sphinx-doc.org/en/master/). You can then run: 
+```bash
+cd docs
+make html
+``` 
+
+## Citation
+
+If you use fgivenx to generate plots for a publication, please cite as:
+```bibtex
+@article{fgivenx,
+    doi = {xx.xxxxx/joss.xxxxx},
+    url = {http://dx.doi.org/xx.xxxxx/joss.xxxxx},
+    year  = {xxxx},
+    month = {xxx},
+    publisher = {The Open Journal},
+    volume = {X},
+    number = {X},
+    author = {Will Handley},
+    title = {fgivenx: Functional Posterior Plotter},
+    journal = {The Journal of Open Source Software}
+}
+
+```
+
+## Example Usage
 
 ```python
 import numpy
