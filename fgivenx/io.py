@@ -38,7 +38,7 @@ class CacheMissing(CacheException):
 
 
 class Cache(object):
-    """ Cacheing tool.
+    """ Cacheing tool for saving recomputation.
 
     Parameters
     ----------
@@ -52,7 +52,7 @@ class Cache(object):
             os.makedirs(dirname)
 
     def check(self, *args):
-        """ Check that the cache has changed.
+        """ Check that the arguments haven't changed since the last call.
 
         Parameters
         ----------
@@ -62,8 +62,10 @@ class Cache(object):
 
         Returns
         -------
-        If cache is unchanged, return the last answer, otherwise indicate
-        recomputation required by throwing a :class:`CacheException`.
+        If arguments unchanged:
+            return the cached answer
+        else:
+            indicate recomputation required by throwing a :class:`CacheException`.
         """
         data = self.load()
 
