@@ -2,6 +2,7 @@
 [![codecov](https://codecov.io/gh/williamjameshandley/fgivenx/branch/master/graph/badge.svg)](https://codecov.io/gh/williamjameshandley/fgivenx)
 [![PyPI version](https://badge.fury.io/py/fgivenx.svg)](https://badge.fury.io/py/fgivenx)
 [![Documentation Status](https://readthedocs.org/projects/fgivenx/badge/?version=latest)](https://fgivenx.readthedocs.io/en/latest/?badge=latest)
+[![status](http://joss.theoj.org/papers/cf6f8ac309d6a18b6d6cf08b64aa3f62/status.svg)](http://joss.theoj.org/papers/cf6f8ac309d6a18b6d6cf08b64aa3f62)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1310715.svg)](https://doi.org/10.5281/zenodo.1310715)
 
 Functional Posterior Plotter
