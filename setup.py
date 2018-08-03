@@ -8,7 +8,7 @@ except (IOError, ImportError):
     long_description = ''
 
 setup(name='fgivenx',
-      version='2.1.1',
+      version='2.1.1a',
       author='Will Handley',
       author_email='wh260@cam.ac.uk',
       url='https://github.com/williamjameshandley/fgivenx',
@@ -29,5 +29,5 @@ setup(name='fgivenx',
       'Topic :: Scientific/Engineering :: Information Analysis',
       ],
       description='Functional Posterior Plotter',
-      long_description=long_description
+      long_description=long_description,
       )
