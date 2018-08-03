@@ -14,6 +14,7 @@ setup(name='fgivenx',
       url='https://github.com/williamjameshandley/fgivenx',
       packages=['fgivenx'],
       install_requires=['numpy','matplotlib','scipy','joblib','tqdm'],
+      tests_require=['pytest'],
       license='MIT',
       classifiers=[
       'Development Status :: 4 - Beta',
