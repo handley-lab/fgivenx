@@ -5,14 +5,14 @@
 [![status](http://joss.theoj.org/papers/cf6f8ac309d6a18b6d6cf08b64aa3f62/status.svg)](http://joss.theoj.org/papers/cf6f8ac309d6a18b6d6cf08b64aa3f62)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1310715.svg)](https://doi.org/10.5281/zenodo.1310715)
 
-# Functional Posterior Plotter
+# fgivenx: Functional Posterior Plotter
 ![](https://raw.github.com/williamjameshandley/fgivenx/master/plot.png)
 
 These packages allow one to compute a predictive posterior of a function,
 dependent on sampled parameters. We assume one has a Bayesian posterior
-Post(theta|D,M) described by a set of posterior samples {theta_i}~Post. If
-there is a function parameterised by theta f(x;theta), then this script will
-produce a contour plot of the conditional posterior P(f|x,D,M) in the (x,f)
+`Post(theta|D,M)` described by a set of posterior samples `{theta_i}~Post`. If
+there is a function parameterised by theta `f(x;theta)`, then this script will
+produce a contour plot of the conditional posterior `P(f|x,D,M)` in the `(x,f)`
 plane.
 
 The driving routine is `fgivenx.compute_contours`, and example usage can be
@@ -49,7 +49,7 @@ make html
 
 ## Citation
 
-If you use fgivenx to generate plots for a publication, please cite as:
+If you use `fgivenx` to generate plots for a publication, please cite as:
 ```bibtex
 @article{fgivenx,
     doi = {10.21105/joss.00849},
