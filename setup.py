@@ -8,11 +8,11 @@ except (IOError, ImportError):
     long_description = ''
 
 setup(name='fgivenx',
-      version='2.1.0',
+      version='2.1.1',
       author='Will Handley',
       author_email='wh260@cam.ac.uk',
       url='https://github.com/williamjameshandley/fgivenx',
-      packages=['fgivenx'],
+      packages=['fgivenx', 'fgivenx.tests'],
       install_requires=['numpy','matplotlib','scipy','joblib','tqdm'],
       tests_require=['pytest'],
       license='MIT',
