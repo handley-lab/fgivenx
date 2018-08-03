@@ -26,48 +26,63 @@ bibliography: paper.bib
 
 Scientists are often concerned with numerical values of parameters in
 scientific models. Our knowledge of such things can be quantified and presented
-as a probability distribution:
+using probability distributions as demonstrated in Figure 1.
 
 ![The age and size of the universe, as measured using Planck 2018 data.
 (non-Astro)Physicists may have noted that 14 Gigaparsecs is roughly 46 billion
 light years. The fact that the observable universe is roughly three times
 larger in light years in comparison with its age is explained by the expansion
-of space over cosmic history.](parameters.png) 
+of space over cosmic history.](planck.png) 
 
-Plots like the above can be created using two-dimensional kernel density
+Plots such as Figure 1 can be created using two-dimensional kernel density
 estimation using packages such as
-[scipy](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gaussian_kde.html),
-[getdist](http://getdist.readthedocs.io/en/latest/intro.html) and
-[corner](https://corner.readthedocs.io/en/latest/), where the samples provided
-as inputs to such programs are typically created by a Markov-Chain-Monte-Carlo
-analysis.
+[scipy](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gaussian_kde.html)
+[@scipy], [getdist](http://getdist.readthedocs.io/en/latest/intro.html)
+[@getdist], [corner](https://corner.readthedocs.io/en/latest/) [@corner] and
+[pygtc](https://pygtc.readthedocs.io/en/latest/) [@pygtc], where the samples
+provided as inputs to such programs are typically created by a
+Markov-Chain-Monte-Carlo analysis. For further information on MCMC and Bayesian
+analysis in general, we highly recommend "Information Theory, Inference and
+Learning Algorithms" [@mackay], which is available for free as an online
+[pdf](http://www.inference.org.uk/itprnn/book.html)
 
-As well as uncertain parameters, scientists may also be interested in
-quantifying uncertainty in functional relationships. Take as a universally
-relatable case the equation of a straight line ``y = m*x + c``. If one measured
-the gradient ``m`` and intercept ``c`` with some uncertainty, then our ability
-to predict ``y`` from ``x`` using the straight line relationship would also be
-uncertain, and plotted thus:
+As well as quantifying the uncertainty of real-valued parameters, scientists
+may also be interested in producing probability distributions of functions
+``f(x)``. Take as a universally-relatable case the equation of a straight line
+``y = m*x + c``. If we have probablility distribution for the gradient ``m``
+and intercept ``c``, then our ability to predict ``y`` if we knew ``x``
+using the straight line relationship would also be uncertain. The appropriate
+plot to make is that of ``P(y|x)`` in the ``(x,y)`` plane, as demonstrated in
+Figure 2.
 
-![An example of plots fgivenx is capable of producing](figure.png) 
+![An example of plots produced by fgivenx..
+Top-left: underlying parameter covariances between ``m`` and ``c`` for
+realizations from the prior (blue) and from the posterior (red). 
+Top-right realisations function ``y=m*x+c``. 
+Bottom-left: The conditional Kullback-Leibler divergence. 
+Bottom-right: The probability of measuring y for a given x, essential a contour
+version of the panel directly above.
+](figure.png) 
 
-The above example is a little over-simplified, but the code has been used in
-the latest two Planck inflation papers [-@inflation2015][-@inflation2018] to
-quantify our knowledge of the primordial power spectrum of curvature
-perturbations, by [@Hee2015] in examining the dark energy equation of state
-(and later by [@Hee2016]), by [@Higson2017] for measuring errors in parameter
-estimation and by [@Higson2018] for providing diagnostic tests for nested
-sampling.                
+``fgivenx`` is a python package for producing plots as in Figure 2, including
+the conditional Kullback-Leibler divergence [@Kullback]. This ``y=m*x+c``
+example is a little over-simplified, but the code has been used in the latest
+Planck papers [@inflation2015][@legacy2018][@inflation2018] to quantify our
+knowledge of the primordial power spectrum of curvature perturbations
+[@Hee2015] in examining the dark energy equation of state [@Hee2016] for
+measuring errors in parameter estimation [@Higson2017], for providing
+diagnostic tests for nested sampling [@Higson2018] and for Bayesian compressive
+sensing [@Higson2018b].
 
 ``fgivenx`` is a python package for functional posterior plotting, currently
 used in astronomy, but will be of use to any scientists performing any Bayesian
 analysis which have predictive posteriors that are functions. The source code
 for ``fgivenx`` is available on
-[github](https://github.com/williamjameshandley/fgivenx) and has been archived to
+[GitHub](https://github.com/williamjameshandley/fgivenx) and has been archived to
 Zenodo with the linked DOI: [@zenodo] 
 
 # Acknowledgements
 
-We acknowledge contributions and bug-testing from Ed Higson
+We acknowledge contributions and bug-testing from Ed Higson and Sonke Hee.
 
 # References
