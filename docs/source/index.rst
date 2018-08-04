@@ -16,7 +16,6 @@ Modules:
    :maxdepth: 2
 
    fgivenx
-   fgivenx.tests
 
 * :ref:`genindex`
 * :ref:`search`

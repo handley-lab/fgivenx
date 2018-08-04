@@ -20,7 +20,6 @@ except ImportError:
     def delayed(x):
         return x
 
-
     def cpu_count():
         return 1
 

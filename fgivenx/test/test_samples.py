@@ -11,7 +11,7 @@ try:
     def test_samples_from_getdist_chains():
 
         # Set up getdist chains
-        file_root = './chains/test'
+        file_root = './.chains/test'
         labels = [r'\alpha', r'\beta', r'\gamma']
         names = ['a', 'b', 'g']
         chains_file = file_root + '.txt'
@@ -54,7 +54,7 @@ try:
             pass
         samples, weights = samples_from_getdist_chains(params, file_root=file_root)
 
-        rmtree('chains')
+        rmtree('./.chains')
 
 except ImportError:
     pass

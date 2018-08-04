@@ -1,13 +1,6 @@
 fgivenx package
 ===============
 
-Subpackages
------------
-
-.. toctree::
-
-    fgivenx.tests
-
 Submodules
 ----------
 
