@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 try:
-    from setuptools import setup
+    from setuptools import setup, Command
 except ImportError:
-    from distutils.core import setup
+    from distutils.core import setup, Command
 
 
 def readme():
@@ -23,6 +23,21 @@ def get_version(short=False):
                     return ver
 
 
+class PyTest(Command):
+    user_options = []
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        import subprocess
+        import sys
+        errno = subprocess.call(['pytest', '--cov=fgivenx'])
+        raise SystemExit(errno)
+
+
 setup(name='fgivenx',
       version=get_version(),
       description='fgivenx: Functional Posterior Plotter',
@@ -32,7 +47,9 @@ setup(name='fgivenx',
       url='https://github.com/williamjameshandley/fgivenx',
       packages=['fgivenx', 'fgivenx.tests'],
       install_requires=['matplotlib', 'numpy', 'scipy'],
-      extra_requires=['joblib', 'tqdm'],
+      extra_requires=['joblib', 'tqdm','getdist'],
+      extras_require={'docs': ['sphinx', 'sphinx_rtd_theme', 'numpydoc']},
+      cmdclass = {'test': PyTest},
       tests_require=['pytest', 'pytest-cov', 'coverage'],
       license='MIT',
       classifiers=[
