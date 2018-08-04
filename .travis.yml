@@ -4,6 +4,8 @@ env:
         - OMP_NUM_THREADS=4
 python:
     - "2.7"
+    - "3.4"
+    - "3.5"
     - "3.6"
 install:
     - pip install -r requirements.txt
