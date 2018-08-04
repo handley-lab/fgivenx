@@ -78,7 +78,7 @@ Dependencies
 =============
 Basic requirements:
 
-* Python 2.7+ or 3.6+
+* Python 2.7+ or 3.4+
 * matplotlib
 * numpy
 * scipy

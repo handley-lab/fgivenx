@@ -1,9 +1,11 @@
 matplotlib
-tqdm
 pytest
 scipy
 numpy
-joblib
+sphinx
 numpydoc
-getdist
+pytest
 pytest-cov
+joblib
+tqdm
+getdist

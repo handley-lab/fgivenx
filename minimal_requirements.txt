@@ -1,0 +1,5 @@
+matplotlib
+scipy
+numpy
+pytest
+pytest-cov

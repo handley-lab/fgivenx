@@ -1,19 +1,39 @@
 language: python
-env:
-    global:
-        - OMP_NUM_THREADS=4
-python:
-    - "2.7"
-    - "3.4"
-    - "3.5"
-    - "3.6"
-install:
-    - pip install -r requirements.txt
-before_script:
-    - "export DISPLAY=:99.0"
-    - "sh -e /etc/init.d/xvfb start"
-    - sleep 3
-script: 
-    - pytest --cov=fgivenx
-after_success: 
-    - codecov
+jobs:
+    include:
+        - stage: minimal
+          python:
+              - "2.7"
+              - "3.4"
+              - "3.5"
+              - "3.6"
+          install:
+              - pip install -r minimal_requirements.txt
+          before_script:
+              - "export DISPLAY=:99.0"
+              - "sh -e /etc/init.d/xvfb start"
+              - sleep 3
+          script: 
+              - pytest --cov=fgivenx
+          after_success: 
+              - codecov
+
+        - stage: full
+          install:
+              - pip install -r requirements.txt
+          python:
+              - "2.7"
+              - "3.4"
+              - "3.5"
+              - "3.6"
+          install:
+              - pip install -r minimal_requirements.txt
+          before_script:
+              - "export DISPLAY=:99.0"
+              - "sh -e /etc/init.d/xvfb start"
+              - sleep 3
+          script: 
+              - pytest --cov=fgivenx
+          after_success: 
+              - codecov
+
