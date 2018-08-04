@@ -1,5 +1,4 @@
 matplotlib
-pytest
 scipy
 numpy
 sphinx
@@ -9,3 +8,4 @@ pytest-cov
 joblib
 tqdm
 getdist
+codecov

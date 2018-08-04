@@ -3,3 +3,4 @@ scipy
 numpy
 pytest
 pytest-cov
+codecov
