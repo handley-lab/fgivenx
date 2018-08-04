@@ -29,21 +29,20 @@ fgivenx: Functional Posterior Plotter
 Description
 ===========
 
-``fgivenx`` is a python package for functional posterior plotting, currently
-used in astronomy, but will be of use to any scientists performing any Bayesian
-analysis which have predictive posteriors that are functions.
+``fgivenx`` is a python package for plotting posteriors of functions. It is
+currently used in astronomy, but will be of use to any scientists performing
+Bayesian analyses which have predictive posteriors that are functions.
 
-These packages allow one to plot a predictive posterior of a
-function, dependent on sampled parameters. We assume one has a Bayesian
-posterior ``Post(theta|D,M)`` described by a set of posterior samples
-``{theta_i}~Post``. If there is a function parameterised by theta
-``f(x;theta)``, then this script will produce a contour plot of the
-conditional posterior ``P(f|x,D,M)`` in the ``(x,f)`` plane.
+These packages allow one to plot a predictive posterior of a function,
+dependent on sampled parameters. We assume one has a Bayesian posterior
+``Post(theta|D,M)`` described by a set of posterior samples ``{theta_i}~Post``.
+If there is a function parameterised by theta ``f(x;theta)``, then this script
+will produce a contour plot of the conditional posterior ``P(f|x,D,M)`` in the
+``(x,f)`` plane.
 
-The driving routine is ``fgivenx.compute_contours``, and `Example Usage`_
-can be found by running ``help(fgivenx)``. It is compatible with
-getdist, and has a loading function provided by
-``fgivenx.samples.samples_from_getdist_chains``.
+The driving routine is ``fgivenx.compute_contours``, and `Example Usage`_ can
+be found by running ``help(fgivenx)``. It is compatible with getdist, and has a
+loading function provided by ``fgivenx.samples.samples_from_getdist_chains``.
 
 |image0|
 

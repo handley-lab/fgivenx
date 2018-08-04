@@ -4,8 +4,7 @@ except ImportError:
     def tqdm(x, **kwargs):
         return x
 
-    def tqdm_notebook(x, **kwargs):
-        return x
+    def tqdm_notebook(x, **kwargs): return x
 
 
 try:
