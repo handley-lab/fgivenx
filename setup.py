@@ -1,13 +1,29 @@
 #!/usr/bin/env python3
-from distutils.core import setup
+
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 def readme():
     with open('README.rst') as f:
         return f.read()
 
+def get_version(short=False):
+    with open('README.rst') as f:
+        for line in f:
+            if ':Version:' in line:
+                ver = line.split(':')[2].strip()
+                if short:
+                    subver = ver.split('.')
+                    return '%s.%s' % tuple(subver[:2])
+                else:
+                    return ver
 
 setup(name='fgivenx',
-      version='2.1.2a',
+      version=get_version(),
+      description='fgivenx: Functional Posterior Plotter',
+      long_description=readme(),
       author='Will Handley',
       author_email='wh260@cam.ac.uk',
       url='https://github.com/williamjameshandley/fgivenx',
@@ -27,6 +43,4 @@ setup(name='fgivenx',
       'Topic :: Scientific/Engineering :: Visualization',
       'Topic :: Scientific/Engineering :: Information Analysis',
       ],
-      description='fgivenx: Functional Posterior Plotter',
-      long_description=readme()
       )

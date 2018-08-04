@@ -1,3 +1,12 @@
+===================
+fgivenx:
+===================
+:fgivenx:  Functional Posterior Plotter 
+:Author: Will Handley
+:Version: 2.1.2
+:Homepage: https://github.com/williamjameshandley/fgivenx
+:Documentation: http://fgivenx.readthedocs.io/
+
 .. image:: https://travis-ci.org/williamjameshandley/fgivenx.svg?branch=master
    :target: https://travis-ci.org/williamjameshandley/fgivenx
    :alt: Build Status
@@ -17,11 +26,9 @@
    :target: https://zenodo.org/badge/latestdoi/100947684
    :alt: Permanent DOI
 
+Description
+===========
 
-fgivenx: Functional Posterior Plotter
-=====================================
-
-|image0|
 
 These packages allow one to compute a predictive posterior of a
 function, dependent on sampled parameters. We assume one has a Bayesian
@@ -35,8 +42,10 @@ can be found by running ``help(fgivenx)``. It is compatible with
 getdist, and has a loading function provided by
 ``fgivenx.samples.samples_from_getdist_chains``.
 
-Installation
-------------
+|image0|
+
+Getting Started
+===============
 
 Users can install using pip:
 
@@ -44,7 +53,7 @@ Users can install using pip:
 
    pip install fgivenx
 
-using the setup.py:
+from source:
 
 .. code:: bash
 
@@ -56,13 +65,43 @@ or for those on `Arch linux <https://www.archlinux.org/>`__ it is
 available on the
 `AUR <https://aur.archlinux.org/packages/python-fgivenx/>`__
 
+You can check that things are working by running the test suite:
+
+.. code:: bash
+
+   pytest
+
+Check the dependencies listed in the next section are installed. You can then
+use the ``fgivenx`` module from your scripts.
+
+Dependencies
+=============
+Basic requirements:
+* Python 2.7+ or 3.6+
+* matplotlib
+* numpy
+* scipy
+
+Documentation:
+* sphinx
+* numpydoc
+
+Tests:
+* pytest
+* pytest-cov
+
+Optional:
+* joblib (parallelisation)
+* getdist (compatibility with getdist chains)
+* tqdm (progress bars)
+
+
 Documentation
--------------
+=============
 
-Documentation is hosted at
+Full Documentation is hosted at
 `ReadTheDocs <http://fgivenx.readthedocs.io/>`__.
-
-To build your own local copy of the documentation you’ll need to install
+To build your own local copy of the documentation you'll need to install
 `sphinx <http://www.sphinx-doc.org/en/master/>`__. You can then run:
 
 .. code:: bash
@@ -71,7 +110,7 @@ To build your own local copy of the documentation you’ll need to install
    make html
 
 Citation
---------
+========
 
 If you use ``fgivenx`` to generate plots for a publication, please cite
 as:
@@ -92,7 +131,7 @@ as:
    }
 
 Example Usage
--------------
+=============
 
 .. code:: python
 

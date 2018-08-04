@@ -1,23 +1,24 @@
-.. fgivenx documentation master file, created by
-   sphinx-quickstart on Tue Jul 17 22:50:36 2018.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+fgivenx
+=======
 
-Welcome to fgivenx's documentation!
-===================================
+fgivenx is a Python package for plotting predictive posteriors of functions
 
 .. toctree::
-   :maxdepth: 3
-   :caption: Contents:
+   :maxdepth: 1
 
-   modules
+   Introduction <intro>
+
+|image0|
+
+Modules:
+
+.. toctree::
+   :maxdepth: 2
+
    fgivenx
    fgivenx.tests
 
-
-Indices and tables
-==================
-
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
+
+.. |image0| image:: https://raw.github.com/williamjameshandley/fgivenx/master/plot.png

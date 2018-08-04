@@ -8,14 +8,20 @@
 
 # -- Path setup --------------------------------------------------------------
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import sys
+import os
+sys.path.append(os.path.abspath('../../'))
 
+def get_version(short=False):
+    with open('../../README.rst') as f:
+        for line in f:
+            if ':Version:' in line:
+                ver = line.split(':')[2].strip()
+                if short:
+                    subver = ver.split('.')
+                    return '%s.%s' % tuple(subver[:2])
+                else:
+                    return ver
 
 # -- Project information -----------------------------------------------------
 
@@ -23,14 +29,12 @@ project = 'fgivenx'
 copyright = '2018, Will Handley'
 author = 'Will Handley'
 
-# The short X.Y version
-version = ''
-# The full version, including alpha/beta/rc tags
-release = '2.0'
 
-import sys
-import os
-sys.path.append(os.path.abspath('../../'))
+# The short X.Y version
+version = get_version(True)
+# The full version, including alpha/beta/rc tags
+release = get_version()
+
 
 # -- General configuration ---------------------------------------------------
 
@@ -93,7 +97,7 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
