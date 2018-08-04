@@ -77,20 +77,24 @@ use the ``fgivenx`` module from your scripts.
 Dependencies
 =============
 Basic requirements:
+
 * Python 2.7+ or 3.6+
 * matplotlib
 * numpy
 * scipy
 
 Documentation:
+
 * sphinx
 * numpydoc
 
 Tests:
+
 * pytest
 * pytest-cov
 
 Optional:
+
 * joblib (parallelisation)
 * getdist (compatibility with getdist chains)
 * tqdm (progress bars)
