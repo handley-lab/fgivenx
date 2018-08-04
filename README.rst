@@ -3,7 +3,7 @@ fgivenx: Functional Posterior Plotter
 =====================================
 :fgivenx:  Functional Posterior Plotter 
 :Author: Will Handley
-:Version: 2.1.4
+:Version: 2.1.5
 :Homepage: https://github.com/williamjameshandley/fgivenx
 :Documentation: http://fgivenx.readthedocs.io/
 
@@ -72,6 +72,8 @@ You can check that things are working by running the test suite:
 .. code:: bash
 
    pytest
+   # or, equivalently
+   python setup.py test
 
 Check the dependencies listed in the next section are installed. You can then
 use the ``fgivenx`` module from your scripts.
