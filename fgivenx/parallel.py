@@ -78,8 +78,6 @@ def parallel_apply(f, array, **kwargs):
     if not parallel:
         return [f(*(precurry + (x,) + postcurry)) for x in
                 progress(array, **tqdm_kwargs)]
-    elif parallel and not PARALLEL:
-        warnings.warn("You need to install the package joblib if you want to use parallelisation")
     elif parallel is True:
         parallel = cpu_count()
     elif isinstance(parallel, int):
@@ -89,6 +87,9 @@ def parallel_apply(f, array, **kwargs):
             parallel = parallel
     else:
         raise ValueError("parallel keyword must be an integer or bool")
+
+    if parallel and not PARALLEL:
+        warnings.warn("You need to install the package joblib if you want to use parallelisation")
 
     return Parallel(n_jobs=parallel)(delayed(f)(*(precurry + (x,) + postcurry))
                                    for x in progress(array, **tqdm_kwargs))
