@@ -1,3 +1,4 @@
+import warnings
 try:
     from tqdm import tqdm, tqdm_notebook
 except ImportError:
@@ -8,8 +9,10 @@ except ImportError:
 
 
 try:
+    PARALLEL=True
     from joblib import Parallel, delayed, cpu_count
 except ImportError:
+    PARALLEL=False
     class Parallel(object):
         def __init__(self, n_jobs=None):
             pass
@@ -75,6 +78,8 @@ def parallel_apply(f, array, **kwargs):
     if not parallel:
         return [f(*(precurry + (x,) + postcurry)) for x in
                 progress(array, **tqdm_kwargs)]
+    elif parallel and not PARALLEL:
+        warnings.warn("You need to install the package joblib if you want to use parallelisation")
     elif parallel is True:
         nprocs = cpu_count()
     elif isinstance(parallel, int):

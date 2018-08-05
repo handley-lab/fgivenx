@@ -78,30 +78,38 @@ You can check that things are working by running the test suite:
 Check the dependencies listed in the next section are installed. You can then
 use the ``fgivenx`` module from your scripts.
 
+If you want to use parallelisation, have progress bars or getdist compatibility
+you should install the additional optional dependencies:
+
+.. code:: bash
+
+   pip install joblib tqdm getdist
+   # or, equivalently
+   pip install -r  requirements.txt
+
 Dependencies
 =============
 Basic requirements:
 
 * Python 2.7+ or 3.4+
-* matplotlib
-* numpy
-* scipy
+* `matplotlib <https://pypi.org/project/matplotlib/>`__
+* `numpy <https://pypi.org/project/numpy/>`__
+* `scipy <https://pypi.org/project/scipy/>`__
 
 Documentation:
 
-* sphinx
-* numpydoc
+* `sphinx <https://pypi.org/project/Sphinx/>`__
+* `numpydoc <https://pypi.org/project/numpydoc/>`__
 
 Tests:
 
-* pytest
-* pytest-cov
+* `pytest <https://pypi.org/project/pytest/>`__
 
-Optional:
+Optional extras:
 
-* joblib (parallelisation)
-* getdist (compatibility with getdist chains)
-* tqdm (progress bars)
+* `joblib <https://pypi.org/project/joblib/>`__ (parallelisation)
+* `tqdm <https://pypi.org/project/tqdm/>`__ (progress bars)
+* `getdist <https://pypi.org/project/GetDist/>`__ (reading of getdist compatible files)
 
 
 Documentation
@@ -110,7 +118,7 @@ Documentation
 Full Documentation is hosted at
 `ReadTheDocs <http://fgivenx.readthedocs.io/>`__.
 To build your own local copy of the documentation you'll need to install
-`sphinx <http://www.sphinx-doc.org/en/master/>`__. You can then run:
+`sphinx <https://pypi.org/project/Sphinx/>`__. You can then run:
 
 .. code:: bash
 
