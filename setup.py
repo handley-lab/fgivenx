@@ -39,7 +39,7 @@ setup(name='fgivenx',
           'progress_bar': ['tqdm'],
           'getdist_chains': ['getdist']
           },
-      tests_require=['pytest', 'pytest-cov', 'coverage'],
+      tests_require=['pytest'],
       license='MIT',
       classifiers=[
                    'Development Status :: 5 - Production/Stable',

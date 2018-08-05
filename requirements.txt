@@ -3,9 +3,6 @@ scipy
 numpy
 sphinx
 numpydoc
-pytest
-pytest-cov
 joblib
 tqdm
 getdist
-codecov

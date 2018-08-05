@@ -9,6 +9,7 @@ env:
     - REQUIREMENTS=requirements.txt
 install:
     - pip install -r $REQUIREMENTS
+    - pip install pytest pytest-cov codecov
 before_script:
     - "export DISPLAY=:99.0"
     - "sh -e /etc/init.d/xvfb start"
