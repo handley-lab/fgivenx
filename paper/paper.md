@@ -4,7 +4,7 @@ tags:
   - Python
   - Statistics
   - Bayesian inference
-  - astronomy
+  - Astronomy
 authors:
   - name: Will Handley
     orcid: 0000-0002-5866-0445
@@ -42,18 +42,18 @@ estimation using packages such as
 [pygtc](https://pygtc.readthedocs.io/en/latest/) [@pygtc], where the samples
 provided as inputs to such programs are typically created by a
 Markov-Chain-Monte-Carlo analysis. For further information on MCMC and Bayesian
-analysis in general, we highly recommend "Information Theory, Inference and
-Learning Algorithms" [@mackay], which is available for free as an online
+analysis in general, "Information Theory, Inference and Learning Algorithms" is
+highly recommended [@mackay], which is available for free as an online
 [pdf](http://www.inference.org.uk/itprnn/book.html)
 
 As well as quantifying the uncertainty of real-valued parameters, scientists
-may also be interested in producing probability distributions of functions
+may also be interested in producing a probability distribution of a function
 ``f(x)``. Take as a universally-relatable case the equation of a straight line
-``y = m*x + c``. If we have probablility distribution for the gradient ``m``
-and intercept ``c``, then our ability to predict ``y`` if we knew ``x``
+``y = m*x + c``. If one has probability distribution for the gradient ``m``
+and intercept ``c``, then the ability to predict ``y`` knowing ``x``
 using the straight line relationship would also be uncertain. The appropriate
 plot to make is that of ``P(y|x)`` in the ``(x,y)`` plane, as demonstrated in
-Figure 2.
+Figure 2's bottom right panel.
 
 ![An example of plots produced by fgivenx..
 Top-left: underlying parameter covariances between ``m`` and ``c`` for
@@ -83,6 +83,6 @@ Zenodo with the linked DOI: [@zenodo]
 
 # Acknowledgements
 
-We acknowledge contributions and bug-testing from Ed Higson and Sonke Hee.
+Contributions and bug-testing were provided by Ed Higson and Sonke Hee.
 
 # References
