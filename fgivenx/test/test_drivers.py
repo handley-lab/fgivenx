@@ -1,8 +1,9 @@
+import pytest
 import numpy
 import matplotlib.pyplot as plt
 from fgivenx import plot_contours, plot_lines, plot_dkl
 from fgivenx.drivers import compute_samples, compute_pmf, compute_dkl
-import pytest
+from matplotlib.testing.decorators import image_comparison
 
 
 def test_full():
@@ -58,6 +59,41 @@ def test_full():
     y_prior, pmf_prior = compute_pmf(f, x, prior_samples,
                                      cache=prior_cache, parallel=True)
 
+    plot_dkl(f, x, samples, prior_samples,
+             cache=cache, prior_cache=prior_cache)
+
+
+@image_comparison(baseline_images=['fgivenx'], extensions=['pdf'])
+def test_plotting():
+    # Model definitions
+    # =================
+    # Define a simple straight line function, parameters theta=(m,c)
+    def f(x, theta):
+        m, c = theta
+        return m * x + c
+
+    numpy.random.seed(1)
+
+    # Posterior samples
+    nsamples = 1000
+    ms = numpy.random.normal(loc=-5, scale=1, size=nsamples)
+    cs = numpy.random.normal(loc=2, scale=1, size=nsamples)
+    samples = numpy.array([(m, c) for m, c in zip(ms, cs)]).copy()
+
+    # Prior samples
+    ms = numpy.random.normal(loc=0, scale=5, size=nsamples)
+    cs = numpy.random.normal(loc=0, scale=5, size=nsamples)
+    prior_samples = numpy.array([(m, c) for m, c in zip(ms, cs)]).copy()
+
+    # Examine the function over a range of x's
+    xmin, xmax = -2, 2
+    nx = 100
+    x = numpy.linspace(xmin, xmax, nx)
+
+    # Set the cache
+    cache = 'cache/test'
+    prior_cache = cache + '_prior'
+
     # Plotting
     # ========
     fig, axes = plt.subplots(2, 2)
@@ -99,4 +135,3 @@ def test_full():
 
     ax_lines.get_shared_x_axes().join(ax_lines, ax_fgivenx, ax_samples)
     fig.set_size_inches(6, 6)
-    fig.tight_layout()
