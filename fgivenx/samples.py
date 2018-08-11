@@ -48,8 +48,7 @@ def compute_samples(f, x, samples, **kwargs):
     return fsamples
 
 
-def samples_from_getdist_chains(params, file_root=None, chains_file=None,
-                                paramnames_file=None, latex=False):
+def samples_from_getdist_chains(params, file_root, latex=False):
     """ Extract samples and weights from getdist chains.
 
     Parameters
@@ -63,12 +62,6 @@ def samples_from_getdist_chains(params, file_root=None, chains_file=None,
         - chains_file = file_root.txt
         - paramnames_file = file_root.paramnames
         but can be overidden by chains_file or paramnames_file.
-
-    chains_file: str, optional
-        Full filename for getdist chains file.
-
-    paramnames_file: str, optional
-        Full filename for getdist paramnames file.
 
     latex: bool, optional
         Also return an array of latex strings for those paramnames.
@@ -86,37 +79,14 @@ def samples_from_getdist_chains(params, file_root=None, chains_file=None,
         (if latex is provided as an argument)
     """
 
-    # Get the full data
-    if file_root is not None:
-        if chains_file is None:
-            chains_file = file_root + '.txt'
-        if paramnames_file is None:
-            paramnames_file = file_root + '.paramnames'
+    import getdist
+    samples = getdist.loadMCSamples(file_root)
+    weights = samples.weights
 
-    if paramnames_file is None:
-        raise ValueError("You must define paramnames_file,"
-                         "either by file_root, or paramnames_file")
-    if chains_file is None:
-        raise ValueError("You must define chains_file,"
-                         "either by file_root, or chains_file")
-
-    data = numpy.loadtxt(chains_file)
-    if len(data) is 0:
-        return numpy.array([[]]), numpy.array([])
-    weights = data[:, 0]
-
-    # Get the paramnames
-    paramnames = [line.split()[0].replace('*', '')
-                  for line in open(paramnames_file, 'r')]
-
-    # Get the relevant samples
-    indices = [2+paramnames.index(p) for p in params]
-    samples = data[:, indices]
-
+    indices = [samples.index[p] for p in params]
+    samps = samples.samples[:, indices]
     if latex:
-        latex = [' '.join(line.split()[1:])
-                 for line in open(paramnames_file, 'r')]
-        latex = [latex[i-2] for i in indices]
-        return samples, weights, latex
+        latex = [samples.parLabel(p) for p in params]
+        return samps, weights, latex
     else:
-        return samples, weights
+        return samps, weights

@@ -14,8 +14,6 @@ try:
         file_root = './.chains/test'
         labels = [r'\alpha', r'\beta', r'\gamma']
         names = ['a', 'b', 'g']
-        chains_file = file_root + '.txt'
-        pars_file = file_root + '.paramnames'
         nsamples = 1000
         params = ['a', 'g']
         i = [names.index(p) for p in params]
@@ -26,33 +24,15 @@ try:
                                               names=names, weights=weights_)
         samples.saveAsText(file_root, make_dirs=True)
 
-        samples, weights = samples_from_getdist_chains(params, file_root=file_root)
-        assert_allclose(samples, samples_[:, i])
-        assert_allclose(weights, weights_)
-
-        # now test function
-        with pytest.raises(ValueError):
-            samples_from_getdist_chains(params)
-        with pytest.raises(ValueError):
-            samples_from_getdist_chains(params, chains_file=chains_file)
-        with pytest.raises(ValueError):
-            samples_from_getdist_chains(params, paramnames_file=pars_file)
-
-        samples, weights = samples_from_getdist_chains(params,
-                                                       chains_file=chains_file,
-                                                       paramnames_file=pars_file)
+        samples, weights = samples_from_getdist_chains(params, file_root)
         assert_allclose(samples, samples_[:, i])
         assert_allclose(weights, weights_)
 
         samples, weights, latex = samples_from_getdist_chains(params,
-                                                              file_root=file_root,
+                                                              file_root,
                                                               latex=True)
         assert_allclose(weights, weights_)
         assert_array_equal(latex, numpy.array(labels)[i])
-
-        with open(chains_file, "w"):
-            pass
-        samples, weights = samples_from_getdist_chains(params, file_root=file_root)
 
         rmtree('./.chains')
 
@@ -90,5 +70,3 @@ def test_compute_samples():
     assert_allclose(fsamps_, fsamps,)
 
     rmtree('.test_cache')
-
-

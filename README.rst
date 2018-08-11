@@ -71,6 +71,7 @@ You can check that things are working by running the test suite:
 
 .. code:: bash
 
+   export MPLBACKEND=Agg
    pytest
    # or, equivalently
    python setup.py test
@@ -244,11 +245,8 @@ Plot GetDist chains
     import matplotlib.pyplot as plt
     from fgivenx import plot_contours, samples_from_getdist_chains
 
-    file_root = './planck_dir/base_plikHM_TT_lowl_1'
-    paramnames = './planck_dir/base_plikHM_TT_lowl.paramnames'
-    samples, weights = samples_from_getdist_chains(['logA', 'ns'],
-                                                   file_root=file_root,
-                                                   paramnames_file=paramnames_file)
+    file_root = './plik_HM_TT_lowl/base_plikHM_TT_lowl'
+    samples, weights = samples_from_getdist_chains(['logA', 'ns'], file_root)
 
     def PPS(k, theta):
         logA, ns = theta
