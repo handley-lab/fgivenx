@@ -139,12 +139,12 @@ def compute_pmf(fsamps, y, **kwargs):
         `shape=(len(fsamps),len(y)`
     """
     parallel = kwargs.pop('parallel', False)
-    cache = kwargs.pop('cache', None)
+    cache = kwargs.pop('cache', '')
     tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
-    if cache is not None:
+    if cache:
         cache = Cache(cache + '_masses')
         try:
             return cache.check(fsamps, y)
@@ -155,7 +155,7 @@ def compute_pmf(fsamps, y, **kwargs):
                             tqdm_kwargs=tqdm_kwargs)
     masses = numpy.array(masses).transpose().copy()
 
-    if cache is not None:
+    if cache:
         cache.save(fsamps, y, masses)
 
     return masses

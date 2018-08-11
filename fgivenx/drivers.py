@@ -33,11 +33,53 @@ import numpy
 import fgivenx.samples
 import fgivenx.mass
 import fgivenx.dkl
+import fgivenx.plot
+import matplotlib.pyplot as plt
 from fgivenx._utils import _check_args, _normalise_weights,\
                            _equally_weight_samples
 
 
-def compute_samples(f, x, samples, logZ=None, **kwargs):
+def plot_contours(f, x, samples, ax=None, **kwargs):
+    logZ = kwargs.pop('logZ', None)
+    weights = kwargs.pop('weights', None)
+    parallel = kwargs.pop('parallel', False)
+    ntrim = kwargs.pop('ntrim', 100000)
+    ny = kwargs.pop('ny', 100)
+    y = kwargs.pop('y', None)
+    cache = kwargs.pop('cache', '')
+    tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
+
+    y, pmf = compute_pmf(f, x, samples, weights=weights, logZ=logZ,
+                         parallel=parallel, ntrim=ntrim,
+                         ny=ny, y=y, cache=cache,
+                         tqdm_kwargs=tqdm_kwargs)
+    cbar = fgivenx.plot.plot(x, y, pmf, ax, **kwargs)
+    return cbar
+
+
+def plot_lines(f, x, samples, ax=None, **kwargs):
+    logZ = kwargs.pop('logZ', None)
+    weights = kwargs.pop('weights', None)
+    parallel = kwargs.pop('parallel', False)
+    ntrim = kwargs.pop('ntrim', 100000)
+    cache = kwargs.pop('cache', '')
+    tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
+
+    fsamps = compute_samples(f, x, samples, logZ=logZ,
+                             weights=weights, ntrim=ntrim,
+                             parallel=parallel, cache=cache,
+                             tqdm_kwargs=tqdm_kwargs)
+    fgivenx.plot.plot_lines(x, fsamps, ax, **kwargs)
+
+
+def plot_dkl(f, x, samples, prior_samples, ax=None, **kwargs):
+    dkls = compute_dkl(f, x, samples, prior_samples, **kwargs)
+    if ax is None:
+        ax = plt.gca()
+    ax.plot(x, dkls)
+
+
+def compute_samples(f, x, samples, **kwargs):
     r"""
     Apply the function(s) :math:`f(x;\theta)` to the arrays defined in x and
     samples.  Has options for weighting, trimming, cacheing and parallelising.
@@ -82,10 +124,11 @@ def compute_samples(f, x, samples, logZ=None, **kwargs):
         Equivalent to `[[f(x_i,theta) for theta in samples] for x_i in x]`
 
     """
+    logZ = kwargs.pop('logZ', None)
     weights = kwargs.pop('weights', None)
     parallel = kwargs.pop('parallel', False)
     ntrim = kwargs.pop('ntrim', None)
-    cache = kwargs.pop('cache', None)
+    cache = kwargs.pop('cache', '')
     tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
@@ -102,7 +145,7 @@ def compute_samples(f, x, samples, logZ=None, **kwargs):
                                            tqdm_kwargs=tqdm_kwargs)
 
 
-def compute_pmf(f, x, samples, logZ=None, **kwargs):
+def compute_pmf(f, x, samples, **kwargs):
     r"""
     Compute the probability mass function given x at a range of y values
     for :math:`y = f(x|\theta)`
@@ -138,12 +181,13 @@ def compute_pmf(f, x, samples, logZ=None, **kwargs):
 
     """
 
+    logZ = kwargs.pop('logZ', None)
     weights = kwargs.pop('weights', None)
     parallel = kwargs.pop('parallel', False)
     ntrim = kwargs.pop('ntrim', 100000)
     ny = kwargs.pop('ny', 100)
     y = kwargs.pop('y', None)
-    cache = kwargs.pop('cache', None)
+    cache = kwargs.pop('cache', '')
     tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
@@ -168,7 +212,7 @@ def compute_pmf(f, x, samples, logZ=None, **kwargs):
                                        cache=cache, tqdm_kwargs=tqdm_kwargs)
 
 
-def compute_dkl(f, x, samples, prior_samples, logZ=None, **kwargs):
+def compute_dkl(f, x, samples, prior_samples, **kwargs):
     r"""
     Compute the Kullback-Leibler divergence at each value of x for the prior
     and posterior defined by prior_samples and samples.
@@ -196,8 +240,10 @@ def compute_dkl(f, x, samples, prior_samples, logZ=None, **kwargs):
         dkl values at each value of x.
     """
 
+    logZ = kwargs.pop('logZ', None)
     parallel = kwargs.pop('parallel', False)
-    cache = kwargs.pop('cache', None)
+    cache = kwargs.pop('cache', '')
+    prior_cache = kwargs.pop('prior_cache', '')
     ntrim = kwargs.pop('ntrim', None)
     weights = kwargs.pop('weights', None)
     prior_weights = kwargs.pop('prior_weights', None)
@@ -212,17 +258,18 @@ def compute_dkl(f, x, samples, prior_samples, logZ=None, **kwargs):
         weights = [weights]
         prior_weights = [prior_weights]
         cache = [cache]
+        prior_cache = [prior_cache]
 
     DKLs = []
 
-    for fi, c, s, w, ps, pw in zip(f, cache, samples, weights,
-                                   prior_samples, prior_weights):
+    for fi, c, pc, s, w, ps, pw in zip(f, cache, prior_cache, samples, weights,
+                                       prior_samples, prior_weights):
 
         fsamps = compute_samples(fi, x, s, weights=w, ntrim=ntrim,
                                  parallel=parallel, cache=c)
 
         fsamps_prior = compute_samples(fi, x, ps, weights=pw, ntrim=ntrim,
-                                       parallel=parallel, cache=c+'_prior')
+                                       parallel=parallel, cache=pc)
 
         dkls = fgivenx.dkl.compute_dkl(fsamps, fsamps_prior,
                                        parallel=parallel, cache=c)

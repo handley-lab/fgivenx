@@ -21,12 +21,12 @@ def compute_samples(f, x, samples, **kwargs):
     """
 
     parallel = kwargs.pop('parallel', False)
-    cache = kwargs.pop('cache', None)
+    cache = kwargs.pop('cache', '')
     tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
-    if cache is not None:
+    if cache:
         cache = Cache(cache + '_fsamples')
         try:
             return cache.check(x, samples)
@@ -42,7 +42,7 @@ def compute_samples(f, x, samples, **kwargs):
             fsamples.append(fsamps)
     fsamples = numpy.concatenate(fsamples, axis=1)
 
-    if cache is not None:
+    if cache:
         cache.save(x, samples, fsamples)
 
     return fsamples

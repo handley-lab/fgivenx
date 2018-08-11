@@ -4,7 +4,7 @@ import numpy
 import matplotlib.pyplot
 
 
-def plot(x, y, z, ax, **kwargs):
+def plot(x, y, z, ax=None, **kwargs):
     """ Plot iso-probability mass function, converted to sigmas.
 
         Parameters
@@ -12,7 +12,7 @@ def plot(x, y, z, ax, **kwargs):
         x, y, z : numpy arrays
             See arguments to :func:`matplotlib.pyplot.contour`
 
-        ax: axes object
+        ax: axes object, optional
             :class:`matplotlib.axes._subplots.AxesSubplot` to plot the contours
             onto. Typically generated with:
             >>> fig, ax = matplotlib.pyplot.subplots()
@@ -54,6 +54,8 @@ def plot(x, y, z, ax, **kwargs):
             :class:`matplotlib.contour.QuadContourSet`
             Colors to create a global colour bar
     """
+    if ax is None:
+        ax = matplotlib.pyplot.gca()
     # Get inputs
     colors = kwargs.pop('colors', matplotlib.pyplot.cm.Reds_r)
     smooth = kwargs.pop('smooth', False)
@@ -103,7 +105,7 @@ def plot(x, y, z, ax, **kwargs):
     return cbar
 
 
-def plot_lines(x, fsamps, ax, downsample=100, **kwargs):
+def plot_lines(x, fsamps, ax=None, downsample=100, **kwargs):
     """
     Plot function samples as a set of line plots.
 
@@ -124,6 +126,8 @@ def plot_lines(x, fsamps, ax, downsample=100, **kwargs):
 
     any other keywords are passed to :meth:`matplotlib.pyplot.ax.plot`
     """
+    if ax is None:
+        ax = matplotlib.pyplot.gca()
     if downsample < len(fsamps.T):
         indices = numpy.random.choice(len(fsamps.T), downsample, replace=False)
     else:

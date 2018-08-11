@@ -55,11 +55,11 @@ def compute_dkl(fsamps, prior_fsamps, **kwargs):
     """
 
     parallel = kwargs.pop('parallel', False)
-    cache = kwargs.pop('cache', None)
+    cache = kwargs.pop('cache', '')
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
-    if cache is not None:
+    if cache:
         cache = Cache(cache + '_dkl')
         try:
             return cache.check(fsamps, prior_fsamps)
@@ -70,7 +70,7 @@ def compute_dkl(fsamps, prior_fsamps, **kwargs):
     dkls = parallel_apply(DKL, zip_fsamps, parallel=parallel)
     dkls = numpy.array(dkls)
 
-    if cache is not None:
+    if cache:
         cache.save(fsamps, prior_fsamps, dkls)
 
     return dkls
