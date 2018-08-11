@@ -1,6 +1,13 @@
 fgivenx package
 ===============
 
+Subpackages
+-----------
+
+.. toctree::
+
+    fgivenx.test
+
 Submodules
 ----------
 
@@ -8,6 +15,14 @@ fgivenx.dkl module
 ------------------
 
 .. automodule:: fgivenx.dkl
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+fgivenx.drivers module
+----------------------
+
+.. automodule:: fgivenx.drivers
     :members:
     :undoc-members:
     :show-inheritance:
