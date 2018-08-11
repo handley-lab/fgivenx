@@ -132,7 +132,7 @@ def plot_lines(x, fsamps, ax=None, downsample=100, **kwargs):
         indices = numpy.random.choice(len(fsamps.T), downsample, replace=False)
     else:
         indices = numpy.arange(len(fsamps.T))
-    linewidth = kwargs.pop('linewidth', 0.1)
     color = kwargs.pop('color', 'k')
+    alpha = kwargs.pop('alpha', 0.1)
     for y in fsamps.T[indices]:
-        ax.plot(x, y, linewidth=linewidth, color=color, **kwargs)
+        ax.plot(x, y, color=color, alpha=alpha, **kwargs)
