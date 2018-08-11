@@ -5,7 +5,7 @@ fgivenx: Functional Posterior Plotter
 :Author: Will Handley
 :Version: 2.1.8
 :Homepage: https://github.com/williamjameshandley/fgivenx
-:Documentation: http://fgivenx.readthedocs.io/
+:Documentation: http://fgivenx.readthedocs.io/intro.html
 
 .. image:: https://travis-ci.org/williamjameshandley/fgivenx.svg?branch=master
    :target: https://travis-ci.org/williamjameshandley/fgivenx
@@ -117,7 +117,7 @@ Documentation
 =============
 
 Full Documentation is hosted at
-`ReadTheDocs <http://fgivenx.readthedocs.io/>`__.
+`ReadTheDocs <http://fgivenx.readthedocs.io/intro.html>`__.
 To build your own local copy of the documentation you'll need to install
 `sphinx <https://pypi.org/project/Sphinx/>`__. You can then run:
 
