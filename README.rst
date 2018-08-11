@@ -5,7 +5,7 @@ fgivenx: Functional Posterior Plotter
 :Author: Will Handley
 :Version: 2.1.8
 :Homepage: https://github.com/williamjameshandley/fgivenx
-:Documentation: http://fgivenx.readthedocs.io/intro.html
+:Documentation: http://fgivenx.readthedocs.io/
 
 .. image:: https://travis-ci.org/williamjameshandley/fgivenx.svg?branch=master
    :target: https://travis-ci.org/williamjameshandley/fgivenx
@@ -36,9 +36,9 @@ Bayesian analyses which have predictive posteriors that are functions.
 These packages allow one to plot a predictive posterior of a function,
 dependent on sampled parameters. We assume one has a Bayesian posterior
 ``Post(theta|D,M)`` described by a set of posterior samples ``{theta_i}~Post``.
-If there is a function parameterised by theta ``f(x;theta)``, then this script
-will produce a contour plot of the conditional posterior ``P(f|x,D,M)`` in the
-``(x,f)`` plane.
+If there is a function parameterised by theta ``y=f(x;theta)``, then this script
+will produce a contour plot of the conditional posterior ``P(y|x,D,M)`` in the
+``(x,y)`` plane.
 
 The driving routines are ``fgivenx.plot_contours``, ``fgivenx.plot_lines`` and
 ``fgivenx.plot_dkl``. The code is compatible with getdist, and has a loading function
@@ -117,7 +117,7 @@ Documentation
 =============
 
 Full Documentation is hosted at
-`ReadTheDocs <http://fgivenx.readthedocs.io/intro.html>`__.
+`ReadTheDocs <http://fgivenx.readthedocs.io/>`__.
 To build your own local copy of the documentation you'll need to install
 `sphinx <https://pypi.org/project/Sphinx/>`__. You can then run:
 
@@ -236,6 +236,8 @@ Plot user-generated samples
     fig.tight_layout()
     fig.savefig('plot.png')
 
+|image0|
+
 Plot GetDist chains
 -------------------
 
@@ -253,14 +255,25 @@ Plot GetDist chains
         return logA + (ns - 1) * numpy.log(k)
         
     k = numpy.logspace(-4,1,100)
-    plot_contours(PPS, k, samples, weights=weights)
+    cbar = plot_contours(PPS, k, samples, weights=weights)
+    cbar = plt.colorbar(cbar,ticks=[0,1,2,3])
+    cbar.set_ticklabels(['',r'$1\sigma$',r'$2\sigma$',r'$3\sigma$'])
+    
     plt.xscale('log')
     plt.ylim(2,4)
+    plt.ylabel(r'$\ln\left(10^{10}\mathcal{P}_\mathcal{R}\right)$')
+    plt.xlabel(r'$k / {\rm Mpc}^{-1}$')
+    plt.tight_layout()
+    plt.savefig('planck.png')
+
+|image1|
 
 Contributing
 ============
 Want to contribute to ``fgivenx``? Awesome!
-There are many ways you can contribute via the github repository, see below.
+There are many ways you can contribute via the 
+[GitHub repository](https://github.com/williamjameshandley/fgivenx), 
+see below.
 
 Opening issues
 --------------
@@ -272,5 +285,6 @@ Pull requests are very welcome. Note that if you are going to propose drastic
 changes, be sure to open an issue for discussion first, to make sure that your
 PR will be accepted before you spend effort coding it.
 
-.. |image0| image:: https://raw.github.com/williamjameshandley/fgivenx/master/plot.png
+.. |image0| image:: https://github.com/williamjameshandley/fgivenx/blob/master/plot.png
+.. |image1| image:: https://github.com/williamjameshandley/fgivenx/blob/master/planck.png
 

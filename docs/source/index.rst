@@ -1,17 +1,10 @@
-fgivenx
-=======
+.. title:: Introduction
 
 .. toctree::
    :maxdepth: 1
    :caption: Contents
 
    Introduction <intro>
-   fgivenx
+   API <fgivenx>
 
-
-Indices and tables
-------------------
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. include:: ../../README.rst
