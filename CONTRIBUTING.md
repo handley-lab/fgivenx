@@ -1,5 +1,5 @@
 # Contributing guide
-Want to contribute to **PROJECT NAME**? Awesome!
+Want to contribute to `fgivenx`? Awesome!
 There are many ways you can contribute, see below.
 
 ## Opening issues
