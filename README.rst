@@ -40,9 +40,9 @@ If there is a function parameterised by theta ``f(x;theta)``, then this script
 will produce a contour plot of the conditional posterior ``P(f|x,D,M)`` in the
 ``(x,f)`` plane.
 
-The driving routines are ``fgivenx.plot_lines``, and `Example Usage`_ can
-be found by running ``help(fgivenx)``. It is compatible with getdist, and has a
-loading function provided by ``fgivenx.samples.samples_from_getdist_chains``.
+The driving routines are ``fgivenx.plot_contours``, ``fgivenx.plot_lines`` and
+``fgivenx.plot_dkl``. The code is compatible with getdist, and has a loading function
+provided by ``fgivenx.samples_from_getdist_chains``.
 
 |image0|
 
@@ -149,6 +149,11 @@ as:
 Example Usage
 =============
 
+
+
+Plot user-generated samples
+---------------------------
+
 .. code:: python
 
     import numpy
@@ -230,6 +235,29 @@ Example Usage
     fig.tight_layout()
     fig.savefig('plot.png')
 
+Plot GetDist chains
+-------------------
+
+.. code:: python
+
+    import numpy
+    import matplotlib.pyplot as plt
+    from fgivenx import plot_contours, samples_from_getdist_chains
+
+    file_root = './planck_dir/base_plikHM_TT_lowl_1'
+    paramnames = './planck_dir/base_plikHM_TT_lowl.paramnames'
+    samples, weights = samples_from_getdist_chains(['logA', 'ns'],
+                                                   file_root=file_root,
+                                                   paramnames_file=paramnames_file)
+
+    def PPS(k, theta):
+        logA, ns = theta
+        return logA + (ns - 1) * numpy.log(k)
+        
+    k = numpy.logspace(-4,1,100)
+    plot_contours(PPS, k, samples, weights=weights)
+    plt.xscale('log')
+    plt.ylim(2,4)
 
 Contributing
 ============

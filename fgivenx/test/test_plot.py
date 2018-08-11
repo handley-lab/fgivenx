@@ -17,11 +17,12 @@ def test_plot():
     assert type(cbar) is matplotlib.contour.QuadContourSet
 
     with pytest.raises(TypeError):
-        plot(x, y, z, ax, wrong_argument=None)
+        plot(x, y, z, wrong_argument=None)
 
-    cbar = plot(x, y, z, ax, smooth=1)
-    cbar = plot(x, y, z, ax, rasterize_contours=True)
-    cbar = plot(x, y, z, ax, lines=False)
+    cbar = plot(x, y, z)
+    cbar = plot(x, y, z, smooth=1)
+    cbar = plot(x, y, z, rasterize_contours=True)
+    cbar = plot(x, y, z, lines=False)
 
 
 def test_plot_lines():
@@ -33,4 +34,6 @@ def test_plot_lines():
     fsamps = numpy.outer(x, m) + c
     fig, ax = plt.subplots()
     plot_lines(x, fsamps, ax)
-    plot_lines(x, fsamps, ax, downsample=200)
+
+    plot_lines(x, fsamps)
+    plot_lines(x, fsamps, downsample=200)

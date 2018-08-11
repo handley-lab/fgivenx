@@ -73,10 +73,24 @@ def plot_lines(f, x, samples, ax=None, **kwargs):
 
 
 def plot_dkl(f, x, samples, prior_samples, ax=None, **kwargs):
-    dkls = compute_dkl(f, x, samples, prior_samples, **kwargs)
+
+    logZ = kwargs.pop('logZ', None)
+    parallel = kwargs.pop('parallel', False)
+    cache = kwargs.pop('cache', '')
+    prior_cache = kwargs.pop('prior_cache', '')
+    ntrim = kwargs.pop('ntrim', None)
+    weights = kwargs.pop('weights', None)
+    prior_weights = kwargs.pop('prior_weights', None)
+
+    dkls = compute_dkl(f, x, samples, prior_samples, 
+                       logZ=logZ, parallel=parallel, 
+                       cache=cache, prior_cache=prior_cache, 
+                       ntrim=ntrim, weights=weights, 
+                       prior_weights=prior_weights)
+
     if ax is None:
         ax = plt.gca()
-    ax.plot(x, dkls)
+    ax.plot(x, dkls, **kwargs)
 
 
 def compute_samples(f, x, samples, **kwargs):
