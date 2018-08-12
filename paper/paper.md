@@ -47,9 +47,9 @@ highly recommended [@mackay], which is available for free as an online
 [pdf](http://www.inference.org.uk/itprnn/book.html)
 
 As well as quantifying the uncertainty of real-valued parameters, scientists
-may also be interested in producing a probability distribution of a function
+may also be interested in producing a probability distribution for a function
 ``f(x)``. Take as a universally-relatable case the equation of a straight line
-``y = m*x + c``. If one has probability distribution for the gradient ``m``
+``y = m*x + c``. If one has a probability distribution for the gradient ``m``
 and intercept ``c``, then the ability to predict ``y`` knowing ``x``
 using the straight line relationship would also be uncertain. The appropriate
 plot to make is that of ``P(y|x)`` in the ``(x,y)`` plane, as demonstrated in
@@ -68,15 +68,15 @@ version of the panel directly above.
 the conditional Kullback-Leibler divergence [@Kullback]. This ``y=m*x+c``
 example is a little over-simplified, but the code has been used in the latest
 Planck papers [@inflation2015][@legacy2018][@inflation2018] to quantify our
-knowledge of the primordial power spectrum of curvature perturbations
-[@Hee2015] in examining the dark energy equation of state [@Hee2016] for
+knowledge of the primordial power spectrum of curvature perturbations,
+in examining the dark energy equation of state [@Hee2015] [@Hee2016] for
 measuring errors in parameter estimation [@Higson2017], for providing
 diagnostic tests for nested sampling [@Higson2018] and for Bayesian compressive
 sensing [@Higson2018b].
 
 ``fgivenx`` is a python package for functional posterior plotting, currently
-used in astronomy, but will be of use to any scientists performing any Bayesian
-analysis which have predictive posteriors that are functions. The source code
+used in astronomy, but will be of use to scientists performing any Bayesian
+analysis which has predictive posteriors that are functions. The source code
 for ``fgivenx`` is available on
 [GitHub](https://github.com/williamjameshandley/fgivenx) and has been archived to
 Zenodo with the linked DOI: [@zenodo] 
