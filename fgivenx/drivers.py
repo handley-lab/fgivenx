@@ -13,7 +13,7 @@ r"""This module provides utilities for computing the grid for contours of a
     .. math::
 
         P(y|x) &= \int P(y=f(x;\theta)|x,\theta) P(\theta) d\theta \\
-                &= \int \delta(y-f(x;\theta)) P(\theta) d\theta
+               &= \int \delta(y-f(x;\theta)) P(\theta) d\theta
 
     which gives our degree of knowledge for each :math:`y` value given an
     :math:`x` value.
@@ -40,29 +40,150 @@ from fgivenx._utils import _check_args, _normalise_weights,\
 
 
 def plot_contours(f, x, samples, ax=None, **kwargs):
+    r"""
+    Plot the probability mass function given x at a range of y values
+    for :math:`y = f(x|\theta)`
+
+    :math:`P(y|x) = \int P(y=f(x;\theta)|x,\theta) P(\theta) d\theta`
+
+    :math:`\mathrm{pmf}(y|x) = \int_{P(y'|x) < P(y|x)} P(y'|x) dy'`
+
+    Additionally, if a list of log-evidences are passed, along with list of
+    functions, and list of samples, this function plots the probability mass
+    function of all models marginalised according to the evidences.
+
+    Parameters
+    ----------
+    f: function
+        function :math:`f(x;\theta)` (or list of functions for each model) with
+        dependent variable :math:`x`, parameterised by :math:`\theta`.
+
+    x: 1D array-like
+        x values to evaluate :math:`f(x;\theta)` at.
+
+    samples: 2D array-like
+        theta samples (or list of theta samples) to evaluate
+        :math:`f(x;\theta)` at.
+        `shape = (nsamples, npars)`
+
+    ax: axes object, optional
+        :class:`matplotlib.axes._subplots.AxesSubplot` to plot the contours
+        onto. If unsupplied, then :func:`matplotlib.pyplot.gca()` is used to
+        get the last axis used, or create a new one. 
+
+    logZ: 1D array-like, optional
+        relative evidences of each model if multiple models are passed.
+        Should be same length as the list f
+        default: `numpy.ones_like(f)`
+
+    weights: 1D array-like, optional
+        sample weights (or list of weights), if desired. Should have length
+        same as samples.shape[0]
+        default: `numpy.ones_like(samples)`
+
+    ny: int, optional
+        Resolution of y axis
+        default: `100`
+
+    y: array-like, optional
+        Explicit descriptor of y values to evaluate.
+        default: `numpy.linspace(min(f), max(f), ny)`
+
+    ntrim: int, optional
+        Approximate number of samples to trim down to, if desired. Useful if
+        the posterior is dramatically oversampled
+        default: None
+
+    cache: str, optional
+        File root for saving previous calculations for re-use
+
+    parallel, tqdm_args:
+        see docstring for :func:`fgivenx.parallel.parallel_apply`
+
+    kwargs: further keyword arguments
+        Any further keyword arguments are plotting keywords that are passed to
+        :func:`fgivenx.plot.plot`.
+
+    Returns
+    -------
+    cbar: color bar
+        :class:`matplotlib.contour.QuadContourSet`
+        Colors to create a global colour bar
+    """
     logZ = kwargs.pop('logZ', None)
     weights = kwargs.pop('weights', None)
-    parallel = kwargs.pop('parallel', False)
-    ntrim = kwargs.pop('ntrim', 100000)
+    ntrim = kwargs.pop('ntrim', None)
     ny = kwargs.pop('ny', 100)
     y = kwargs.pop('y', None)
     cache = kwargs.pop('cache', '')
+    parallel = kwargs.pop('parallel', False)
     tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
 
     y, pmf = compute_pmf(f, x, samples, weights=weights, logZ=logZ,
-                         parallel=parallel, ntrim=ntrim,
-                         ny=ny, y=y, cache=cache,
+                         ntrim=ntrim, ny=ny, y=y,
+                         parallel=parallel, cache=cache,
                          tqdm_kwargs=tqdm_kwargs)
     cbar = fgivenx.plot.plot(x, y, pmf, ax, **kwargs)
     return cbar
 
 
 def plot_lines(f, x, samples, ax=None, **kwargs):
+    """
+    Plot a representative set of functions to sample
+
+    Additionally, if a list of log-evidences are passed, along with list of
+    functions, and list of samples, this function plots the probability mass
+    function of all models marginalised according to the evidences.
+
+    Parameters
+    ----------
+    f: function
+        function :math:`f(x;\theta)` (or list of functions for each model) with
+        dependent variable :math:`x`, parameterised by :math:`\theta`.
+
+    x: 1D array-like
+        x values to evaluate :math:`f(x;\theta)` at.
+
+    samples: 2D array-like
+        theta samples (or list of theta samples) to evaluate
+        :math:`f(x;\theta)` at.
+        `shape = (nsamples, npars)`
+
+    ax: axes object, optional
+        :class:`matplotlib.axes._subplots.AxesSubplot` to plot the contours
+        onto. If unsupplied, then :func:`matplotlib.pyplot.gca()` is used to
+        get the last axis used, or create a new one. 
+
+    logZ: 1D array-like, optional
+        relative evidences of each model if multiple models are passed.
+        Should be same length as the list f
+        default: `numpy.ones_like(f)`
+
+    weights: 1D array-like, optional
+        sample weights (or list of weights), if desired. Should have length
+        same as samples.shape[0]
+        default: `numpy.ones_like(samples)`
+
+    ntrim: int, optional
+        Approximate number of samples to trim down to, if desired. Useful if
+        the posterior is dramatically oversampled
+        default: None
+
+    cache: str, optional
+        File root for saving previous calculations for re-use
+
+    parallel, tqdm_args:
+        see docstring for :func:`fgivenx.parallel.parallel_apply`
+
+    kwargs: further keyword arguments
+        Any further keyword arguments are plotting keywords that are passed to
+        :func:`fgivenx.plot.plot_lines`.
+    """
     logZ = kwargs.pop('logZ', None)
     weights = kwargs.pop('weights', None)
-    parallel = kwargs.pop('parallel', False)
-    ntrim = kwargs.pop('ntrim', 100000)
+    ntrim = kwargs.pop('ntrim', None)
     cache = kwargs.pop('cache', '')
+    parallel = kwargs.pop('parallel', False)
     tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
 
     fsamps = compute_samples(f, x, samples, logZ=logZ,
@@ -73,19 +194,81 @@ def plot_lines(f, x, samples, ax=None, **kwargs):
 
 
 def plot_dkl(f, x, samples, prior_samples, ax=None, **kwargs):
+    r"""
+    Plot the Kullback-Leibler divergence at each value of x for the prior
+    and posterior defined by prior_samples and samples.
+
+    Let the posterior be:
+
+    :math:`P(y|x) = \int P(y=f(x;\theta)|x,\theta)P(\theta) d\theta`
+
+    and the prior be:
+
+    :math:`Q(y|x) = \int P(y=f(x;\theta)|x,\theta)Q(\theta) d\theta`
+
+    then the Kullback-Leibler divergence at each x is defined by
+
+    :math:`D_\mathrm{KL}(x)=\int P(y|x)\ln\left[\frac{Q(y|x)}{P(y|x)}\right]dy`
+
+    Parameters
+    ----------
+    f: function
+        function :math:`f(x;\theta)` (or list of functions for each model) with
+        dependent variable :math:`x`, parameterised by :math:`\theta`.
+
+    x: 1D array-like
+        x values to evaluate :math:`f(x;\theta)` at.
+
+    samples, prior_samples: 2D array-like
+        theta samples (or list of theta samples) from posterior and prior to
+        evaluate :math:`f(x;\theta)` at.
+        `shape = (nsamples, npars)`
+
+    ax: axes object, optional
+        :class:`matplotlib.axes._subplots.AxesSubplot` to plot the contours
+        onto. If unsupplied, then :func:`matplotlib.pyplot.gca()` is used to
+        get the last axis used, or create a new one. 
+
+    logZ: 1D array-like, optional
+        relative evidences of each model if multiple models are passed.
+        Should be same length as the list f
+        default: `numpy.ones_like(f)`
+
+    weights, prior_weights: 1D array-like, optional
+        sample weights (or list of weights), if desired. Should have length
+        same as samples.shape[0]
+        default: `numpy.ones_like(samples)`
+
+    ntrim: int, optional
+        Approximate number of samples to trim down to, if desired. Useful if
+        the posterior is dramatically oversampled
+        default: None
+
+    cache, prior_cache: str, optional
+        File roots for saving previous calculations for re-use
+
+    parallel, tqdm_args:
+        see docstring for :func:`fgivenx.parallel.parallel_apply`
+
+    kwargs: further keyword arguments
+        Any further keyword arguments are plotting keywords that are passed to
+        :func:`fgivenx.plot.plot`.
+    """
 
     logZ = kwargs.pop('logZ', None)
-    parallel = kwargs.pop('parallel', False)
-    cache = kwargs.pop('cache', '')
-    prior_cache = kwargs.pop('prior_cache', '')
-    ntrim = kwargs.pop('ntrim', None)
     weights = kwargs.pop('weights', None)
     prior_weights = kwargs.pop('prior_weights', None)
+    ntrim = kwargs.pop('ntrim', None)
+    cache = kwargs.pop('cache', '')
+    prior_cache = kwargs.pop('prior_cache', '')
+    parallel = kwargs.pop('parallel', False)
+    tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
 
-    dkls = compute_dkl(f, x, samples, prior_samples, 
-                       logZ=logZ, parallel=parallel, 
-                       cache=cache, prior_cache=prior_cache, 
-                       ntrim=ntrim, weights=weights, 
+    dkls = compute_dkl(f, x, samples, prior_samples,
+                       logZ=logZ, parallel=parallel,
+                       cache=cache, prior_cache=prior_cache,
+                       tqdm_kwargs=tqdm_kwargs,
+                       ntrim=ntrim, weights=weights,
                        prior_weights=prior_weights)
 
     if ax is None:
@@ -105,19 +288,26 @@ def compute_samples(f, x, samples, **kwargs):
     Parameters
     ----------
     f: function
-        function :math:`f(x;\theta)` with dependent variable :math:`x`,
-        parameterised by :math:`\theta`.
+        function :math:`f(x;\theta)` (or list of functions for each model) with
+        dependent variable :math:`x`, parameterised by :math:`\theta`.
 
     x: 1D array-like
         x values to evaluate :math:`f(x;\theta)` at.
 
     samples: 2D array-like
-        theta samples to evaluate :math:`f(x;\theta)` at.
-        shape = (nsamples, npars)
+        theta samples (or list of theta samples) to evaluate
+        :math:`f(x;\theta)` at.
+        `shape = (nsamples, npars)`
+
+    logZ: 1D array-like, optional
+        relative evidences of each model if multiple models are passed.
+        Should be same length as the list f
+        default: `numpy.ones_like(f)`
 
     weights: 1D array-like, optional
-        sample weights, if desired. Should have length same as samples.shape[0]
-        default `numpy.ones_like(samples)`
+        sample weights (or list of weights), if desired. Should have length
+        same as samples.shape[0]
+        default: `numpy.ones_like(samples)`
 
     ntrim: int, optional
         Approximate number of samples to trim down to, if desired. Useful if
@@ -140,9 +330,9 @@ def compute_samples(f, x, samples, **kwargs):
     """
     logZ = kwargs.pop('logZ', None)
     weights = kwargs.pop('weights', None)
-    parallel = kwargs.pop('parallel', False)
     ntrim = kwargs.pop('ntrim', None)
     cache = kwargs.pop('cache', '')
+    parallel = kwargs.pop('parallel', False)
     tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
@@ -174,17 +364,47 @@ def compute_pmf(f, x, samples, **kwargs):
 
     Parameters
     ----------
-    f, x, samples, weights, ntrim, cache
-        see arguments for :func:`fgivenx.compute_samples`
+    f: function
+        function :math:`f(x;\theta)` (or list of functions for each model) with
+        dependent variable :math:`x`, parameterised by :math:`\theta`.
 
-    ny: int
+    x: 1D array-like
+        x values to evaluate :math:`f(x;\theta)` at.
+
+    samples: 2D array-like
+        theta samples (or list of theta samples) to evaluate
+        :math:`f(x;\theta)` at.
+        `shape = (nsamples, npars)`
+
+    logZ: 1D array-like, optional
+        relative evidences of each model if multiple models are passed.
+        Should be same length as the list f
+        default: `numpy.ones_like(f)`
+
+    weights: 1D array-like, optional
+        sample weights (or list of weights), if desired. Should have length
+        same as samples.shape[0]
+        default: `numpy.ones_like(samples)`
+
+    ny: int, optional
         Resolution of y axis
+        default: `100`
 
-    y: array-like
+    y: array-like, optional
         Explicit descriptor of y values to evaluate.
+        default: `numpy.linspace(min(f), max(f), ny)`
 
-    tqdm_kwargs, parallel:
+    ntrim: int, optional
+        Approximate number of samples to trim down to, if desired. Useful if
+        the posterior is dramatically oversampled
+        default: None
+
+    cache: str, optional
+        File root for saving previous calculations for re-use
+
+    parallel, tqdm_args:
         see docstring for :func:`fgivenx.parallel.parallel_apply`
+
 
     Returns
     -------
@@ -192,15 +412,14 @@ def compute_pmf(f, x, samples, **kwargs):
         y values pmf is computed at `shape=(len(y))` or `ny`
     2D numpy.array:
         pmf values at each x and y  `shape=(len(x),len(y))`
-
     """
 
     logZ = kwargs.pop('logZ', None)
     weights = kwargs.pop('weights', None)
-    parallel = kwargs.pop('parallel', False)
-    ntrim = kwargs.pop('ntrim', 100000)
     ny = kwargs.pop('ny', 100)
     y = kwargs.pop('y', None)
+    ntrim = kwargs.pop('ntrim', 100000)
+    parallel = kwargs.pop('parallel', False)
     cache = kwargs.pop('cache', '')
     tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
     if kwargs:
@@ -231,22 +450,44 @@ def compute_dkl(f, x, samples, prior_samples, **kwargs):
     Compute the Kullback-Leibler divergence at each value of x for the prior
     and posterior defined by prior_samples and samples.
 
-    Let the posterior be:
-
-    :math:`P(y|x) = \int P(y=f(x;\theta)|x,\theta)P(\theta) d\theta`
-
-    and the prior be:
-
-    :math:`Q(y|x) = \int P(y=f(x;\theta)|x,\theta)Q(\theta) d\theta`
-
-    then the Kullback-Leibler divergence at each x is defined by
-
-    :math:`D_\mathrm{KL}(x)=\int P(y|x)\ln\left[\frac{Q(y|x)}{P(y|x)}\right]dy`
-
     Parameters
     ----------
-    f, x, samples, weights, ntrim, cache, parallel
-        see arguments for :func:`fgivenx.compute_samples`
+    f: function
+        function :math:`f(x;\theta)` (or list of functions for each model) with
+        dependent variable :math:`x`, parameterised by :math:`\theta`.
+
+    x: 1D array-like
+        x values to evaluate :math:`f(x;\theta)` at.
+
+    samples, prior_samples: 2D array-like
+        theta samples (or list of theta samples) from posterior and prior to
+        evaluate :math:`f(x;\theta)` at.
+        `shape = (nsamples, npars)`
+
+    logZ: 1D array-like, optional
+        relative evidences of each model if multiple models are passed.
+        Should be same length as the list f
+        default: `numpy.ones_like(f)`
+
+    weights, prior_weights: 1D array-like, optional
+        sample weights (or list of weights), if desired. Should have length
+        same as samples.shape[0]
+        default: `numpy.ones_like(samples)`
+
+    ntrim: int, optional
+        Approximate number of samples to trim down to, if desired. Useful if
+        the posterior is dramatically oversampled
+        default: None
+
+    cache, prior_cache: str, optional
+        File roots for saving previous calculations for re-use
+
+    parallel, tqdm_args:
+        see docstring for :func:`fgivenx.parallel.parallel_apply`
+
+    kwargs: further keyword arguments
+        Any further keyword arguments are plotting keywords that are passed to
+        :func:`fgivenx.plot.plot`.
 
     Returns
     -------
@@ -255,12 +496,14 @@ def compute_dkl(f, x, samples, prior_samples, **kwargs):
     """
 
     logZ = kwargs.pop('logZ', None)
-    parallel = kwargs.pop('parallel', False)
-    cache = kwargs.pop('cache', '')
-    prior_cache = kwargs.pop('prior_cache', '')
-    ntrim = kwargs.pop('ntrim', None)
     weights = kwargs.pop('weights', None)
     prior_weights = kwargs.pop('prior_weights', None)
+    ntrim = kwargs.pop('ntrim', None)
+    cache = kwargs.pop('cache', '')
+    prior_cache = kwargs.pop('prior_cache', '')
+    parallel = kwargs.pop('parallel', False)
+    tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
+
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
@@ -280,13 +523,16 @@ def compute_dkl(f, x, samples, prior_samples, **kwargs):
                                        prior_samples, prior_weights):
 
         fsamps = compute_samples(fi, x, s, weights=w, ntrim=ntrim,
-                                 parallel=parallel, cache=c)
+                                 parallel=parallel, cache=c,
+                                 tqdm_kwargs=tqdm_kwargs)
 
         fsamps_prior = compute_samples(fi, x, ps, weights=pw, ntrim=ntrim,
-                                       parallel=parallel, cache=pc)
+                                       parallel=parallel, cache=pc,
+                                       tqdm_kwargs=tqdm_kwargs)
 
         dkls = fgivenx.dkl.compute_dkl(fsamps, fsamps_prior,
-                                       parallel=parallel, cache=c)
+                                       parallel=parallel, cache=c,
+                                       tqdm_kwargs=tqdm_kwargs)
         DKLs.append(dkls)
 
     logZ = numpy.array(logZ)
