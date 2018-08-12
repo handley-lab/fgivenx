@@ -56,6 +56,7 @@ def compute_dkl(fsamps, prior_fsamps, **kwargs):
 
     parallel = kwargs.pop('parallel', False)
     cache = kwargs.pop('cache', '')
+    tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
@@ -67,7 +68,8 @@ def compute_dkl(fsamps, prior_fsamps, **kwargs):
             print(e)
 
     zip_fsamps = list(zip(fsamps, prior_fsamps))
-    dkls = parallel_apply(DKL, zip_fsamps, parallel=parallel)
+    dkls = parallel_apply(DKL, zip_fsamps, parallel=parallel,
+                          tqdm_kwargs=tqdm_kwargs)
     dkls = numpy.array(dkls)
 
     if cache:

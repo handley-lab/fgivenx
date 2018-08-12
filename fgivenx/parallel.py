@@ -38,11 +38,13 @@ def parallel_apply(f, array, **kwargs):
 
     parallel: int or bool, optional
         int > 0: number of processes to parallelise over
+
         int < 0 or bool=True: use OMP_NUM_THREADS to choose parallelisation
+
         bool=False or int=0: do not parallelise
 
     tqdm_kwargs: dict, optional
-        additional kwargs for [tqdm](https://tqdm.github.io/) progress bars.
+        additional kwargs for tqdm progress bars.
 
     precurry: tuple, optional
         immutable arguments to pass to f before x,

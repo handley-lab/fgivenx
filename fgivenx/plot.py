@@ -5,54 +5,55 @@ import matplotlib.pyplot
 
 
 def plot(x, y, z, ax=None, **kwargs):
-    """ Plot iso-probability mass function, converted to sigmas.
+    r""" 
+    Plot iso-probability mass function, converted to sigmas.
 
-        Parameters
-        ----------
-        x, y, z : numpy arrays
-            See arguments to :func:`matplotlib.pyplot.contour`
+    Parameters
+    ----------
+    x, y, z : numpy arrays
+        Same as arguments to :func:`matplotlib.pyplot.contour`
 
-        ax: axes object, optional
-            :class:`matplotlib.axes._subplots.AxesSubplot` to plot the contours
-            onto. Typically generated with:
-            >>> fig, ax = matplotlib.pyplot.subplots()
+    ax: axes object, optional
+        :class:`matplotlib.axes._subplots.AxesSubplot` to plot the contours
+        onto. If unsupplied, then :func:`matplotlib.pyplot.gca()` is used to
+        get the last axis used, or create a new one.
 
-        colors: color scheme, optional
-            :class:`matplotlib.colors.LinearSegmentedColormap`
-            Color scheme to plot with. Recommend plotting in reverse
-            (Default: :class:`matplotlib.pyplot.cm.Reds_r`)
+    colors: color scheme, optional
+        :class:`matplotlib.colors.LinearSegmentedColormap`
+        Color scheme to plot with. Recommend plotting in reverse
+        (Default: :class:`matplotlib.pyplot.cm.Reds_r`)
 
-        smooth: float, optional
-            Percentage by which to smooth the contours.
-            (Default: no smoothing)
+    smooth: float, optional
+        Percentage by which to smooth the contours.
+        (Default: no smoothing)
 
-        contour_line_levels: List[float], optional
-            Contour lines to be plotted.  (Default: [1,2])
+    contour_line_levels: List[float], optional
+        Contour lines to be plotted.  (Default: [1,2])
 
-        linewidths: float, optional
-            Thickness of contour lines.  (Default: 0.3)
+    linewidths: float, optional
+        Thickness of contour lines.  (Default: 0.3)
 
-        contour_color_levels: List[float], optional
-            Contour color levels.
-            (Default: `numpy.arange(0, contour_line_levels[-1] + 1, fineness)`)
+    contour_color_levels: List[float], optional
+        Contour color levels.
+        (Default: `numpy.arange(0, contour_line_levels[-1] + 1, fineness)`)
 
-        fineness: float, optional
-            Spacing of contour color levels.  (Default: 0.1)
+    fineness: float, optional
+        Spacing of contour color levels.  (Default: 0.1)
 
-        lines: bool, optional
-            (Default: True)
+    lines: bool, optional
+        (Default: True)
 
-        rasterize_contours: bool, optional
-            Rasterize the contours while keeping the lines, text etc in vector
-            format. Useful for reducing file size bloat and making printing
-            easier when you have dense contours.
-            (Default: False)
+    rasterize_contours: bool, optional
+        Rasterize the contours while keeping the lines, text etc in vector
+        format. Useful for reducing file size bloat and making printing
+        easier when you have dense contours.
+        (Default: False)
 
-        Returns
-        -------
-        cbar: color bar
-            :class:`matplotlib.contour.QuadContourSet`
-            Colors to create a global colour bar
+    Returns
+    -------
+    cbar: color bar
+        :class:`matplotlib.contour.QuadContourSet`
+        Colors to create a global colour bar
     """
     if ax is None:
         ax = matplotlib.pyplot.gca()

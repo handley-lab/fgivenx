@@ -4,15 +4,27 @@ from fgivenx.io import CacheException, Cache
 
 
 def compute_samples(f, x, samples, **kwargs):
-    """ Apply f(x,theta) to x array and theta in samples.
+    r""" Apply f(x,theta) to x array and theta in samples.
 
     Parameters
     ----------
-    See arguments of :func:`fgivenx.compute_contours`
+    f: function
+        list of functions :math:`f(x;\theta)`  with dependent variable
+        :math:`x`, parameterised by :math:`\theta`.
+
+    x: 1D array-like
+        x values to evaluate :math:`f(x;\theta)` at.
+
+    samples: 2D array-like
+        list of theta samples to evaluate :math:`f(x;\theta)` at.
+        `shape = (nfunc, nsamples, npars)`
 
     parallel, tqdm_kwargs: optional
         see docstring for :func:`fgivenx.parallel.parallel_apply`
 
+    cache: str, optional
+        File root for saving previous calculations for re-use
+        default None
 
     Returns
     -------

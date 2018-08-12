@@ -69,7 +69,7 @@ def plot_contours(f, x, samples, ax=None, **kwargs):
     ax: axes object, optional
         :class:`matplotlib.axes._subplots.AxesSubplot` to plot the contours
         onto. If unsupplied, then :func:`matplotlib.pyplot.gca()` is used to
-        get the last axis used, or create a new one. 
+        get the last axis used, or create a new one.
 
     logZ: 1D array-like, optional
         relative evidences of each model if multiple models are passed.
@@ -152,7 +152,7 @@ def plot_lines(f, x, samples, ax=None, **kwargs):
     ax: axes object, optional
         :class:`matplotlib.axes._subplots.AxesSubplot` to plot the contours
         onto. If unsupplied, then :func:`matplotlib.pyplot.gca()` is used to
-        get the last axis used, or create a new one. 
+        get the last axis used, or create a new one.
 
     logZ: 1D array-like, optional
         relative evidences of each model if multiple models are passed.
@@ -227,7 +227,7 @@ def plot_dkl(f, x, samples, prior_samples, ax=None, **kwargs):
     ax: axes object, optional
         :class:`matplotlib.axes._subplots.AxesSubplot` to plot the contours
         onto. If unsupplied, then :func:`matplotlib.pyplot.gca()` is used to
-        get the last axis used, or create a new one. 
+        get the last axis used, or create a new one.
 
     logZ: 1D array-like, optional
         relative evidences of each model if multiple models are passed.
@@ -326,7 +326,6 @@ def compute_samples(f, x, samples, **kwargs):
     2D numpy.array
         Evaluate the function f at each x value and each theta.
         Equivalent to `[[f(x_i,theta) for theta in samples] for x_i in x]`
-
     """
     logZ = kwargs.pop('logZ', None)
     weights = kwargs.pop('weights', None)

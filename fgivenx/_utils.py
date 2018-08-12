@@ -2,12 +2,12 @@ import numpy
 
 
 def _check_args(logZ, f, x, samples, weights):
-    """ Sanity-check the arguments for compute_samples.
+    """ Sanity-check the arguments for :func:`fgivenx.drivers.compute_samples`.
 
     Parameters
     ----------
     f, x, samples, weights:
-        see arguments for :func:`fgivenx.compute_samples`
+        see arguments for :func:`fgivenx.drivers.compute_samples`
     """
     # convert to arrays
     if logZ is None:
