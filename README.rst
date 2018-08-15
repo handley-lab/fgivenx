@@ -3,7 +3,7 @@ fgivenx: Functional Posterior Plotter
 =====================================
 :fgivenx:  Functional Posterior Plotter 
 :Author: Will Handley
-:Version: 2.1.10
+:Version: 2.1.11
 :Homepage: https://github.com/williamjameshandley/fgivenx
 :Documentation: http://fgivenx.readthedocs.io/
 
@@ -285,9 +285,10 @@ Pull requests are very welcome. Note that if you are going to propose drastic
 changes, be sure to open an issue for discussion first, to make sure that your
 PR will be accepted before you spend effort coding it.
 
-.. |image0| image:: https://github.com/williamjameshandley/fgivenx/blob/master/plot.png
-.. |image1| image:: https://github.com/williamjameshandley/fgivenx/blob/master/planck.png
+.. |image0| image:: https://raw.githubusercontent.com/williamjameshandley/fgivenx/master/plot.png
+.. |image1| image:: https://raw.githubusercontent.com/williamjameshandley/fgivenx/master/planck.png 
 
 Changelog
 =========
+:v2.1.11: Documentation upgrades
 :v2.1.10: Added changelog

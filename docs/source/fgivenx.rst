@@ -1,6 +1,14 @@
 fgivenx package
 ===============
 
+Module contents
+---------------
+
+.. automodule:: fgivenx
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Submodules
 ----------
 
@@ -56,15 +64,6 @@ fgivenx.samples module
 ----------------------
 
 .. automodule:: fgivenx.samples
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-Module contents
----------------
-
-.. automodule:: fgivenx
     :members:
     :undoc-members:
     :show-inheritance:

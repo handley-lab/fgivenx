@@ -78,8 +78,8 @@ sensing [@Higson2018b].
 used in astronomy, but will be of use to scientists performing any Bayesian
 analysis which has predictive posteriors that are functions. The source code
 for ``fgivenx`` is available on
-[GitHub](https://github.com/williamjameshandley/fgivenx) and has been archived to
-Zenodo with the linked DOI: [@zenodo] 
+[GitHub](https://github.com/williamjameshandley/fgivenx) and has been archived
+as ``v2.1.11`` to Zenodo with the linked DOI: [@zenodo] 
 
 # Acknowledgements
 
