@@ -3,7 +3,7 @@ fgivenx: Functional Posterior Plotter
 =====================================
 :fgivenx:  Functional Posterior Plotter 
 :Author: Will Handley
-:Version: 2.1.12
+:Version: 2.1.13
 :Homepage: https://github.com/williamjameshandley/fgivenx
 :Documentation: http://fgivenx.readthedocs.io/
 
@@ -71,9 +71,13 @@ You can check that things are working by running the test suite:
 
 .. code:: bash
 
+   pip install pytest pytest-mpl
    export MPLBACKEND=Agg
-   pytest
+   pytest <fgivenx-install-location>
+
    # or, equivalently
+   git clone https://github.com/williamjameshandley/fgivenx
+   cd fgivenx
    python setup.py test
 
 Check the dependencies listed in the next section are installed. You can then
@@ -105,6 +109,7 @@ Documentation:
 Tests:
 
 * `pytest <https://pypi.org/project/pytest/>`__
+* `pytest-mpl <https://pypi.org/project/pytest-mpl/>`__
 
 Optional extras:
 
@@ -290,6 +295,7 @@ PR will be accepted before you spend effort coding it.
 
 Changelog
 =========
+:v2.1.13: Further bug fix in test suite for image comparison
 :v2.1.12: Bug fix in test suite for image comparison
 :v2.1.11: Documentation upgrades
 :v2.1.10: Added changelog
