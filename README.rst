@@ -33,7 +33,7 @@ Description
 currently used in astronomy, but will be of use to any scientists performing
 Bayesian analyses which have predictive posteriors that are functions.
 
-These packages allow one to plot a predictive posterior of a function,
+This package allows one to plot a predictive posterior of a function,
 dependent on sampled parameters. We assume one has a Bayesian posterior
 ``Post(theta|D,M)`` described by a set of posterior samples ``{theta_i}~Post``.
 If there is a function parameterised by theta ``y=f(x;theta)``, then this script
@@ -67,11 +67,12 @@ or for those on `Arch linux <https://www.archlinux.org/>`__ it is
 available on the
 `AUR <https://aur.archlinux.org/packages/python-fgivenx/>`__
 
-You can check that things are working by running the test suite:
+You can check that things are working by running the test suite (You may
+encounter warnings if the optional dependency ``joblib`` is not installed):
 
 .. code:: bash
 
-   pip install pytest pytest-mpl
+   pip install pytest pytest-runner pytest-mpl
    export MPLBACKEND=Agg
    pytest <fgivenx-install-location>
 
@@ -80,8 +81,8 @@ You can check that things are working by running the test suite:
    cd fgivenx
    python setup.py test
 
-Check the dependencies listed in the next section are installed. You can then
-use the ``fgivenx`` module from your scripts.
+Check the dependencies listed in the next section are installed. You can then use the
+``fgivenx`` module from your scripts.
 
 If you want to use parallelisation, have progress bars or getdist compatibility
 you should install the additional optional dependencies:
@@ -91,6 +92,9 @@ you should install the additional optional dependencies:
    pip install joblib tqdm getdist
    # or, equivalently
    pip install -r  requirements.txt
+
+You may encounter warnings if you don't have the optional dependency ``joblib``
+installed.
 
 Dependencies
 =============
@@ -232,7 +236,7 @@ Plot user-generated samples
     ax_dkl = axes[1, 0]
     ax_dkl.set_ylabel(r'$D_\mathrm{KL}$')
     ax_dkl.set_xlabel(r'$x$')
-    ax_dkl.set_ylim(bottom=0)
+    ax_dkl.set_ylim(bottom=0, top=2.0)
     plot_dkl(f, x, samples, prior_samples, ax_dkl,
              cache=cache, prior_cache=prior_cache)
 

@@ -7,7 +7,7 @@ r"""This module provides utilities for computing the grid for contours of a
      * dependent variable :math:`y`
      * functional form :math:`y = f(x;\theta)` parameterised by :math:`\theta`
 
-    Assuming that you have obtained samples of theta from an MCMC
+    Assuming that you have obtained samples of :math:`\theta` from an MCMC
     process, we aim to compute the density:
 
     .. math::
@@ -15,8 +15,8 @@ r"""This module provides utilities for computing the grid for contours of a
         P(y|x) &= \int P(y=f(x;\theta)|x,\theta) P(\theta) d\theta \\
                &= \int \delta(y-f(x;\theta)) P(\theta) d\theta
 
-    which gives our degree of knowledge for each :math:`y` value given an
-    :math:`x` value.
+    which gives our degree of knowledge for each :math:`y=f(x;\theta)` value
+    given an :math:`x` value.
 
     In fact, for a more representative plot, we are not actually
     interested in the value of the probability density above, but in fact
@@ -41,7 +41,7 @@ from fgivenx._utils import _check_args, _normalise_weights,\
 
 def plot_contours(f, x, samples, ax=None, **kwargs):
     r"""
-    Plot the probability mass function given x at a range of y values
+    Plot the probability mass function given `x` at a range of :math:`y` values
     for :math:`y = f(x|\theta)`
 
     :math:`P(y|x) = \int P(y=f(x;\theta)|x,\theta) P(\theta) d\theta`
@@ -50,7 +50,7 @@ def plot_contours(f, x, samples, ax=None, **kwargs):
 
     Additionally, if a list of log-evidences are passed, along with list of
     functions, and list of samples, this function plots the probability mass
-    function of all models marginalised according to the evidences.
+    function for all models marginalised according to the evidences.
 
     Parameters
     ----------
@@ -59,10 +59,10 @@ def plot_contours(f, x, samples, ax=None, **kwargs):
         dependent variable :math:`x`, parameterised by :math:`\theta`.
 
     x: 1D array-like
-        x values to evaluate :math:`f(x;\theta)` at.
+        `x` values to evaluate :math:`f(x;\theta)` at.
 
     samples: 2D array-like
-        theta samples (or list of theta samples) to evaluate
+        :math:`\theta` samples (or list of :math:`\theta` samples) to evaluate
         :math:`f(x;\theta)` at.
         `shape = (nsamples, npars)`
 
@@ -72,27 +72,27 @@ def plot_contours(f, x, samples, ax=None, **kwargs):
         get the last axis used, or create a new one.
 
     logZ: 1D array-like, optional
-        relative evidences of each model if multiple models are passed.
-        Should be same length as the list f
-        default: `numpy.ones_like(f)`
+        log-evidences of each model if multiple models are passed.
+        Should be same length as the list `f`, and need not be normalised.
+        Default: `numpy.ones_like(f)`
 
     weights: 1D array-like, optional
         sample weights (or list of weights), if desired. Should have length
-        same as samples.shape[0]
-        default: `numpy.ones_like(samples)`
+        same as `samples.shape[0]`.
+        Default: `numpy.ones_like(samples)`
 
     ny: int, optional
-        Resolution of y axis
-        default: `100`
+        Resolution of `y` axis.
+        Default: `100`
 
     y: array-like, optional
-        Explicit descriptor of y values to evaluate.
-        default: `numpy.linspace(min(f), max(f), ny)`
+        Explicit descriptor of `y` values to evaluate.
+        Default: `numpy.linspace(min(f), max(f), ny)`
 
     ntrim: int, optional
         Approximate number of samples to trim down to, if desired. Useful if
-        the posterior is dramatically oversampled
-        default: None
+        the posterior is dramatically oversampled.
+        Default: None
 
     cache: str, optional
         File root for saving previous calculations for re-use
@@ -128,12 +128,12 @@ def plot_contours(f, x, samples, ax=None, **kwargs):
 
 
 def plot_lines(f, x, samples, ax=None, **kwargs):
-    """
+    r"""
     Plot a representative set of functions to sample
 
     Additionally, if a list of log-evidences are passed, along with list of
     functions, and list of samples, this function plots the probability mass
-    function of all models marginalised according to the evidences.
+    function for all models marginalised according to the evidences.
 
     Parameters
     ----------
@@ -142,10 +142,10 @@ def plot_lines(f, x, samples, ax=None, **kwargs):
         dependent variable :math:`x`, parameterised by :math:`\theta`.
 
     x: 1D array-like
-        x values to evaluate :math:`f(x;\theta)` at.
+        `x` values to evaluate :math:`f(x;\theta)` at.
 
     samples: 2D array-like
-        theta samples (or list of theta samples) to evaluate
+        :math:`\theta` samples (or list of :math:`\theta` samples) to evaluate
         :math:`f(x;\theta)` at.
         `shape = (nsamples, npars)`
 
@@ -155,19 +155,19 @@ def plot_lines(f, x, samples, ax=None, **kwargs):
         get the last axis used, or create a new one.
 
     logZ: 1D array-like, optional
-        relative evidences of each model if multiple models are passed.
-        Should be same length as the list f
-        default: `numpy.ones_like(f)`
+        log-evidences of each model if multiple models are passed.
+        Should be same length as the list `f`, and need not be normalised.
+        Default: `numpy.ones_like(f)`
 
     weights: 1D array-like, optional
         sample weights (or list of weights), if desired. Should have length
-        same as samples.shape[0]
-        default: `numpy.ones_like(samples)`
+        same as `samples.shape[0]`.
+        Default: `numpy.ones_like(samples)`
 
     ntrim: int, optional
         Approximate number of samples to trim down to, if desired. Useful if
-        the posterior is dramatically oversampled
-        default: None
+        the posterior is dramatically oversampled.
+        Default: None
 
     cache: str, optional
         File root for saving previous calculations for re-use
@@ -195,8 +195,8 @@ def plot_lines(f, x, samples, ax=None, **kwargs):
 
 def plot_dkl(f, x, samples, prior_samples, ax=None, **kwargs):
     r"""
-    Plot the Kullback-Leibler divergence at each value of x for the prior
-    and posterior defined by prior_samples and samples.
+    Plot the Kullback-Leibler divergence at each value of :math:`x` for the
+    prior and posterior defined by `prior_samples` and `samples`.
 
     Let the posterior be:
 
@@ -210,6 +210,10 @@ def plot_dkl(f, x, samples, prior_samples, ax=None, **kwargs):
 
     :math:`D_\mathrm{KL}(x)=\int P(y|x)\ln\left[\frac{Q(y|x)}{P(y|x)}\right]dy`
 
+    Additionally, if a list of log-evidences are passed, along with list of
+    functions, and list of samples, this function plots the Kullback-Leibler
+    divergence for all models marginalised according to the evidences.
+
     Parameters
     ----------
     f: function
@@ -217,11 +221,11 @@ def plot_dkl(f, x, samples, prior_samples, ax=None, **kwargs):
         dependent variable :math:`x`, parameterised by :math:`\theta`.
 
     x: 1D array-like
-        x values to evaluate :math:`f(x;\theta)` at.
+        `x` values to evaluate :math:`f(x;\theta)` at.
 
     samples, prior_samples: 2D array-like
-        theta samples (or list of theta samples) from posterior and prior to
-        evaluate :math:`f(x;\theta)` at.
+        :math:`\theta` samples (or list of :math:`\theta` samples) from
+        posterior and prior to evaluate :math:`f(x;\theta)` at.
         `shape = (nsamples, npars)`
 
     ax: axes object, optional
@@ -230,19 +234,19 @@ def plot_dkl(f, x, samples, prior_samples, ax=None, **kwargs):
         get the last axis used, or create a new one.
 
     logZ: 1D array-like, optional
-        relative evidences of each model if multiple models are passed.
-        Should be same length as the list f
-        default: `numpy.ones_like(f)`
+        log-evidences of each model if multiple models are passed.
+        Should be same length as the list `f`, and need not be normalised.
+        Default: `numpy.ones_like(f)`
 
     weights, prior_weights: 1D array-like, optional
         sample weights (or list of weights), if desired. Should have length
-        same as samples.shape[0]
-        default: `numpy.ones_like(samples)`
+        same as `samples.shape[0]`.
+        Default: `numpy.ones_like(samples)`
 
     ntrim: int, optional
         Approximate number of samples to trim down to, if desired. Useful if
-        the posterior is dramatically oversampled
-        default: None
+        the posterior is dramatically oversampled.
+        Default: None
 
     cache, prior_cache: str, optional
         File roots for saving previous calculations for re-use
@@ -278,8 +282,8 @@ def plot_dkl(f, x, samples, prior_samples, ax=None, **kwargs):
 
 def compute_samples(f, x, samples, **kwargs):
     r"""
-    Apply the function(s) :math:`f(x;\theta)` to the arrays defined in x and
-    samples.  Has options for weighting, trimming, cacheing and parallelising.
+    Apply the function(s) :math:`f(x;\theta)` to the arrays defined in `x` and
+    `samples`.  Has options for weighting, trimming, cacheing and parallelising.
 
     Additionally, if a list of log-evidences are passed, along with list of
     functions, samples and optional weights it marginalises over the models
@@ -292,31 +296,31 @@ def compute_samples(f, x, samples, **kwargs):
         dependent variable :math:`x`, parameterised by :math:`\theta`.
 
     x: 1D array-like
-        x values to evaluate :math:`f(x;\theta)` at.
+        `x` values to evaluate :math:`f(x;\theta)` at.
 
     samples: 2D array-like
-        theta samples (or list of theta samples) to evaluate
+        :math:`\theta` samples (or list of :math:`\theta` samples) to evaluate
         :math:`f(x;\theta)` at.
         `shape = (nsamples, npars)`
 
     logZ: 1D array-like, optional
-        relative evidences of each model if multiple models are passed.
-        Should be same length as the list f
-        default: `numpy.ones_like(f)`
+        log-evidences of each model if multiple models are passed.
+        Should be same length as the list `f`, and need not be normalised.
+        Default: `numpy.ones_like(f)`
 
     weights: 1D array-like, optional
         sample weights (or list of weights), if desired. Should have length
-        same as samples.shape[0]
-        default: `numpy.ones_like(samples)`
+        same as `samples.shape[0]`.
+        Default: `numpy.ones_like(samples)`
 
     ntrim: int, optional
         Approximate number of samples to trim down to, if desired. Useful if
-        the posterior is dramatically oversampled
-        default None
+        the posterior is dramatically oversampled.
+        Default: None
 
     cache: str, optional
-        File root for saving previous calculations for re-use
-        default None
+        File root for saving previous calculations for re-use.
+        Default: None
 
     parallel, tqdm_args:
         see docstring for :func:`fgivenx.parallel.parallel_apply`
@@ -324,7 +328,7 @@ def compute_samples(f, x, samples, **kwargs):
     Returns
     -------
     2D numpy.array
-        Evaluate the function f at each x value and each theta.
+        Evaluate the function `f` at each x value and each theta.
         Equivalent to `[[f(x_i,theta) for theta in samples] for x_i in x]`
     """
     logZ = kwargs.pop('logZ', None)
@@ -350,7 +354,7 @@ def compute_samples(f, x, samples, **kwargs):
 
 def compute_pmf(f, x, samples, **kwargs):
     r"""
-    Compute the probability mass function given x at a range of y values
+    Compute the probability mass function given `x` at a range of `x` values
     for :math:`y = f(x|\theta)`
 
     :math:`P(y|x) = \int P(y=f(x;\theta)|x,\theta) P(\theta) d\theta`
@@ -368,35 +372,35 @@ def compute_pmf(f, x, samples, **kwargs):
         dependent variable :math:`x`, parameterised by :math:`\theta`.
 
     x: 1D array-like
-        x values to evaluate :math:`f(x;\theta)` at.
+        `x` values to evaluate :math:`f(x;\theta)` at.
 
     samples: 2D array-like
-        theta samples (or list of theta samples) to evaluate
+        :math:`\theta` samples (or list of :math:`\theta` samples) to evaluate
         :math:`f(x;\theta)` at.
         `shape = (nsamples, npars)`
 
     logZ: 1D array-like, optional
-        relative evidences of each model if multiple models are passed.
-        Should be same length as the list f
-        default: `numpy.ones_like(f)`
+        log-evidences of each model if multiple models are passed.
+        Should be same length as the list `f`, and need not be normalised.
+        Default: `numpy.ones_like(f)`
 
     weights: 1D array-like, optional
         sample weights (or list of weights), if desired. Should have length
-        same as samples.shape[0]
-        default: `numpy.ones_like(samples)`
+        same as `samples.shape[0]`.
+        Default: `numpy.ones_like(samples)`
 
     ny: int, optional
-        Resolution of y axis
-        default: `100`
+        Resolution of y axis.
+        Default: `100`
 
     y: array-like, optional
-        Explicit descriptor of y values to evaluate.
-        default: `numpy.linspace(min(f), max(f), ny)`
+        Explicit descriptor of `y` values to evaluate.
+        Default: `numpy.linspace(min(f), max(f), ny)`
 
     ntrim: int, optional
         Approximate number of samples to trim down to, if desired. Useful if
-        the posterior is dramatically oversampled
-        default: None
+        the posterior is dramatically oversampled.
+        Default: None
 
     cache: str, optional
         File root for saving previous calculations for re-use
@@ -408,9 +412,9 @@ def compute_pmf(f, x, samples, **kwargs):
     Returns
     -------
     1D numpy.array:
-        y values pmf is computed at `shape=(len(y))` or `ny`
+        `y` values pmf is computed at `shape=(len(y))` or `ny`
     2D numpy.array:
-        pmf values at each x and y  `shape=(len(x),len(y))`
+        pmf values at each `x` and `y`  `shape=(len(x),len(y))`
     """
 
     logZ = kwargs.pop('logZ', None)
@@ -446,8 +450,8 @@ def compute_pmf(f, x, samples, **kwargs):
 
 def compute_dkl(f, x, samples, prior_samples, **kwargs):
     r"""
-    Compute the Kullback-Leibler divergence at each value of x for the prior
-    and posterior defined by prior_samples and samples.
+    Compute the Kullback-Leibler divergence at each value of `x` for the prior
+    and posterior defined by `prior_samples` and `samples`.
 
     Parameters
     ----------
@@ -456,27 +460,27 @@ def compute_dkl(f, x, samples, prior_samples, **kwargs):
         dependent variable :math:`x`, parameterised by :math:`\theta`.
 
     x: 1D array-like
-        x values to evaluate :math:`f(x;\theta)` at.
+        `x` values to evaluate :math:`f(x;\theta)` at.
 
     samples, prior_samples: 2D array-like
-        theta samples (or list of theta samples) from posterior and prior to
-        evaluate :math:`f(x;\theta)` at.
+        :math:`\theta` samples (or list of :math:`\theta` samples) from
+        posterior and prior to evaluate :math:`f(x;\theta)` at.
         `shape = (nsamples, npars)`
 
     logZ: 1D array-like, optional
-        relative evidences of each model if multiple models are passed.
-        Should be same length as the list f
-        default: `numpy.ones_like(f)`
+        log-evidences of each model if multiple models are passed.
+        Should be same length as the list `f`, and need not be normalised.
+        Default: `numpy.ones_like(f)`
 
     weights, prior_weights: 1D array-like, optional
         sample weights (or list of weights), if desired. Should have length
-        same as samples.shape[0]
-        default: `numpy.ones_like(samples)`
+        same as `samples.shape[0]`.
+        Default: `numpy.ones_like(samples)`
 
     ntrim: int, optional
         Approximate number of samples to trim down to, if desired. Useful if
-        the posterior is dramatically oversampled
-        default: None
+        the posterior is dramatically oversampled.
+        Default: None
 
     cache, prior_cache: str, optional
         File roots for saving previous calculations for re-use
@@ -491,7 +495,7 @@ def compute_dkl(f, x, samples, prior_samples, **kwargs):
     Returns
     -------
     1D numpy array:
-        dkl values at each value of x.
+        dkl values at each value of `x`.
     """
 
     logZ = kwargs.pop('logZ', None)
