@@ -84,6 +84,8 @@ encounter warnings if the optional dependency ``joblib`` is not installed):
 Check the dependencies listed in the next section are installed. You can then use the
 ``fgivenx`` module from your scripts.
 
+Some users of OSX or `Anaconda <https://en.wikipedia.org/wiki/Anaconda_(Python_distribution)>`__ may find ``QueueManagerThread`` errors if `Pillow <https://pypi.org/project/Pillow/>`__ is not installed (run ``pip install pillow``).
+
 If you want to use parallelisation, have progress bars or getdist compatibility
 you should install the additional optional dependencies:
 
@@ -117,7 +119,7 @@ Tests:
 
 Optional extras:
 
-* `joblib <https://pypi.org/project/joblib/>`__ (parallelisation)
+* `joblib <https://pypi.org/project/joblib/>`__ (parallelisation) [`+ pillow <https://pypi.org/project/Pillow/>`__ on some systems]
 * `tqdm <https://pypi.org/project/tqdm/>`__ (progress bars)
 * `getdist <https://pypi.org/project/GetDist/>`__ (reading of getdist compatible files)
 
