@@ -283,7 +283,7 @@ def plot_dkl(f, x, samples, prior_samples, ax=None, **kwargs):
 def compute_samples(f, x, samples, **kwargs):
     r"""
     Apply the function(s) :math:`f(x;\theta)` to the arrays defined in `x` and
-    `samples`.  Has options for weighting, trimming, cacheing and parallelising.
+    `samples`.  Has options for weighting, trimming, cacheing & parallelising.
 
     Additionally, if a list of log-evidences are passed, along with list of
     functions, samples and optional weights it marginalises over the models

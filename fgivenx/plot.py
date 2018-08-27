@@ -5,7 +5,7 @@ import matplotlib.pyplot
 
 
 def plot(x, y, z, ax=None, **kwargs):
-    r""" 
+    r"""
     Plot iso-probability mass function, converted to sigmas.
 
     Parameters

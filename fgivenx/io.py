@@ -65,7 +65,8 @@ class Cache(object):
         If arguments unchanged:
             return the cached answer
         else:
-            indicate recomputation required by throwing a :class:`CacheException`.
+            indicate recomputation required by throwing a
+            :class:`CacheException`.
         """
         data = self.load()
 
