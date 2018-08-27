@@ -33,7 +33,7 @@ using probability distributions as demonstrated in Figure 1.
 years. The fact that the observable universe is roughly three times larger in
 light years in comparison with its age is explained by the expansion of space
 over cosmic history. Contours indicate 67% and 95% marginalised iso-probability
-credibility regions](planck.png) 
+credibility regions.](planck.png) 
 
 Contour plots such as Figure 1 can be created using two-dimensional kernel
 density estimation using packages such as
@@ -81,7 +81,7 @@ used in astronomy, but will be of use to scientists performing any Bayesian
 analysis which has predictive posteriors that are functions. The source code
 for ``fgivenx`` is available on
 [GitHub](https://github.com/williamjameshandley/fgivenx) and has been archived
-as ``v2.1.11`` to Zenodo with the linked DOI: [@zenodo] 
+as ``v2.1.11`` to Zenodo with the linked DOI: [@zenodo].
 
 # Acknowledgements
 
