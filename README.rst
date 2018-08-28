@@ -141,18 +141,24 @@ Citation
 ========
 
 If you use ``fgivenx`` to generate plots for a publication, please cite
-as:
+as: ::
+
+   Handley, (2018). fgivenx: A Python package for functional posterior
+   plotting . Journal of Open Source Software, 3(28), 849,
+   https://doi.org/10.21105/joss.00849
+
+or using the BibTeX:
 
 .. code:: bibtex
 
    @article{fgivenx,
        doi = {10.21105/joss.00849},
        url = {http://dx.doi.org/10.21105/joss.00849},
-       year  = {xxxx},
-       month = {xxx},
+       year  = {2018},
+       month = {Aug},
        publisher = {The Open Journal},
-       volume = {X},
-       number = {X},
+       volume = {3},
+       number = {28},
        author = {Will Handley},
        title = {fgivenx: Functional Posterior Plotter},
        journal = {The Journal of Open Source Software}
