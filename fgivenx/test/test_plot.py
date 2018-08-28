@@ -86,7 +86,7 @@ def test_plot_lines_no_ax():
 
 
 @image_comparison(baseline_images=['plot_lines_downsample'], extensions=['pdf'])
-def test_plot_lines_no_ax():
+def test_plot_lines_downsample():
     x, fsamps = gen_line_data()
     plt.subplots()
     plot_lines(x, fsamps, downsample=50)
