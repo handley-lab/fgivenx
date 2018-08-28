@@ -81,7 +81,7 @@ used in astronomy, but will be of use to scientists performing any Bayesian
 analysis which has predictive posteriors that are functions. The source code
 for ``fgivenx`` is available on
 [GitHub](https://github.com/williamjameshandley/fgivenx) and has been archived
-as ``v2.1.16`` to Zenodo with the linked DOI: [@zenodo].
+as ``v2.1.17`` to Zenodo with the linked DOI: [@zenodo].
 
 # Acknowledgements
 
