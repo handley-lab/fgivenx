@@ -3,7 +3,7 @@ fgivenx: Functional Posterior Plotter
 =====================================
 :fgivenx:  Functional Posterior Plotter 
 :Author: Will Handley
-:Version: 2.1.15
+:Version: 2.1.16
 :Homepage: https://github.com/williamjameshandley/fgivenx
 :Documentation: http://fgivenx.readthedocs.io/
 
@@ -301,6 +301,7 @@ PR will be accepted before you spend effort coding it.
 
 Changelog
 =========
+:v2.1.16: Tests fixes
 :v2.1.15: Additional plot tests
 :v2.1.13: Further bug fix in test suite for image comparison
 :v2.1.12: Bug fix in test suite for image comparison
