@@ -3,7 +3,6 @@ import numpy
 import matplotlib.pyplot as plt
 from fgivenx import plot_contours, plot_lines, plot_dkl
 from fgivenx.drivers import compute_samples, compute_pmf, compute_dkl
-from matplotlib.testing.decorators import image_comparison
 
 
 def test_full():
@@ -63,7 +62,6 @@ def test_full():
              cache=cache, prior_cache=prior_cache)
 
 
-@image_comparison(baseline_images=['fgivenx'], extensions=['pdf'])
 def test_plotting():
     # Model definitions
     # =================

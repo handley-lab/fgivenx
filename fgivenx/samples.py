@@ -78,7 +78,7 @@ def samples_from_getdist_chains(params, file_root, latex=False, *args):
     latex: bool, optional
         Also return an array of latex strings for those paramnames.
 
-    Any additional keyword arguments are forwarded onto getdists, e.g:
+    Any additional keyword arguments are forwarded onto getdist, e.g:
 
         samples_from_getdist_chains(params, file_root,
                                     settings={'ignore_rows':0.5})
