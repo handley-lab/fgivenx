@@ -89,47 +89,50 @@ def test_plotting():
     x = numpy.linspace(xmin, xmax, nx)
 
     # Set the cache
-    cache = 'cache/test'
-    prior_cache = cache + '_prior'
+    for cache in [None, 'cache/test']:
+        if cache is not None:
+            prior_cache = cache + '_prior'
+        else:
+            prior_cache = None
 
-    # Plotting
-    # ========
-    fig, axes = plt.subplots(2, 2)
+        # Plotting
+        # ========
+        fig, axes = plt.subplots(2, 2)
 
-    # Sample plot
-    # -----------
-    ax_samples = axes[0, 0]
-    ax_samples.set_ylabel(r'$c$')
-    ax_samples.set_xlabel(r'$m$')
-    ax_samples.plot(prior_samples.T[0], prior_samples.T[1], 'b.')
-    ax_samples.plot(samples.T[0], samples.T[1], 'r.')
+        # Sample plot
+        # -----------
+        ax_samples = axes[0, 0]
+        ax_samples.set_ylabel(r'$c$')
+        ax_samples.set_xlabel(r'$m$')
+        ax_samples.plot(prior_samples.T[0], prior_samples.T[1], 'b.')
+        ax_samples.plot(samples.T[0], samples.T[1], 'r.')
 
-    # Line plot
-    # ---------
-    ax_lines = axes[0, 1]
-    ax_lines.set_ylabel(r'$y = m x + c$')
-    ax_lines.set_xlabel(r'$x$')
-    plot_lines(f, x, prior_samples, ax_lines, color='b', cache=prior_cache)
-    plot_lines(f, x, samples, ax_lines, color='r', cache=cache)
+        # Line plot
+        # ---------
+        ax_lines = axes[0, 1]
+        ax_lines.set_ylabel(r'$y = m x + c$')
+        ax_lines.set_xlabel(r'$x$')
+        plot_lines(f, x, prior_samples, ax_lines, color='b', cache=prior_cache)
+        plot_lines(f, x, samples, ax_lines, color='r', cache=cache)
 
-    # Predictive posterior plot
-    # -------------------------
-    ax_fgivenx = axes[1, 1]
-    ax_fgivenx.set_ylabel(r'$P(y|x)$')
-    ax_fgivenx.set_xlabel(r'$x$')
-    plot_contours(f, x, prior_samples, ax_fgivenx,
-                  colors=plt.cm.Blues_r, lines=False,
-                  cache=prior_cache)
-    plot_contours(f, x, samples, ax_fgivenx, cache=cache)
+        # Predictive posterior plot
+        # -------------------------
+        ax_fgivenx = axes[1, 1]
+        ax_fgivenx.set_ylabel(r'$P(y|x)$')
+        ax_fgivenx.set_xlabel(r'$x$')
+        plot_contours(f, x, prior_samples, ax_fgivenx,
+                      colors=plt.cm.Blues_r, lines=False,
+                      cache=prior_cache)
+        plot_contours(f, x, samples, ax_fgivenx, cache=cache)
 
-    # DKL plot
-    # --------
-    ax_dkl = axes[1, 0]
-    ax_dkl.set_ylabel(r'$D_\mathrm{KL}$')
-    ax_dkl.set_xlabel(r'$x$')
-    ax_dkl.set_ylim(bottom=0)
-    plot_dkl(f, x, samples, prior_samples, ax_dkl,
-             cache=cache, prior_cache=prior_cache)
+        # DKL plot
+        # --------
+        ax_dkl = axes[1, 0]
+        ax_dkl.set_ylabel(r'$D_\mathrm{KL}$')
+        ax_dkl.set_xlabel(r'$x$')
+        ax_dkl.set_ylim(bottom=0)
+        plot_dkl(f, x, samples, prior_samples, ax_dkl,
+                 cache=cache, prior_cache=prior_cache)
 
-    ax_lines.get_shared_x_axes().join(ax_lines, ax_fgivenx, ax_samples)
-    fig.set_size_inches(6, 6)
+        ax_lines.get_shared_x_axes().join(ax_lines, ax_fgivenx, ax_samples)
+        fig.set_size_inches(6, 6)
