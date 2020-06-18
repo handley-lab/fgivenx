@@ -60,7 +60,7 @@ def compute_samples(f, x, samples, **kwargs):
     return fsamples
 
 
-def samples_from_getdist_chains(params, file_root, latex=False):
+def samples_from_getdist_chains(params, file_root, latex=False, *args):
     """ Extract samples and weights from getdist chains.
 
     Parameters
@@ -78,6 +78,11 @@ def samples_from_getdist_chains(params, file_root, latex=False):
     latex: bool, optional
         Also return an array of latex strings for those paramnames.
 
+    Any additional keyword arguments are forwarded onto getdists, e.g:
+
+        samples_from_getdist_chains(params, file_root,
+                                    settings={'ignore_rows':0.5})
+
     Returns
     -------
     samples: numpy.array
@@ -92,7 +97,7 @@ def samples_from_getdist_chains(params, file_root, latex=False):
     """
 
     import getdist
-    samples = getdist.loadMCSamples(file_root)
+    samples = getdist.loadMCSamples(file_root, *args)
     weights = samples.weights
 
     indices = [samples.index[p] for p in params]

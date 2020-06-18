@@ -34,6 +34,11 @@ try:
         assert_allclose(weights, weights_)
         assert_array_equal(latex, numpy.array(labels)[i])
 
+        settings = {'ignore_rows': 0.5}
+        samples1, weights = samples_from_getdist_chains(params, file_root,
+                                                        settings=settings)
+        assert len(samples1) < len(samples)
+
         rmtree('./.chains')
 
 except ImportError:
