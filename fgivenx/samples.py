@@ -60,7 +60,7 @@ def compute_samples(f, x, samples, **kwargs):
     return fsamples
 
 
-def samples_from_getdist_chains(params, file_root, latex=False, *args):
+def samples_from_getdist_chains(params, file_root, latex=False, **kwargs):
     """ Extract samples and weights from getdist chains.
 
     Parameters
@@ -97,7 +97,7 @@ def samples_from_getdist_chains(params, file_root, latex=False, *args):
     """
 
     import getdist
-    samples = getdist.loadMCSamples(file_root, *args)
+    samples = getdist.loadMCSamples(file_root, **kwargs)
     weights = samples.weights
 
     indices = [samples.index[p] for p in params]
