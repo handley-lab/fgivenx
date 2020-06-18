@@ -9,10 +9,12 @@ env:
     - REQUIREMENTS=requirements.txt
 install:
     - pip install -r $REQUIREMENTS
-    - pip install pytest pytest-cov codecov
+    - pip install --upgrade pytest
+    - pip install pytest-cov codecov
 before_script:
     - "export MPLBACKEND=Agg"
 script: 
     - python -m pytest --cov=fgivenx
 after_success: 
     - codecov
+    - bash <(curl -s https://codecov.io/bash)
