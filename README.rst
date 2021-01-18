@@ -25,6 +25,9 @@ fgivenx: Functional Posterior Plotter
 .. image:: https://zenodo.org/badge/100947684.svg
    :target: https://zenodo.org/badge/latestdoi/100947684
    :alt: Permanent DOI
+.. image:: https://img.shields.io/badge/arXiv-1908.01711-b31b1b.svg
+   :target: https://arxiv.org/abs/1908.01711
+   :alt: Open-access paper
 
 Description
 ===========
