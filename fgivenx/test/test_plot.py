@@ -24,6 +24,14 @@ def test_plot():
     assert type(cbar) is matplotlib.contour.QuadContourSet
 
 
+def test_plot_transparent():
+    x, y, z = gen_plot_data()
+
+    fig, ax = plt.subplots()
+    cbar = plot(x, y, z, ax, alpha=0.7)
+    assert type(cbar) is matplotlib.contour.QuadContourSet
+
+
 def test_plot_wrong_argument():
     x, y, z = gen_plot_data()
     with pytest.raises(TypeError):
