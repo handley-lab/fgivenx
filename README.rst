@@ -7,8 +7,8 @@ fgivenx: Functional Posterior Plotter
 :Homepage: https://github.com/williamjameshandley/fgivenx
 :Documentation: http://fgivenx.readthedocs.io/
 
-.. image:: https://travis-ci.org/williamjameshandley/fgivenx.svg?branch=master
-   :target: https://travis-ci.org/williamjameshandley/fgivenx
+.. image:: https://github.com/williamjameshandley/fgivenx/workflows/CI/badge.svg?branch=master
+   :target: https://github.com/williamjameshandley/fgivenx/actions?query=workflow%3ACI+branch%3Amaster
    :alt: Build Status
 .. image:: https://codecov.io/gh/williamjameshandley/fgivenx/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/williamjameshandley/fgivenx
