@@ -92,7 +92,8 @@ def plot(x, y, z, ax=None, **kwargs):
         z = scipy.ndimage.gaussian_filter(z, sigma=sigma, order=0)
 
     # Plot the filled contours onto the axis ax
-    cbar = ax.contourf(x, y, z, cmap=colors, levels=contour_color_levels, alpha=alpha)
+    cbar = ax.contourf(x, y, z, cmap=colors, levels=contour_color_levels,
+                       alpha=alpha)
 
     # Rasterize contours (the rest of the figure stays in vector format)
     if rasterize_contours:
