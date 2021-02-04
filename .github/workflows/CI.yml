@@ -9,20 +9,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-    - name: Upgrade pip and install linters
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install flake8 pydocstyle
-    - name: flake8 PEP compliance checks
-      run: python -m flake8 fgivenx tests
-    - name: pydocstyle documentation style checks
-      run: python -m pydocstyle --convention=numpy fgivenx
-
   pip:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -46,34 +32,7 @@ jobs:
         python -m pip install -r ${{ matrix.requirements }} 
 
     - name: Test with pytest
-      run: python -m pytest --cov=fgivenx -n auto tests
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
-
-  conda:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: [3.6, 3.7, 3.8, 3.9]
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: conda-incubator/setup-miniconda@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Install dependencies
-      shell: bash -l {0}
-      run: |
-        conda install pytest pytest-cov pytest-xdist
-        conda install --file requirements.txt
-
-    - name: Test with pytest
-      shell: bash -l {0}
-      run: pytest --cov=fgivenx -n auto tests
+      run: python -m pytest --cov=fgivenx -n auto
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
