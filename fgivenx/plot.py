@@ -23,6 +23,10 @@ def plot(x, y, z, ax=None, **kwargs):
         Color scheme to plot with. Recommend plotting in reverse
         (Default: :class:`matplotlib.pyplot.cm.Reds_r`)
 
+    alpha: float, optional
+        Transparency of filled contours. Given as alpha blending
+        value between 0 (transparent) and 1 (opague).
+
     smooth: float, optional
         Percentage by which to smooth the contours.
         (Default: no smoothing)
@@ -72,6 +76,8 @@ def plot(x, y, z, ax=None, **kwargs):
 
     rasterize_contours = kwargs.pop('rasterize_contours', False)
 
+    alpha = kwargs.pop('alpha', 1)
+
     lines = kwargs.pop('lines', True)
 
     if kwargs:
@@ -86,7 +92,8 @@ def plot(x, y, z, ax=None, **kwargs):
         z = scipy.ndimage.gaussian_filter(z, sigma=sigma, order=0)
 
     # Plot the filled contours onto the axis ax
-    cbar = ax.contourf(x, y, z, cmap=colors, levels=contour_color_levels)
+    cbar = ax.contourf(x, y, z, cmap=colors, levels=contour_color_levels,
+                       alpha=alpha)
 
     # Rasterize contours (the rest of the figure stays in vector format)
     if rasterize_contours:
