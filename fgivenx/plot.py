@@ -23,6 +23,10 @@ def plot(x, y, z, ax=None, **kwargs):
         Color scheme to plot with. Recommend plotting in reverse
         (Default: :class:`matplotlib.pyplot.cm.Reds_r`)
 
+    histogram: bool, optional
+        Replaces the contour filling by a histogram.
+        (Default: False)
+
     alpha: float, optional
         Transparency of filled contours. Given as alpha blending
         value between 0 (transparent) and 1 (opague).
@@ -62,7 +66,12 @@ def plot(x, y, z, ax=None, **kwargs):
     if ax is None:
         ax = matplotlib.pyplot.gca()
     # Get inputs
-    colors = kwargs.pop('colors', matplotlib.pyplot.cm.Reds_r)
+    histogram = kwargs.pop('histogram', False)
+
+    default_color = matplotlib.pyplot.cm.Reds_r if not histogram \
+                                                else matplotlib.pyplot.cm.Reds
+    colors = kwargs.pop('colors', default_color)
+
     smooth = kwargs.pop('smooth', False)
 
     linewidths = kwargs.pop('linewidths', 0.3)
@@ -83,6 +92,9 @@ def plot(x, y, z, ax=None, **kwargs):
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
+    if histogram:
+        cbar = ax.pcolormesh(x, y, z, cmap=colors, alpha=alpha, **kwargs)
+
     # Convert to sigmas
     z = numpy.sqrt(2) * scipy.special.erfinv(1 - z)
 
@@ -92,17 +104,18 @@ def plot(x, y, z, ax=None, **kwargs):
         z = scipy.ndimage.gaussian_filter(z, sigma=sigma, order=0)
 
     # Plot the filled contours onto the axis ax
-    cbar = ax.contourf(x, y, z, cmap=colors, levels=contour_color_levels,
+    if not histogram:
+        cbar = ax.contourf(x, y, z, cmap=colors, levels=contour_color_levels,
                        alpha=alpha)
 
-    # Rasterize contours (the rest of the figure stays in vector format)
-    if rasterize_contours:
-        for c in cbar.collections:
-            c.set_rasterized(True)
+        # Rasterize contours (the rest of the figure stays in vector format)
+        if rasterize_contours:
+            for c in cbar.collections:
+                c.set_rasterized(True)
 
-    # Remove those annoying white lines
-    for c in cbar.collections:
-        c.set_edgecolor("face")
+        # Remove those annoying white lines
+        for c in cbar.collections:
+            c.set_edgecolor("face")
 
     # Plot some sigma-based contour lines
     if lines:

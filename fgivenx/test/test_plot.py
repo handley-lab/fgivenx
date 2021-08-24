@@ -15,6 +15,15 @@ def gen_plot_data():
     z = numpy.exp(-((X-0.5)**2+(Y-0.5)**2)/0.01)
     return x, y, z
 
+def gen_interesting_plot_data():
+    numpy.random.seed(0)
+    nx = 100
+    ny = 101
+    x = numpy.linspace(0, 1, nx)
+    y = numpy.linspace(0, 1, ny)
+    X, Y = numpy.meshgrid(x, y)
+    z = numpy.exp(-((Y-X**2)**2)/0.01)
+    return x, y, z
 
 def test_plot():
     x, y, z = gen_plot_data()
@@ -31,6 +40,12 @@ def test_plot_transparent():
     cbar = plot(x, y, z, ax, alpha=0.7)
     assert type(cbar) is matplotlib.contour.QuadContourSet
 
+def test_hist():
+    x, y, z = gen_interesting_plot_data()
+
+    fig, ax = plt.subplots()
+    cbar = plot(x, y, z, ax, histogram=True, colors=matplotlib.pyplot.cm.Oranges)
+    assert type(cbar) is matplotlib.collections.QuadMesh
 
 def test_plot_wrong_argument():
     x, y, z = gen_plot_data()
