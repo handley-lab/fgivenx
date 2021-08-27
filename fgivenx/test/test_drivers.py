@@ -3,6 +3,7 @@ import numpy
 import matplotlib.pyplot as plt
 from fgivenx import plot_contours, plot_lines, plot_dkl
 from fgivenx.drivers import compute_samples, compute_pmf, compute_dkl
+from matplotlib.colors import LogNorm
 
 
 def test_full():
@@ -136,3 +137,56 @@ def test_plotting():
 
         ax_lines.get_shared_x_axes().join(ax_lines, ax_fgivenx, ax_samples)
         fig.set_size_inches(6, 6)
+
+
+def test_histogram():
+    # Model definitions
+    # =================
+    # Define a simple straight line function, parameters theta=(m,c)
+    def f(x, theta):
+        m, c = theta
+        return m * x + c
+
+    numpy.random.seed(1)
+
+    # Posterior samples
+    nsamples = 1000
+    ms = numpy.random.normal(loc=-5, scale=1, size=nsamples)
+    cs = numpy.random.normal(loc=2, scale=1, size=nsamples)
+    samples = numpy.array([(m, c) for m, c in zip(ms, cs)]).copy()
+
+    # Prior samples
+    ms = numpy.random.normal(loc=0, scale=5, size=nsamples)
+    cs = numpy.random.normal(loc=0, scale=5, size=nsamples)
+    prior_samples = numpy.array([(m, c) for m, c in zip(ms, cs)]).copy()
+
+    # Examine the function over a range of x's
+    xmin, xmax = -2, 2
+    nx = 100
+    x = numpy.linspace(xmin, xmax, nx)
+
+    # Set the cache
+    cache = 'cache/test'
+    prior_cache = cache + '_prior'
+
+    # Plotting
+    # ========
+    fig, axes = plt.subplots()
+    ax_fgivenx = axes
+    ax_fgivenx.set_ylabel(r'$P(y|x)$')
+    ax_fgivenx.set_xlabel(r'$x$')
+    cbar = plot_contours(f, x, samples, ax_fgivenx, cache=cache,
+                         histogram=True)
+    plot_contours(f, x, samples, ax_fgivenx, cache=cache, alpha=0,
+                  linewidths=2)
+    fig.colorbar(cbar, label=r"$\sigma$")
+
+    fig, axes = plt.subplots()
+    ax_fgivenx = axes
+    ax_fgivenx.set_ylabel(r'$P(y|x)$')
+    ax_fgivenx.set_xlabel(r'$x$')
+    cbar = plot_contours(f, x, samples, ax_fgivenx, cache=cache,
+                         pdf_histogram=True, histogram=True)
+    plot_contours(f, x, samples, ax_fgivenx, cache=cache, alpha=0,
+                  linewidths=2)
+    fig.colorbar(cbar, label=r"PDF")

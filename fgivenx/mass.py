@@ -116,6 +116,68 @@ def PMF(samples, y):
     except numpy.linalg.LinAlgError:
         return numpy.zeros_like(y)
 
+def PDF_hist(samples, y):
+    """ Compute the probability density function (PDF) using a histogram.
+
+        The set of samples defines a probability density P(y),
+        which is computed using a histogram.
+
+        Parameters
+        ----------
+        samples: array-like
+            Array of samples from a probability density P(y).
+
+        y: array-like (optional)
+            Bin edges in between which to evaluate the PDF at.
+
+        Returns
+        -------
+        1D numpy.array:
+            PDF evaluated at each y bin `shape=(len(y)-1)`
+
+    """
+    # Compute a histogram of the samples, with bin edges specified by y
+    edges = y
+    hist, bin_edges = numpy.histogram(samples, bins=edges, density=True)
+    assert numpy.all(edges == bin_edges), (
+        "Bin edges different from specified:", edges, bin_edges)
+
+    return hist
+
+def PMF_hist(samples, y):
+    """ Compute the probability mass function (PMF) using a histogram.
+
+        The set of samples defines a probability density P(y),
+        which is computed using a histogram. The PMF is computed
+        for each bin specified by the bin edges y
+
+        Parameters
+        ----------
+        samples: array-like
+            Array of samples from a probability density P(y).
+
+        y: array-like (optional)
+            Bin edges in between which to evaluate the PDF at.
+
+        Returns
+        -------
+        1D numpy.array:
+            PMF evaluated at each y bin `shape=(len(y)-1)`
+
+    """
+    # Compute a histogram of the samples, with bin edges specified by y
+    hist = PDF_hist(samples, y)
+
+    # Integrate the PDF where PDF()<p for every p in [PDF(yi) for yi in y]
+    bin_widths = numpy.diff(y)
+    ms = []
+    for i in range(len(y)-1):
+        yi = y[i]
+        p = hist[i]
+        bools = hist < p
+        m = numpy.sum((hist*bin_widths)[bools])
+        ms.append(m)
+    return numpy.array(ms)
 
 def compute_pmf(fsamps, y, **kwargs):
     """ Compute the pmf defined by fsamps at each x for each y.
@@ -129,6 +191,13 @@ def compute_pmf(fsamps, y, **kwargs):
     y: 1D array-like
         y values to evaluate the PMF at
 
+    histogram: bool, optional:
+        Whether to estimate the probability mass function via a histogram
+        instead of a kernel density estimate. Default: `False`
+
+    pdf_histogram: bool, optional:
+        Whether to actually compute the PDF instead of PMF. Default: `False`
+
     parallel, tqdm_kwargs: optional
         see docstring for :func:`fgivenx.parallel.parallel_apply`.
 
@@ -136,10 +205,13 @@ def compute_pmf(fsamps, y, **kwargs):
     -------
     2D numpy.array
         probability mass function at each x for each y
-        `shape=(len(fsamps),len(y)`
+        `shape=(len(fsamps),len(y)` except if histogram
+        then `shape=(len(fsamps),len(y)-1)`
     """
     parallel = kwargs.pop('parallel', False)
     cache = kwargs.pop('cache', '')
+    histogram = kwargs.pop('histogram', False)
+    pdf_histogram = kwargs.pop('pdf_histogram', False)
     tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
@@ -151,8 +223,25 @@ def compute_pmf(fsamps, y, **kwargs):
         except CacheException as e:
             print(e)
 
-    masses = parallel_apply(PMF, fsamps, postcurry=(y,), parallel=parallel,
-                            tqdm_kwargs=tqdm_kwargs)
+    # From a set of y-samples we compute the PDF(y). The we evaluate the PDF
+    # at every given y to obtain p = [PDF(yi) for yi in y]. Then we compute
+    # the PMF for each of probability-levels p to obtain integrals of the PDF
+    # over within the iso-probability contour defined by each p.
+    # Now do the whole thing for every x-slice using parallel_apply() which
+    # takes a slice of fsamps (corresponding to a given x) and applies the
+    # method above.
+    # The histogram method differs slightly as we interpret y as bin edges
+    # and evaluate everything within the bins.
+    if not histogram:
+        masses = parallel_apply(PMF, fsamps, postcurry=(y,), parallel=parallel,
+                                tqdm_kwargs=tqdm_kwargs)
+    elif not pdf_histogram:
+        masses = parallel_apply(PMF_hist, fsamps, postcurry=(y,),
+                                parallel=parallel, tqdm_kwargs=tqdm_kwargs)
+    else:
+        masses = parallel_apply(PDF_hist, fsamps, postcurry=(y,),
+                                parallel=parallel, tqdm_kwargs=tqdm_kwargs)
+
     masses = numpy.array(masses).transpose().copy()
 
     if cache:

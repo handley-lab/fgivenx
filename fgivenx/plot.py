@@ -23,17 +23,30 @@ def plot(x, y, z, ax=None, **kwargs):
         Color scheme to plot with. Recommend plotting in reverse
         (Default: :class:`matplotlib.pyplot.cm.Reds_r`)
 
+    linecolors: color string or sequence of colors, optional
+        Colors for contour lines (Default: 'k')
+
     histogram: bool, optional
-        Replaces the contour filling by a histogram.
+        Replaces the contourf (filling of contours) plot by a histogram.
         (Default: False)
+
+    pdf_histogram: bool, optional:
+        When plotting histogram, interpret z as a PDF instead of
+        a PMF (plotted as "sigmas"). Default: `False`
+
+    pdf_histogram_norm: `~matplotlib.colors.Normalize`, optional
+        Normalization for histogram color map if plotting the PDF.
+        (i.e. only effective if `histogram and pdf_histogram`). E.g. a
+        logarithmic norm can be obtained from `matplotlib.colors.LogNorm()`.
+        Default: `None`
 
     alpha: float, optional
         Transparency of filled contours. Given as alpha blending
         value between 0 (transparent) and 1 (opague).
 
     smooth: float, optional
-        Percentage by which to smooth the contours.
-        (Default: no smoothing)
+        Percentage by which to smooth the contours. Not recommended when
+        using `histogram`. (Default: no smoothing)
 
     contour_line_levels: List[float], optional
         Contour lines to be plotted.  (Default: [1,2])
@@ -66,13 +79,17 @@ def plot(x, y, z, ax=None, **kwargs):
     if ax is None:
         ax = matplotlib.pyplot.gca()
     # Get inputs
-    histogram = kwargs.pop('histogram', False)
+    colors = kwargs.pop('colors', matplotlib.pyplot.cm.Reds_r)
+    linecolors = kwargs.pop('linecolors', 'k')
 
-    default_color = matplotlib.pyplot.cm.Reds_r if not histogram \
-                                                else matplotlib.pyplot.cm.Reds
-    colors = kwargs.pop('colors', default_color)
+    histogram = kwargs.pop('histogram', False)
+    pdf_histogram = kwargs.pop('pdf_histogram', None)
+    pdf_histogram_norm = kwargs.pop('pdf_histogram_norm', None)
 
     smooth = kwargs.pop('smooth', False)
+    if smooth and histogram:
+        print("WARNING: You selected smooth and histogram,"
+              "are you sure you want to plot a smoothed histogram?")
 
     linewidths = kwargs.pop('linewidths', 0.3)
     contour_line_levels = kwargs.pop('contour_line_levels', [1, 2, 3])
@@ -92,8 +109,11 @@ def plot(x, y, z, ax=None, **kwargs):
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
-    if histogram:
-        cbar = ax.pcolormesh(x, y, z, cmap=colors, alpha=alpha, **kwargs)
+    if histogram and pdf_histogram:
+        # cmap is reversed for easy compatibility with histogram = False
+        cbar = ax.pcolormesh(x, y, z, cmap=colors.reversed(), alpha=alpha,
+                             norm=pdf_histogram_norm, **kwargs)
+
 
     # Convert to sigmas
     z = numpy.sqrt(2) * scipy.special.erfinv(1 - z)
@@ -102,6 +122,9 @@ def plot(x, y, z, ax=None, **kwargs):
     if smooth:
         sigma = smooth*numpy.array(z.shape)/100.0
         z = scipy.ndimage.gaussian_filter(z, sigma=sigma, order=0)
+
+    if histogram and not pdf_histogram:
+        cbar = ax.pcolormesh(x, y, z, cmap=colors, alpha=alpha, **kwargs)
 
     # Plot the filled contours onto the axis ax
     if not histogram:
@@ -118,8 +141,8 @@ def plot(x, y, z, ax=None, **kwargs):
             c.set_edgecolor("face")
 
     # Plot some sigma-based contour lines
-    if lines:
-        ax.contour(x, y, z, colors='k', linewidths=linewidths,
+    if lines and not histogram:
+        ax.contour(x, y, z, colors=linecolors, linewidths=linewidths,
                    levels=contour_line_levels)
 
     # Return the contours for use as a colourbar later

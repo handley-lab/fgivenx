@@ -97,6 +97,22 @@ def plot_contours(f, x, samples, ax=None, **kwargs):
     cache: str, optional
         File root for saving previous calculations for re-use
 
+    histogram: bool, optional
+        Whether to estimate and plot the probability mass function via a
+        histogram instead of a kernel density estimate. (Note: Cannot plot
+        contour lines in this case, one can use kde with alpha=0 to add kde
+        contour lines to existing histogram.) Default: `False`
+
+    pdf_histogram: bool, optional:
+        Whether to actually compute and plot the PDF with the histogram
+        instead of the PMF (as "sigmas"). Default: `False`
+
+    pdf_histogram_norm: `~matplotlib.colors.Normalize`, optional
+        Normalization for histogram color map if plotting the PDF.
+        (i.e. only effective if `histogram and pdf_histogram`). E.g. a
+        logarithmic norm can be obtained from `matplotlib.colors.LogNorm()`.
+        Default: `None`
+
     parallel, tqdm_args:
         see docstring for :func:`fgivenx.parallel.parallel_apply`
 
@@ -116,14 +132,21 @@ def plot_contours(f, x, samples, ax=None, **kwargs):
     ny = kwargs.pop('ny', 100)
     y = kwargs.pop('y', None)
     cache = kwargs.pop('cache', '')
+    histogram = kwargs.pop('histogram', False)
+    pdf_histogram = kwargs.pop('pdf_histogram', False)
+    pdf_histogram_norm = kwargs.pop('pdf_histogram_norm', None)
     parallel = kwargs.pop('parallel', False)
     tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
 
     y, pmf = compute_pmf(f, x, samples, weights=weights, logZ=logZ,
                          ntrim=ntrim, ny=ny, y=y,
                          parallel=parallel, cache=cache,
-                         tqdm_kwargs=tqdm_kwargs)
-    cbar = fgivenx.plot.plot(x, y, pmf, ax, **kwargs)
+                         tqdm_kwargs=tqdm_kwargs, histogram=histogram,
+                         pdf_histogram=pdf_histogram)
+
+    cbar = fgivenx.plot.plot(x, y, pmf, ax, histogram=histogram,
+                             pdf_histogram=pdf_histogram,
+                             pdf_histogram_norm=pdf_histogram_norm, **kwargs)
     return cbar
 
 
@@ -365,6 +388,10 @@ def compute_pmf(f, x, samples, **kwargs):
     functions, samples and optional weights it marginalises over the models
     according to the evidences.
 
+    Using a KDE, this computes PMF(yi) for yi in y. Using the histogram, it
+    computes the average PMF in [yi, yi+1] for yi in y[:-1], i.e. returns a
+    lower dimension in PMF than in y, the y array represents the bin edges.
+
     Parameters
     ----------
     f: function
@@ -405,6 +432,13 @@ def compute_pmf(f, x, samples, **kwargs):
     cache: str, optional
         File root for saving previous calculations for re-use
 
+    histogram: bool, optional:
+        Whether to estimate the probability mass function via a histogram
+        instead of a kernel density estimate. Default: `False`
+
+    pdf_histogram: bool, optional:
+        Whether to actually compute the PDF instead of PMF. Default: `False`
+
     parallel, tqdm_args:
         see docstring for :func:`fgivenx.parallel.parallel_apply`
 
@@ -415,6 +449,7 @@ def compute_pmf(f, x, samples, **kwargs):
         `y` values pmf is computed at `shape=(len(y))` or `ny`
     2D numpy.array:
         pmf values at each `x` and `y`  `shape=(len(x),len(y))`
+        except if histogram then `shape=(len(fsamps),len(y)-1)`
     """
 
     logZ = kwargs.pop('logZ', None)
@@ -424,6 +459,8 @@ def compute_pmf(f, x, samples, **kwargs):
     ntrim = kwargs.pop('ntrim', 100000)
     parallel = kwargs.pop('parallel', False)
     cache = kwargs.pop('cache', '')
+    histogram = kwargs.pop('histogram', False)
+    pdf_histogram = kwargs.pop('pdf_histogram', False)
     tqdm_kwargs = kwargs.pop('tqdm_kwargs', {})
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
@@ -445,7 +482,9 @@ def compute_pmf(f, x, samples, **kwargs):
         y = numpy.linspace(ymin, ymax, ny)
 
     return y, fgivenx.mass.compute_pmf(fsamps, y, parallel=parallel,
-                                       cache=cache, tqdm_kwargs=tqdm_kwargs)
+                                       cache=cache, histogram=histogram,
+                                       pdf_histogram=pdf_histogram,
+                                       tqdm_kwargs=tqdm_kwargs)
 
 
 def compute_dkl(f, x, samples, prior_samples, **kwargs):
