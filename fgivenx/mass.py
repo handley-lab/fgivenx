@@ -217,7 +217,11 @@ def compute_pmf(fsamps, y, **kwargs):
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
     if cache:
-        cache = Cache(cache + '_masses')
+        # Histogram masses are different (in values and shape)
+        if not histogram:
+            cache = Cache(cache + '_masses')
+        else:
+            cache = Cache(cache + '_histogram_masses')
         try:
             return cache.check(fsamps, y)
         except CacheException as e:

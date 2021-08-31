@@ -138,7 +138,6 @@ def test_plotting():
         ax_lines.get_shared_x_axes().join(ax_lines, ax_fgivenx, ax_samples)
         fig.set_size_inches(6, 6)
 
-
 def test_histogram():
     # Model definitions
     # =================
@@ -150,7 +149,7 @@ def test_histogram():
     numpy.random.seed(1)
 
     # Posterior samples
-    nsamples = 1000
+    nsamples = 100000
     ms = numpy.random.normal(loc=-5, scale=1, size=nsamples)
     cs = numpy.random.normal(loc=2, scale=1, size=nsamples)
     samples = numpy.array([(m, c) for m, c in zip(ms, cs)]).copy()
@@ -163,30 +162,29 @@ def test_histogram():
     # Examine the function over a range of x's
     xmin, xmax = -2, 2
     nx = 100
+    ny = 96
     x = numpy.linspace(xmin, xmax, nx)
 
     # Set the cache
-    cache = 'cache/test'
-    prior_cache = cache + '_prior'
+    for cache in [None, 'cache/test']:
+        # Plotting
+        # ========
+        fig, axes = plt.subplots()
+        ax_fgivenx = axes
+        ax_fgivenx.set_ylabel(r'$P(y|x)$')
+        ax_fgivenx.set_xlabel(r'$x$')
+        cbar = plot_contours(f, x, samples, ax_fgivenx, cache=cache,
+                             histogram=True, ny=10*ny)
+        plot_contours(f, x, samples[::1000], ax_fgivenx, cache=cache, alpha=0,
+                      linewidths=2, ny=ny)
+        fig.colorbar(cbar, label=r"$\sigma$")
 
-    # Plotting
-    # ========
-    fig, axes = plt.subplots()
-    ax_fgivenx = axes
-    ax_fgivenx.set_ylabel(r'$P(y|x)$')
-    ax_fgivenx.set_xlabel(r'$x$')
-    cbar = plot_contours(f, x, samples, ax_fgivenx, cache=cache,
-                         histogram=True)
-    plot_contours(f, x, samples, ax_fgivenx, cache=cache, alpha=0,
-                  linewidths=2)
-    fig.colorbar(cbar, label=r"$\sigma$")
-
-    fig, axes = plt.subplots()
-    ax_fgivenx = axes
-    ax_fgivenx.set_ylabel(r'$P(y|x)$')
-    ax_fgivenx.set_xlabel(r'$x$')
-    cbar = plot_contours(f, x, samples, ax_fgivenx, cache=cache,
-                         pdf_histogram=True, histogram=True)
-    plot_contours(f, x, samples, ax_fgivenx, cache=cache, alpha=0,
-                  linewidths=2)
-    fig.colorbar(cbar, label=r"PDF")
+        fig, axes = plt.subplots()
+        ax_fgivenx = axes
+        ax_fgivenx.set_ylabel(r'$P(y|x)$')
+        ax_fgivenx.set_xlabel(r'$x$')
+        cbar = plot_contours(f, x, samples, ax_fgivenx, cache=cache,
+                             pdf_histogram=True, histogram=True, ny=10*ny)
+        plot_contours(f, x, samples[::1000], ax_fgivenx, cache=cache, alpha=0,
+                      linewidths=2, ny=ny)
+        fig.colorbar(cbar, label=r"PDF")

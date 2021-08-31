@@ -3,6 +3,42 @@ import scipy.ndimage
 import numpy
 import matplotlib.pyplot
 
+def make_edges(x, keep_limits=True):
+    r"""
+    Convert a series of points to a set of bin edges with the points
+    contained within the bins.
+
+    Turn the List
+    X__X____X__X____X____X____X__X____X
+    into the edges
+    |_|___|___|___|____|____|___|___|__|
+
+    Parameters
+    ----------
+    x: numpy array
+        List of points
+
+    keep_limits: bool, optional
+        Whether to make sure the edges are within [min(x), max(x)].
+        If True the first and last bin are smaller to stay within these
+        boundaries, if False they will stretch beyond the limits.
+        Default: True
+
+    Returns
+    -------
+    edges: numpy array
+        bin edges with length `len(x)+1`
+    """
+    diff = numpy.diff(x)
+    edges = x[:-1]+diff/2
+    if keep_limits:
+        edges = numpy.append(edges, x[-1])
+        edges = numpy.insert(edges, 0, x[0])
+    else:
+        edges = numpy.append(edges, x[-1]+diff[-1]/2)
+        edges = numpy.insert(edges, 0, x[0]-diff[0]/2)
+    return edges
+
 
 def plot(x, y, z, ax=None, **kwargs):
     r"""
@@ -11,7 +47,8 @@ def plot(x, y, z, ax=None, **kwargs):
     Parameters
     ----------
     x, y, z : numpy arrays
-        Same as arguments to :func:`matplotlib.pyplot.contour`
+        Same as arguments to :func:`matplotlib.pyplot.contour`, or for
+        histogram to :func:`matplotlib.pyplot.pcolormesh`
 
     ax: axes object, optional
         :class:`matplotlib.axes._subplots.AxesSubplot` to plot the contours
@@ -111,7 +148,7 @@ def plot(x, y, z, ax=None, **kwargs):
 
     if histogram and pdf_histogram:
         # cmap is reversed for easy compatibility with histogram = False
-        cbar = ax.pcolormesh(x, y, z, cmap=colors.reversed(), alpha=alpha,
+        cbar = ax.pcolormesh(make_edges(x), y, z, cmap=colors.reversed(), alpha=alpha,
                              norm=pdf_histogram_norm, **kwargs)
 
 
@@ -124,7 +161,7 @@ def plot(x, y, z, ax=None, **kwargs):
         z = scipy.ndimage.gaussian_filter(z, sigma=sigma, order=0)
 
     if histogram and not pdf_histogram:
-        cbar = ax.pcolormesh(x, y, z, cmap=colors, alpha=alpha, **kwargs)
+        cbar = ax.pcolormesh(make_edges(x), y, z, cmap=colors, alpha=alpha, **kwargs)
 
     # Plot the filled contours onto the axis ax
     if not histogram:
