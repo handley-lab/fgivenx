@@ -161,9 +161,19 @@ def test_histogram():
 
     # Examine the function over a range of x's
     xmin, xmax = -2, 2
-    nx = 100
-    ny = 96
+    nx = 1000
+    nx_kde = 100
+    ny = 200
+    ny_kde = 100
     x = numpy.linspace(xmin, xmax, nx)
+    x_kde = numpy.linspace(xmin, xmax, nx_kde)
+    samples_kde = samples[::10]
+
+    # Demonstrate nice cmap
+    from matplotlib.colors import ListedColormap, LinearSegmentedColormap
+    level_cmap = LinearSegmentedColormap.from_list('level_cmap',
+                                                   ["red", "orange", "white"],
+                                                   N=5)
 
     # Set the cache
     for cache in [None, 'cache/test']:
@@ -174,9 +184,11 @@ def test_histogram():
         ax_fgivenx.set_ylabel(r'$P(y|x)$')
         ax_fgivenx.set_xlabel(r'$x$')
         cbar = plot_contours(f, x, samples, ax_fgivenx, cache=cache,
-                             histogram=True, ny=10*ny)
-        plot_contours(f, x, samples[::1000], ax_fgivenx, cache=cache, alpha=0,
-                      linewidths=2, ny=ny)
+                             histogram=True, ny=ny, colors=level_cmap,
+                             fineness=1, contour_line_levels=[1,2,3,4,5])
+        plot_contours(f, x_kde, samples_kde, ax_fgivenx, cache=cache,
+                      alpha=0, linewidths=1, ny=ny_kde,
+                      contour_line_levels=[1,2,3,4,5])
         fig.colorbar(cbar, label=r"$\sigma$")
 
         fig, axes = plt.subplots()
@@ -184,7 +196,8 @@ def test_histogram():
         ax_fgivenx.set_ylabel(r'$P(y|x)$')
         ax_fgivenx.set_xlabel(r'$x$')
         cbar = plot_contours(f, x, samples, ax_fgivenx, cache=cache,
-                             pdf_histogram=True, histogram=True, ny=10*ny)
-        plot_contours(f, x, samples[::1000], ax_fgivenx, cache=cache, alpha=0,
-                      linewidths=2, ny=ny)
+                             histogram=True, ny=ny, pdf_histogram=True)
+        plot_contours(f, x_kde, samples_kde, ax_fgivenx, cache=cache,
+                      alpha=0, linewidths=1, ny=ny_kde,
+                      contour_line_levels=[1,2,3,4,5])
         fig.colorbar(cbar, label=r"PDF")

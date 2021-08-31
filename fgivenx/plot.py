@@ -149,7 +149,7 @@ def plot(x, y, z, ax=None, **kwargs):
     if histogram and pdf_histogram:
         # cmap is reversed for easy compatibility with histogram = False
         cbar = ax.pcolormesh(make_edges(x), y, z, cmap=colors.reversed(), alpha=alpha,
-                             norm=pdf_histogram_norm, **kwargs)
+                             norm=pdf_histogram_norm)
 
 
     # Convert to sigmas
@@ -161,7 +161,7 @@ def plot(x, y, z, ax=None, **kwargs):
         z = scipy.ndimage.gaussian_filter(z, sigma=sigma, order=0)
 
     if histogram and not pdf_histogram:
-        cbar = ax.pcolormesh(make_edges(x), y, z, cmap=colors, alpha=alpha, **kwargs)
+        cbar = ax.pcolormesh(make_edges(x), y, z, cmap=colors, alpha=alpha, vmin=numpy.min(contour_color_levels), vmax=numpy.max(contour_color_levels))
 
     # Plot the filled contours onto the axis ax
     if not histogram:
