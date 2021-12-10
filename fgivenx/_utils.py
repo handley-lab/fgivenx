@@ -18,12 +18,12 @@ def _check_args(logZ, f, x, samples, weights):
 
     # logZ
     logZ = numpy.array(logZ, dtype='double')
-    if len(logZ.shape) is not 1:
+    if len(logZ.shape) != 1:
         raise ValueError("logZ should be a 1D array")
 
     # x
     x = numpy.array(x, dtype='double')
-    if len(x.shape) is not 1:
+    if len(x.shape) != 1:
         raise ValueError("x should be a 1D array")
 
     # f
@@ -41,7 +41,7 @@ def _check_args(logZ, f, x, samples, weights):
                          % (len(logZ), len(samples)))
     samples = [numpy.array(s, dtype='double') for s in samples]
     for s in samples:
-        if len(s.shape) is not 2:
+        if len(s.shape) != 2:
             raise ValueError("each set of samples should be a 2D array")
 
     # weights
@@ -53,7 +53,7 @@ def _check_args(logZ, f, x, samples, weights):
                for w, s in zip(weights, samples)]
 
     for w, s in zip(weights, samples):
-        if len(w.shape) is not 1:
+        if len(w.shape) != 1:
             raise ValueError("each set of weights should be a 1D array")
         if len(w) != len(s):
             raise ValueError("len(w) = %i != len(s) = %i" % (len(s), len(w)))

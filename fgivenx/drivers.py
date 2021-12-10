@@ -431,7 +431,7 @@ def compute_pmf(f, x, samples, **kwargs):
     # y
     if y is not None:
         y = numpy.array(y, dtype='double')
-        if len(y.shape) is not 1:
+        if len(y.shape) != 1:
             raise ValueError("y should be a 1D array")
 
     fsamps = compute_samples(f, x, samples, logZ=logZ,
