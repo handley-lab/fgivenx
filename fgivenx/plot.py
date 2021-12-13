@@ -38,11 +38,11 @@ def plot(x, y, z, ax=None, **kwargs):
         Thickness of contour lines.  (Default: 0.3)
 
     contour_color_levels: List[float], optional
-        Contour color levels.
-        (Default: `numpy.arange(0, contour_line_levels[-1] + 1, fineness)`)
+        Contour color levels. (Default:
+        `numpy.arange(0, contour_line_levels[-1] + fineness / 2, fineness)`)
 
     fineness: float, optional
-        Spacing of contour color levels.  (Default: 0.1)
+        Spacing of contour color levels.  (Default: 0.5)
 
     lines: bool, optional
         (Default: True)
@@ -69,7 +69,8 @@ def plot(x, y, z, ax=None, **kwargs):
     contour_line_levels = kwargs.pop('contour_line_levels', [1, 2, 3])
 
     fineness = kwargs.pop('fineness', 0.5)
-    default_color_levels = numpy.arange(0, contour_line_levels[-1] + 1,
+    default_color_levels = numpy.arange(0,
+                                        contour_line_levels[-1] + fineness / 2,
                                         fineness)
     contour_color_levels = kwargs.pop('contour_color_levels',
                                       default_color_levels)

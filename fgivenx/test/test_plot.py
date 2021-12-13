@@ -31,6 +31,14 @@ def test_plot_transparent():
     cbar = plot(x, y, z, ax, alpha=0.7)
     assert type(cbar) is matplotlib.contour.QuadContourSet
 
+def test_plot_fineness():
+    x, y, z = gen_plot_data()
+
+    fig, ax = plt.subplots()
+    cbar = plot(x, y, z, ax, fineness=0.1, contour_line_levels=[1,2,3,4])
+    assert type(cbar) is matplotlib.contour.QuadContourSet
+    assert len(cbar.levels) == 41
+
 
 def test_plot_wrong_argument():
     x, y, z = gen_plot_data()
