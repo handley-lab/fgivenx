@@ -28,7 +28,7 @@ def _check_args(logZ, f, x, samples, weights):
 
     # f
     if len(logZ) != len(f):
-        raise ValueError("len(logZ) = %i != len(f)= %i"
+        raise ValueError("len(logZ) = %i != len(f) = %i"
                          % (len(logZ), len(f)))
     for func in f:
         if not callable(func):
@@ -37,7 +37,7 @@ def _check_args(logZ, f, x, samples, weights):
 
     # samples
     if len(logZ) != len(samples):
-        raise ValueError("len(logZ) = %i != len(samples)= %i"
+        raise ValueError("len(logZ) = %i != len(samples) = %i"
                          % (len(logZ), len(samples)))
     samples = [numpy.array(s, dtype='double') for s in samples]
     for s in samples:
@@ -46,7 +46,7 @@ def _check_args(logZ, f, x, samples, weights):
 
     # weights
     if len(logZ) != len(weights):
-        raise ValueError("len(logZ) = %i != len(weights)= %i"
+        raise ValueError("len(logZ) = %i != len(weights) = %i"
                          % (len(logZ), len(weights)))
     weights = [numpy.array(w, dtype='double') if w is not None
                else numpy.ones(len(s), dtype='double')

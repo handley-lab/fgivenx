@@ -79,7 +79,7 @@ def plot_contours(f, x, samples, ax=None, **kwargs):
     weights: 1D array-like, optional
         sample weights (or list of weights), if desired. Should have length
         same as `samples.shape[0]`.
-        Default: `numpy.ones_like(samples)`
+        Default: `numpy.ones(samples.shape[0])`
 
     ny: int, optional
         Resolution of `y` axis.
@@ -162,7 +162,7 @@ def plot_lines(f, x, samples, ax=None, **kwargs):
     weights: 1D array-like, optional
         sample weights (or list of weights), if desired. Should have length
         same as `samples.shape[0]`.
-        Default: `numpy.ones_like(samples)`
+        Default: `numpy.ones(samples.shape[0])`
 
     ntrim: int, optional
         Approximate number of samples to trim down to, if desired. Useful if
@@ -241,7 +241,7 @@ def plot_dkl(f, x, samples, prior_samples, ax=None, **kwargs):
     weights, prior_weights: 1D array-like, optional
         sample weights (or list of weights), if desired. Should have length
         same as `samples.shape[0]`.
-        Default: `numpy.ones_like(samples)`
+        Default: `numpy.ones(samples.shape[0])`
 
     ntrim: int, optional
         Approximate number of samples to trim down to, if desired. Useful if
@@ -311,7 +311,7 @@ def compute_samples(f, x, samples, **kwargs):
     weights: 1D array-like, optional
         sample weights (or list of weights), if desired. Should have length
         same as `samples.shape[0]`.
-        Default: `numpy.ones_like(samples)`
+        Default: `numpy.ones(samples.shape[0])`
 
     ntrim: int, optional
         Approximate number of samples to trim down to, if desired. Useful if
@@ -387,7 +387,7 @@ def compute_pmf(f, x, samples, **kwargs):
     weights: 1D array-like, optional
         sample weights (or list of weights), if desired. Should have length
         same as `samples.shape[0]`.
-        Default: `numpy.ones_like(samples)`
+        Default: `numpy.ones(samples.shape[0])`
 
     ny: int, optional
         Resolution of y axis.
@@ -475,7 +475,7 @@ def compute_dkl(f, x, samples, prior_samples, **kwargs):
     weights, prior_weights: 1D array-like, optional
         sample weights (or list of weights), if desired. Should have length
         same as `samples.shape[0]`.
-        Default: `numpy.ones_like(samples)`
+        Default: `numpy.ones(samples.shape[0])`
 
     ntrim: int, optional
         Approximate number of samples to trim down to, if desired. Useful if
