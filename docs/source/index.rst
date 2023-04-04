@@ -5,6 +5,6 @@
    :caption: Contents
 
    Introduction <intro>
-   API <fgivenx>
+   API <modules>
 
 .. include:: ../../README.rst
