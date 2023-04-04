@@ -3,15 +3,15 @@ fgivenx: Functional Posterior Plotter
 =====================================
 :fgivenx:  Functional Posterior Plotter 
 :Author: Will Handley
-:Version: 2.4.1
-:Homepage: https://github.com/williamjameshandley/fgivenx
+:Version: 2.4.2
+:Homepage: https://github.com/handley-lab/fgivenx
 :Documentation: http://fgivenx.readthedocs.io/
 
-.. image:: https://github.com/williamjameshandley/fgivenx/workflows/CI/badge.svg?branch=master
-   :target: https://github.com/williamjameshandley/fgivenx/actions?query=workflow%3ACI+branch%3Amaster
+.. image:: https://github.com/handley-lab/fgivenx/workflows/CI/badge.svg?branch=master
+   :target: https://github.com/handley-lab/fgivenx/actions?query=workflow%3ACI+branch%3Amaster
    :alt: Build Status
-.. image:: https://codecov.io/gh/williamjameshandley/fgivenx/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/williamjameshandley/fgivenx
+.. image:: https://codecov.io/gh/handley-lab/fgivenx/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/handley-lab/fgivenx
    :alt: Test Coverage Status
 .. image:: https://badge.fury.io/py/fgivenx.svg
    :target: https://badge.fury.io/py/fgivenx
@@ -62,7 +62,7 @@ from source:
 
 .. code:: bash
 
-   git clone https://github.com/williamjameshandley/fgivenx
+   git clone https://github.com/handley-lab/fgivenx
    cd fgivenx
    python setup.py install --user
 
@@ -80,7 +80,7 @@ encounter warnings if the optional dependency ``joblib`` is not installed):
    pytest <fgivenx-install-location>
 
    # or, equivalently
-   git clone https://github.com/williamjameshandley/fgivenx
+   git clone https://github.com/handley-lab/fgivenx
    cd fgivenx
    python setup.py test
 
@@ -292,7 +292,7 @@ Contributing
 ============
 Want to contribute to ``fgivenx``? Awesome!
 There are many ways you can contribute via the 
-[GitHub repository](https://github.com/williamjameshandley/fgivenx), 
+[GitHub repository](https://github.com/handley-lab/fgivenx), 
 see below.
 
 Opening issues
@@ -305,8 +305,8 @@ Pull requests are very welcome. Note that if you are going to propose drastic
 changes, be sure to open an issue for discussion first, to make sure that your
 PR will be accepted before you spend effort coding it.
 
-.. |image0| image:: https://raw.githubusercontent.com/williamjameshandley/fgivenx/master/plot.png
-.. |image1| image:: https://raw.githubusercontent.com/williamjameshandley/fgivenx/master/planck.png 
+.. |image0| image:: https://raw.githubusercontent.com/handley-lab/fgivenx/master/plot.png
+.. |image1| image:: https://raw.githubusercontent.com/handley-lab/fgivenx/master/planck.png 
 
 Changelog
 =========
