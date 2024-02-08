@@ -53,6 +53,15 @@ def plot(x, y, z, ax=None, **kwargs):
         easier when you have dense contours.
         (Default: False)
 
+    zorder: float, optional
+        z-order of plotted components. (Default: matplotlib default)
+
+    filled_zorder: float, optional
+        z-order of filled contours. Overrides zorder. (Default: matplotlib default)
+
+    lines_zorder: float, optional
+        z-order of contour lines. Overrides zorder. (Default: matplotlib default)
+
     Returns
     -------
     cbar: color bar
@@ -81,6 +90,9 @@ def plot(x, y, z, ax=None, **kwargs):
 
     lines = kwargs.pop('lines', True)
 
+    filled_zorder = kwargs.pop('filled_zorder', kwargs.pop('zorder', None))
+    lines_zorder = kwargs.pop('lines_zorder', kwargs.pop('zorder', None))
+
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
@@ -94,7 +106,7 @@ def plot(x, y, z, ax=None, **kwargs):
 
     # Plot the filled contours onto the axis ax
     cbar = ax.contourf(x, y, z, cmap=colors, levels=contour_color_levels,
-                       alpha=alpha)
+                       alpha=alpha, zorder=filled_zorder)
 
     # Rasterize contours (the rest of the figure stays in vector format)
     if rasterize_contours:
@@ -108,7 +120,7 @@ def plot(x, y, z, ax=None, **kwargs):
     # Plot some sigma-based contour lines
     if lines:
         ax.contour(x, y, z, colors='k', linewidths=linewidths,
-                   levels=contour_line_levels)
+                   levels=contour_line_levels, zorder=lines_zorder)
 
     # Return the contours for use as a colourbar later
     return cbar
