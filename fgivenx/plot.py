@@ -90,7 +90,7 @@ def plot(x, y, z, ax=None, **kwargs):
 
     lines = kwargs.pop('lines', True)
 
-    filled_zorder = kwargs.pop('filled_zorder', kwargs.pop('zorder', None))
+    filled_zorder = kwargs.pop('filled_zorder', kwargs.get('zorder', None))
     lines_zorder = kwargs.pop('lines_zorder', kwargs.pop('zorder', None))
 
     if kwargs:
