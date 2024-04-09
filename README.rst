@@ -29,7 +29,6 @@ fgivenx: Functional Posterior Plotter
    :target: https://arxiv.org/abs/1908.01711
    :alt: Open-access paper
 
-
 Description
 ===========
 
