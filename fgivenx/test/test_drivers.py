@@ -134,5 +134,7 @@ def test_plotting():
         plot_dkl(f, x, samples, prior_samples, ax_dkl,
                  cache=cache, prior_cache=prior_cache)
 
-        ax_lines.get_shared_x_axes().join(ax_lines, ax_fgivenx, ax_samples)
+        # ax_lines.get_shared_x_axes().join(ax_lines, ax_fgivenx, ax_samples)
+        ax_lines.sharey(ax_fgivenx)
+        ax_fgivenx.sharey(ax_samples)
         fig.set_size_inches(6, 6)
