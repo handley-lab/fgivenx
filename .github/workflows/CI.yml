@@ -20,10 +20,10 @@ jobs:
         requirements: [minimal_requirements.txt, requirements.txt]
         include:
           - os: macos-latest
-            python-version: '3.10'
+            python-version: '3.13'
             requirements: requirements.txt
           - os: windows-latest
-            python-version: '3.10'
+            python-version: '3.13'
             requirements: requirements.txt
 
     steps:
