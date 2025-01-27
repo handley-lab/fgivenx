@@ -102,8 +102,7 @@ def plot(x, y, z, ax=None, **kwargs):
             c.set_rasterized(True)
 
     # Remove those annoying white lines
-    for c in cbar.collections:
-        c.set_edgecolor("face")
+    cbar.set_edgecolor("face")
 
     # Plot some sigma-based contour lines
     if lines:
