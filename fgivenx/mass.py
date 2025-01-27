@@ -14,7 +14,7 @@ def PMF(samples, y):
 
         From :math:`P(y)` we define:
 
-        :math:`\mathrm{pmf}(p) = \int_{P(y)<p} P(y) dy`
+        :math:`\\mathrm{pmf}(p) = \\int_{P(y)<p} P(y) dy`
 
         This is the cumulative distribution function expressed as a
         function of the probability
