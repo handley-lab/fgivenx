@@ -98,8 +98,7 @@ def plot(x, y, z, ax=None, **kwargs):
 
     # Rasterize contours (the rest of the figure stays in vector format)
     if rasterize_contours:
-        for c in cbar.collections:
-            c.set_rasterized(True)
+        cbar.set_rasterized(True)
 
     # Remove those annoying white lines
     cbar.set_edgecolor("face")
