@@ -98,12 +98,12 @@ def PMF(samples, y):
                 starts = numpy.where(numpy.logical_and(bools[:-1], ~bools[1:]))
 
                 # Compute locations
-                starts = [scipy.optimize.brentq(lambda u: (kernel(u)-p)[0],
-                                                y_[i], y_[i+1])
+                starts = [scipy.optimize.brentq(
+                    lambda u: (kernel(u)-p).squeeze(), y_[i], y_[i+1])
                           for i in starts[0]]
                 starts = [-numpy.inf] + starts
-                stops = [scipy.optimize.brentq(lambda u: (kernel(u)-p)[0],
-                                               y_[i], y_[i+1])
+                stops = [scipy.optimize.brentq(
+                    lambda u: (kernel(u)-p).squeeze(), y_[i], y_[i+1])
                          for i in stops[0]]
                 stops = stops + [numpy.inf]
 
