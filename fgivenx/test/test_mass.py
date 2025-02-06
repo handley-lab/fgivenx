@@ -42,7 +42,7 @@ def test_PMF():
     assert_allclose(m, m_, atol=3*N**-0.5)
 
     # Compute PMF via quadrature
-    m_ = [scipy.integrate.quad(lambda x: kernel(x)*(kernel(x) <= kernel(y_i)),
+    m_ = [scipy.integrate.quad(lambda x: (kernel(x)*(kernel(x) <= kernel(y_i)))[0],
                                -numpy.inf, numpy.inf, limit=500)[0]
           for y_i in y]
     assert_allclose(m, m_, atol=1e-4)
