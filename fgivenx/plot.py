@@ -148,7 +148,7 @@ def plot_lines(x, fsamps, ax=None, downsample=100, **kwargs):
     if ax is None:
         ax = matplotlib.pyplot.gca()
     if downsample < len(fsamps.T):
-        indices = numpy.random.choice(len(fsamps.T), downsample, replace=False)
+        indices = numpy.random.choice(len(fsamps.T), downsample, replace=True)
     else:
         indices = numpy.arange(len(fsamps.T))
     color = kwargs.pop('color', 'k')
