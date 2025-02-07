@@ -3,7 +3,7 @@ fgivenx: Functional Posterior Plotter
 =====================================
 :fgivenx:  Functional Posterior Plotter 
 :Author: Will Handley
-:Version: 2.4.2
+:Version: 2.5.0
 :Homepage: https://github.com/handley-lab/fgivenx
 :Documentation: http://fgivenx.readthedocs.io/
 
@@ -251,7 +251,9 @@ Plot user-generated samples
     plot_dkl(f, x, samples, prior_samples, ax_dkl,
              cache=cache, prior_cache=prior_cache)
 
-    ax_lines.get_shared_x_axes().join(ax_lines, ax_fgivenx, ax_samples)
+
+    ax_lines.sharey(ax_fgivenx)
+    ax_fgivenx.sharey(ax_samples)
 
     fig.tight_layout()
     fig.savefig('plot.png')
