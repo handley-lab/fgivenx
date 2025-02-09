@@ -90,18 +90,21 @@ def gen_line_data():
     return x, fsamps
 
 
+@image_comparison(baseline_images=['plot_lines'], extensions=['pdf'])
 def test_plot_lines():
     x, fsamps = gen_line_data()
     fig, ax = plt.subplots()
     plot_lines(x, fsamps, ax)
 
 
+@image_comparison(baseline_images=['plot_lines'], extensions=['pdf'])
 def test_plot_lines_no_ax():
     x, fsamps = gen_line_data()
     plt.subplots()
     plot_lines(x, fsamps)
 
 
+@image_comparison(baseline_images=['plot_lines_downsample'], extensions=['pdf'])
 def test_plot_lines_downsample():
     x, fsamps = gen_line_data()
     plt.subplots()
