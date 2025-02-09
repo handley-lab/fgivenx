@@ -3,6 +3,7 @@ import pytest
 from fgivenx.plot import plot, plot_lines
 import matplotlib.pyplot as plt
 import matplotlib
+from matplotlib.testing.decorators import image_comparison
 
 
 def gen_plot_data():
@@ -16,6 +17,7 @@ def gen_plot_data():
     return x, y, z
 
 
+@image_comparison(baseline_images=['plot'], extensions=['pdf'])
 def test_plot():
     x, y, z = gen_plot_data()
 
@@ -24,6 +26,7 @@ def test_plot():
     assert type(cbar) is matplotlib.contour.QuadContourSet
 
 
+@image_comparison(baseline_images=['plot_transparent'], extensions=['pdf'])
 def test_plot_transparent():
     x, y, z = gen_plot_data()
 
@@ -31,6 +34,8 @@ def test_plot_transparent():
     cbar = plot(x, y, z, ax, alpha=0.7)
     assert type(cbar) is matplotlib.contour.QuadContourSet
 
+
+@image_comparison(baseline_images=['plot_transparent'], extensions=['pdf'])
 def test_plot_fineness():
     x, y, z = gen_plot_data()
 
@@ -46,24 +51,28 @@ def test_plot_wrong_argument():
         plot(x, y, z, wrong_argument=None)
 
 
+@image_comparison(baseline_images=['plot'], extensions=['pdf'])
 def test_plot_no_ax():
     plt.subplots()
     x, y, z = gen_plot_data()
     plot(x, y, z)
 
 
+@image_comparison(baseline_images=['plot_smooth'], extensions=['pdf'])
 def test_plot_smooth():
     plt.subplots()
     x, y, z = gen_plot_data()
     plot(x, y, z, smooth=1)
 
 
+@image_comparison(baseline_images=['plot_rasterize'], extensions=['pdf'])
 def test_plot_rasterize():
     plt.subplots()
     x, y, z = gen_plot_data()
     plot(x, y, z, rasterize_contours=True)
 
 
+@image_comparison(baseline_images=['plot_nolines'], extensions=['pdf'])
 def test_plot_nolines():
     plt.subplots()
     x, y, z = gen_plot_data()
