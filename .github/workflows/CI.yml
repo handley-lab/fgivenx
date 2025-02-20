@@ -27,7 +27,7 @@ jobs:
             requirements: requirements.txt
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
@@ -40,7 +40,7 @@ jobs:
         python -m pip install -r ${{ matrix.requirements }} 
 
     - name: Test with pytest
-      run: python -m pytest --cov=fgivenx
+      run: python -m pytest --cov=fgivenx -sv
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
