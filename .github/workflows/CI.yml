@@ -27,7 +27,7 @@ jobs:
             requirements: requirements.txt
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
@@ -39,11 +39,26 @@ jobs:
         python -m pip install pytest pytest-cov pytest-xdist
         python -m pip install -r ${{ matrix.requirements }} 
 
+    - name: Install ghostscript on Ubuntu
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ghostscript
+
+    - name: Install ghostscript on macOS
+      if: ${{ matrix.os == 'macos-latest' }}
+      run: brew install ghostscript
+
+    - name: Install ghostscript on Windows
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: choco install ghostscript -y
+      shell: powershell
+
     - name: Test with pytest
-      run: python -m pytest --cov=fgivenx
+      run: python -m pytest --cov=fgivenx -s -vv
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
