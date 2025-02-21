@@ -40,19 +40,19 @@ jobs:
         python -m pip install -r ${{ matrix.requirements }} 
 
     - name: Install ghostscript on Ubuntu
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ghostscript
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ghostscript
 
-      - name: Install ghostscript on macOS
-        if: ${{ matrix.os == 'macos-latest' }}
-        run: brew install ghostscript
+    - name: Install ghostscript on macOS
+      if: ${{ matrix.os == 'macos-latest' }}
+      run: brew install ghostscript
 
-      - name: Install ghostscript on Windows
-        if: ${{ matrix.os == 'windows-latest' }}
-        run: choco install ghostscript -y
-        shell: powershell
+    - name: Install ghostscript on Windows
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: choco install ghostscript -y
+      shell: powershell
 
     - name: Test with pytest
       run: python -m pytest --cov=fgivenx -s -vv
