@@ -40,7 +40,7 @@ jobs:
         python -m pip install -r ${{ matrix.requirements }} 
 
     - name: Test with pytest
-      run: python -m pytest --cov=fgivenx -sv
+      run: python -m pytest --cov=fgivenx -s -vv
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
