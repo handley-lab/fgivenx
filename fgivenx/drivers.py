@@ -191,6 +191,7 @@ def plot_lines(f, x, samples, ax=None, **kwargs):
                              parallel=parallel, cache=cache,
                              tqdm_kwargs=tqdm_kwargs)
     fgivenx.plot.plot_lines(x, fsamps, ax, **kwargs)
+    return fsamps
 
 
 def plot_dkl(f, x, samples, prior_samples, ax=None, **kwargs):
@@ -278,6 +279,7 @@ def plot_dkl(f, x, samples, prior_samples, ax=None, **kwargs):
     if ax is None:
         ax = plt.gca()
     ax.plot(x, dkls, **kwargs)
+    return dkls
 
 
 def compute_samples(f, x, samples, **kwargs):
