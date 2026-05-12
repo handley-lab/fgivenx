@@ -290,8 +290,8 @@ Plot GetDist chains
 Contributing
 ============
 Want to contribute to ``fgivenx``? Awesome!
-There are many ways you can contribute via the 
-[GitHub repository](https://github.com/handley-lab/fgivenx), 
+There are many ways you can contribute via the
+`GitHub repository <https://github.com/handley-lab/fgivenx>`__,
 see below.
 
 Opening issues
