@@ -17,14 +17,14 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
-        requirements: [minimal_requirements.txt, requirements.txt]
+        install: ['.', '.[parallel,progress_bar,getdist_chains]']
         include:
           - os: macos-latest
             python-version: '3.13'
-            requirements: requirements.txt
+            install: '.[parallel,progress_bar,getdist_chains]'
           - os: windows-latest
             python-version: '3.13'
-            requirements: requirements.txt
+            install: '.[parallel,progress_bar,getdist_chains]'
 
     steps:
     - uses: actions/checkout@v3
@@ -37,7 +37,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install pytest pytest-cov pytest-xdist
-        python -m pip install -r ${{ matrix.requirements }} 
+        python -m pip install "${{ matrix.install }}"
 
     - name: Test with pytest
       run: python -m pytest --cov=fgivenx
