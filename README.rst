@@ -64,7 +64,7 @@ from source:
 
    git clone https://github.com/handley-lab/fgivenx
    cd fgivenx
-   python setup.py install --user
+   pip install .
 
 or for those on `Arch linux <https://www.archlinux.org/>`__ it is
 available on the
