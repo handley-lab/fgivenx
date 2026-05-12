@@ -36,6 +36,8 @@ parallel = ["joblib"]
 progress_bar = ["tqdm"]
 getdist_chains = ["getdist"]
 test = ["pytest", "pytest-mpl"]
+dev = ["fgivenx[docs]", "fgivenx[parallel]", "fgivenx[progress_bar]",
+       "fgivenx[getdist_chains]", "fgivenx[test]"]
 
 [project.urls]
 Homepage = "https://github.com/handley-lab/fgivenx"

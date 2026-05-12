@@ -91,6 +91,13 @@ compatibility (``getdist``), install the relevant optional dependencies:
 
    pip install .[parallel,progress_bar,getdist_chains]
 
+To install everything (all optional extras plus docs and test dependencies),
+use the ``dev`` extra:
+
+.. code:: bash
+
+   pip install .[dev]
+
 You may encounter warnings if you don't have the optional dependency ``joblib``
 installed.
 
