@@ -35,7 +35,7 @@ def test_plot_transparent():
     assert type(cbar) is matplotlib.contour.QuadContourSet
 
 
-@image_comparison(baseline_images=['plot_transparent'], extensions=['pdf'])
+@image_comparison(baseline_images=['plot_fineness'], extensions=['pdf'])
 def test_plot_fineness():
     x, y, z = gen_plot_data()
 
