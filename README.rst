@@ -77,7 +77,7 @@ encounter warnings if the optional dependency ``joblib`` is not installed):
 
    pip install .[test]
    export MPLBACKEND=Agg
-   pytest <fgivenx-install-location>
+   pytest
 
 Check the dependencies listed in the next section are installed. You can then use the
 ``fgivenx`` module from your scripts.
