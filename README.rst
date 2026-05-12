@@ -252,6 +252,8 @@ Plot user-generated samples
              cache=cache, prior_cache=prior_cache)
 
 
+    ax_lines.sharex(ax_fgivenx)
+    ax_dkl.sharex(ax_fgivenx)
     ax_lines.sharey(ax_fgivenx)
     ax_fgivenx.sharey(ax_samples)
 

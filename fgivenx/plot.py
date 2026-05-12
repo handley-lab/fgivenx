@@ -32,7 +32,7 @@ def plot(x, y, z, ax=None, **kwargs):
         (Default: no smoothing)
 
     contour_line_levels: List[float], optional
-        Contour lines to be plotted.  (Default: [1,2])
+        Contour lines to be plotted.  (Default: [1,2,3])
 
     linewidths: float, optional
         Thickness of contour lines.  (Default: 0.3)
