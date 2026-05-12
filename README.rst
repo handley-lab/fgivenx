@@ -84,14 +84,12 @@ Check the dependencies listed in the next section are installed. You can then us
 
 Some users of OSX or `Anaconda <https://en.wikipedia.org/wiki/Anaconda_(Python_distribution)>`__ may find ``QueueManagerThread`` errors if `Pillow <https://pypi.org/project/Pillow/>`__ is not installed (run ``pip install pillow``).
 
-If you want to use parallelisation, have progress bars or getdist compatibility
-you should install the additional optional dependencies:
+If you want parallelisation (``joblib``), progress bars (``tqdm``) or getdist
+compatibility (``getdist``), install the relevant optional dependencies:
 
 .. code:: bash
 
-   pip install joblib tqdm getdist
-   # or, equivalently
-   pip install -r  requirements.txt
+   pip install .[parallel,progress_bar,getdist_chains]
 
 You may encounter warnings if you don't have the optional dependency ``joblib``
 installed.
