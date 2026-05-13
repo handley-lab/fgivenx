@@ -74,7 +74,7 @@ def plot(x, y, z, ax=None, **kwargs):
     colors = kwargs.pop('colors', matplotlib.pyplot.cm.Reds_r)
     smooth = kwargs.pop('smooth', False)
 
-    linewidths = kwargs.pop('linewidths', 1.5)
+    linewidths = kwargs.pop('linewidths', 0.3)
     contour_line_levels = kwargs.pop('contour_line_levels', [1, 2, 3])
 
     fineness = kwargs.pop('fineness', 0.5)
