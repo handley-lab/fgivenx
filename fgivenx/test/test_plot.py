@@ -3,6 +3,7 @@ import pytest
 from fgivenx.plot import plot, plot_lines
 import matplotlib.pyplot as plt
 import matplotlib
+from matplotlib.testing.decorators import image_comparison, check_figures_equal
 
 
 def gen_plot_data():
@@ -16,6 +17,7 @@ def gen_plot_data():
     return x, y, z
 
 
+@image_comparison(baseline_images=['plot'], extensions=['pdf'], tol=5)
 def test_plot():
     x, y, z = gen_plot_data()
 
@@ -24,6 +26,7 @@ def test_plot():
     assert type(cbar) is matplotlib.contour.QuadContourSet
 
 
+@image_comparison(baseline_images=['plot_transparent'], extensions=['pdf'], tol=5)
 def test_plot_transparent():
     x, y, z = gen_plot_data()
 
@@ -31,6 +34,8 @@ def test_plot_transparent():
     cbar = plot(x, y, z, ax, alpha=0.7)
     assert type(cbar) is matplotlib.contour.QuadContourSet
 
+
+@image_comparison(baseline_images=['plot_fineness'], extensions=['pdf'], tol=5)
 def test_plot_fineness():
     x, y, z = gen_plot_data()
 
@@ -46,24 +51,33 @@ def test_plot_wrong_argument():
         plot(x, y, z, wrong_argument=None)
 
 
-def test_plot_no_ax():
-    plt.subplots()
+@check_figures_equal(extensions=['png'])
+def test_plot_no_ax(fig_test, fig_ref):
     x, y, z = gen_plot_data()
+
+    ax_ref = fig_ref.subplots()
+    plot(x, y, z, ax_ref)
+
+    ax_test = fig_test.subplots()
+    plt.sca(ax_test)  # plot() falls back to plt.gca(); make ax_test the current axes
     plot(x, y, z)
 
 
+@image_comparison(baseline_images=['plot_smooth'], extensions=['pdf'], tol=5)
 def test_plot_smooth():
     plt.subplots()
     x, y, z = gen_plot_data()
     plot(x, y, z, smooth=1)
 
 
+@image_comparison(baseline_images=['plot_rasterize'], extensions=['pdf'], tol=5)
 def test_plot_rasterize():
     plt.subplots()
     x, y, z = gen_plot_data()
     plot(x, y, z, rasterize_contours=True)
 
 
+@image_comparison(baseline_images=['plot_nolines'], extensions=['pdf'], tol=5)
 def test_plot_nolines():
     plt.subplots()
     x, y, z = gen_plot_data()
@@ -81,18 +95,28 @@ def gen_line_data():
     return x, fsamps
 
 
+@image_comparison(baseline_images=['plot_lines'], extensions=['pdf'], tol=5)
 def test_plot_lines():
     x, fsamps = gen_line_data()
     fig, ax = plt.subplots()
     plot_lines(x, fsamps, ax)
 
 
-def test_plot_lines_no_ax():
+@check_figures_equal(extensions=['png'])
+def test_plot_lines_no_ax(fig_test, fig_ref):
     x, fsamps = gen_line_data()
-    plt.subplots()
+
+    ax_ref = fig_ref.subplots()
+    numpy.random.seed(0)  # plot_lines downsamples randomly; reseed before each call
+    plot_lines(x, fsamps, ax_ref)
+
+    ax_test = fig_test.subplots()
+    plt.sca(ax_test)  # plot_lines() falls back to plt.gca(); make ax_test the current axes
+    numpy.random.seed(0)
     plot_lines(x, fsamps)
 
 
+@image_comparison(baseline_images=['plot_lines_downsample'], extensions=['pdf'], tol=5)
 def test_plot_lines_downsample():
     x, fsamps = gen_line_data()
     plt.subplots()
