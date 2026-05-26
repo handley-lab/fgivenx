@@ -3,7 +3,7 @@ fgivenx: Functional Posterior Plotter
 =====================================
 :fgivenx:  Functional Posterior Plotter 
 :Author: Will Handley
-:Version: 2.5.1
+:Version: 2.5.2
 :Homepage: https://github.com/handley-lab/fgivenx
 :Documentation: http://fgivenx.readthedocs.io/
 
@@ -105,7 +105,7 @@ Dependencies
 =============
 Basic requirements:
 
-* Python 3.9+
+* Python 3.10+
 * `matplotlib <https://pypi.org/project/matplotlib/>`__
 * `numpy <https://pypi.org/project/numpy/>`__
 * `scipy <https://pypi.org/project/scipy/>`__
