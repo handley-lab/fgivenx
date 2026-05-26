@@ -3,7 +3,7 @@ fgivenx: Functional Posterior Plotter
 =====================================
 :fgivenx:  Functional Posterior Plotter 
 :Author: Will Handley
-:Version: 2.5.0
+:Version: 2.5.1
 :Homepage: https://github.com/handley-lab/fgivenx
 :Documentation: http://fgivenx.readthedocs.io/
 
@@ -64,7 +64,7 @@ from source:
 
    git clone https://github.com/handley-lab/fgivenx
    cd fgivenx
-   python setup.py install --user
+   pip install .
 
 or for those on `Arch linux <https://www.archlinux.org/>`__ it is
 available on the
@@ -75,28 +75,28 @@ encounter warnings if the optional dependency ``joblib`` is not installed):
 
 .. code:: bash
 
-   pip install pytest pytest-runner pytest-mpl
+   pip install .[test]
    export MPLBACKEND=Agg
-   pytest <fgivenx-install-location>
-
-   # or, equivalently
-   git clone https://github.com/handley-lab/fgivenx
-   cd fgivenx
-   python setup.py test
+   pytest
 
 Check the dependencies listed in the next section are installed. You can then use the
 ``fgivenx`` module from your scripts.
 
 Some users of OSX or `Anaconda <https://en.wikipedia.org/wiki/Anaconda_(Python_distribution)>`__ may find ``QueueManagerThread`` errors if `Pillow <https://pypi.org/project/Pillow/>`__ is not installed (run ``pip install pillow``).
 
-If you want to use parallelisation, have progress bars or getdist compatibility
-you should install the additional optional dependencies:
+If you want parallelisation (``joblib``), progress bars (``tqdm``) or getdist
+compatibility (``getdist``), install the relevant optional dependencies:
 
 .. code:: bash
 
-   pip install joblib tqdm getdist
-   # or, equivalently
-   pip install -r  requirements.txt
+   pip install .[parallel,progress_bar,getdist_chains]
+
+To install everything (all optional extras plus docs and test dependencies),
+use the ``dev`` extra:
+
+.. code:: bash
+
+   pip install .[dev]
 
 You may encounter warnings if you don't have the optional dependency ``joblib``
 installed.
@@ -105,7 +105,7 @@ Dependencies
 =============
 Basic requirements:
 
-* Python 2.7+ or 3.4+
+* Python 3.9+
 * `matplotlib <https://pypi.org/project/matplotlib/>`__
 * `numpy <https://pypi.org/project/numpy/>`__
 * `scipy <https://pypi.org/project/scipy/>`__
@@ -295,8 +295,8 @@ Plot GetDist chains
 Contributing
 ============
 Want to contribute to ``fgivenx``? Awesome!
-There are many ways you can contribute via the 
-[GitHub repository](https://github.com/handley-lab/fgivenx), 
+There are many ways you can contribute via the
+`GitHub repository <https://github.com/handley-lab/fgivenx>`__,
 see below.
 
 Opening issues

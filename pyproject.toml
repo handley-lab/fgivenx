@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fgivenx"
+dynamic = ["version"]
+description = "fgivenx: Functional Posterior Plotter"
+readme = "README.rst"
+license = { text = "MIT" }
+authors = [{ name = "Will Handley", email = "wh260@cam.ac.uk" }]
+requires-python = ">=3.9"
+dependencies = ["matplotlib", "numpy", "scipy"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Natural Language :: English",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+[project.optional-dependencies]
+docs = ["sphinx", "sphinx_rtd_theme", "numpydoc"]
+parallel = ["joblib"]
+progress_bar = ["tqdm"]
+getdist_chains = ["getdist"]
+test = ["pytest", "pytest-mpl"]
+dev = ["fgivenx[docs]", "fgivenx[parallel]", "fgivenx[progress_bar]",
+       "fgivenx[getdist_chains]", "fgivenx[test]"]
+
+[project.urls]
+Homepage = "https://github.com/handley-lab/fgivenx"
+
+[tool.setuptools.dynamic]
+version = { attr = "fgivenx._version.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["fgivenx*"]
+
+[tool.setuptools.package-data]
+"fgivenx.test" = ["baseline_images/*.pdf"]

@@ -27,5 +27,6 @@ Example import and usage:
 >>> plot_contours(f, x, samples)
 """
 
+from fgivenx._version import __version__
 from fgivenx.drivers import plot_contours, plot_lines, plot_dkl
 from fgivenx.samples import samples_from_getdist_chains
